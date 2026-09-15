@@ -1,1 +1,20 @@
-/* You can add global styles to this file, and also import other style files */
+// ═══════════════════════════════════════════════════════════
+// ESTILOS GLOBALES — Clínica Salud Integral S.A.C.
+// ═══════════════════════════════════════════════════════════
+
+// ─── FUENTES ───────────────────────────────────────────────
+@import '@fontsource/poppins/400.css';
+@import '@fontsource/poppins/500.css';
+@import '@fontsource/poppins/600.css';
+@import '@fontsource/poppins/700.css';
+
+// ─── SISTEMA DE DISEÑO ─────────────────────────────────────
+@import 'styles/variables';
+@import 'styles/mixins';
+@import 'styles/typography';
+@import 'styles/buttons';
+@import 'styles/inputs';
+@import 'styles/cards';
+@import 'styles/badges';
+@import 'styles/tables';
+@import 'styles/layout';

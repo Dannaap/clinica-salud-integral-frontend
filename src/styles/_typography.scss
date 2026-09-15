@@ -1,0 +1,186 @@
+// ═══════════════════════════════════════════════════════════
+// TIPOGRAFÍA — Clínica Salud Integral S.A.C.
+// ═══════════════════════════════════════════════════════════
+body {
+  font-family: $font-family;
+  font-size: $font-size-base;
+  font-weight: $font-weight-regular;
+  line-height: $line-height-base;
+  color: $neutral-900;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// ─── HEADINGS ──────────────────────────────────────────────
+h1, .h1 {
+  font-family: $font-family;
+  font-size: $font-size-5xl;      // 40px
+  font-weight: $font-weight-bold;
+  line-height: $line-height-tight;
+  color: $neutral-900;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+h2, .h2 {
+  font-family: $font-family;
+  font-size: $font-size-4xl;      // 32px
+  font-weight: $font-weight-bold;
+  line-height: $line-height-tight;
+  color: $neutral-900;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+h3, .h3 {
+  font-family: $font-family;
+  font-size: $font-size-3xl;      // 28px
+  font-weight: $font-weight-semibold;
+  line-height: $line-height-tight;
+  color: $neutral-900;
+  margin: 0;
+}
+
+h4, .h4 {
+  font-family: $font-family;
+  font-size: $font-size-2xl;      // 22px
+  font-weight: $font-weight-semibold;
+  line-height: $line-height-tight;
+  color: $neutral-900;
+  margin: 0;
+}
+
+h5, .h5 {
+  font-family: $font-family;
+  font-size: $font-size-xl;       // 20px
+  font-weight: $font-weight-semibold;
+  line-height: $line-height-tight;
+  color: $neutral-900;
+  margin: 0;
+}
+
+h6, .h6 {
+  font-family: $font-family;
+  font-size: $font-size-lg;       // 18px
+  font-weight: $font-weight-semibold;
+  line-height: $line-height-tight;
+  color: $neutral-900;
+  margin: 0;
+}
+
+// ─── PÁRRAFOS ──────────────────────────────────────────────
+p, .p {
+  font-size: $font-size-base;
+  font-weight: $font-weight-regular;
+  line-height: $line-height-base;
+  color: $neutral-700;
+  margin: 0;
+}
+
+// ─── TEXTO SECUNDARIO Y AUXILIAR ───────────────────────────
+.text-secondary {
+  color: $neutral-700;
+}
+
+.text-muted {
+  color: $neutral-700;
+  opacity: 0.7;
+}
+
+.text-small {
+  font-size: $font-size-sm;
+}
+
+.text-xs {
+  font-size: $font-size-xs;
+}
+
+// ─── PESOS ─────────────────────────────────────────────────
+.text-regular  { font-weight: $font-weight-regular; }
+.text-medium   { font-weight: $font-weight-medium; }
+.text-semibold { font-weight: $font-weight-semibold; }
+.text-bold     { font-weight: $font-weight-bold; }
+
+// ─── COLORES DE TEXTO ──────────────────────────────────────
+.text-primary   { color: $primary; }
+.text-success   { color: $secondary; }
+.text-warning   { color: $warning; }
+.text-danger    { color: $danger; }
+.text-white     { color: $white; }
+
+// ─── ALINEACIÓN ────────────────────────────────────────────
+.text-left     { text-align: left; }
+.text-center   { text-align: center; }
+.text-right    { text-align: right; }
+
+// ─── LINKS ─────────────────────────────────────────────────
+a, .link {
+  color: $primary;
+  text-decoration: none;
+  font-weight: $font-weight-medium;
+  transition: color $transition-fast;
+
+  &:hover {
+    color: $primary-dark;
+    text-decoration: underline;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $primary;
+    outline-offset: 2px;
+    border-radius: $radius-sm;
+  }
+}
+
+// ─── LABELS ────────────────────────────────────────────────
+label, .label {
+  display: block;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $neutral-700;
+  margin-bottom: $space-2;
+}
+
+// ─── CÓDIGO ────────────────────────────────────────────────
+code, .code {
+  font-family: 'Courier New', monospace;
+  font-size: $font-size-sm;
+  background-color: $neutral-100;
+  padding: 2px 6px;
+  border-radius: $radius-sm;
+  color: $danger;
+}
+
+// ─── UTILIDADES DE ESPACIADO DE TEXTO ──────────────────────
+.text-uppercase {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.text-truncate {
+  @include truncate;
+}
+
+// ─── HEADING DE PÁGINA (para títulos de vista) ─────────────
+.page-title {
+  font-size: $font-size-3xl;   // 28px
+  font-weight: $font-weight-bold;
+  color: $neutral-900;
+  line-height: $line-height-tight;
+  margin: 0;
+}
+
+.page-subtitle {
+  font-size: $font-size-base;
+  font-weight: $font-weight-regular;
+  color: $neutral-700;
+  margin-top: $space-1;
+}
+
+// ─── SECTION TITLE (para títulos de cards) ─────────────────
+.section-title {
+  font-size: $font-size-lg;    // 18px
+  font-weight: $font-weight-semibold;
+  color: $neutral-900;
+  margin: 0;
+}

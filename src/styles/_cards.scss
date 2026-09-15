@@ -1,0 +1,340 @@
+// ═══════════════════════════════════════════════════════════
+// CARDS — Clínica Salud Integral S.A.C.
+// ═══════════════════════════════════════════════════════════
+// ─── CARD BASE ─────────────────────────────────────────────
+.card {
+  @include card;
+
+  & + .card {
+    margin-top: $space-6;
+  }
+}
+
+// ─── CARD CON HOVER ────────────────────────────────────────
+.card-hover {
+  @include card;
+  @include hover-lift;
+  cursor: pointer;
+}
+
+// ─── CARD SIN PADDING (para tablas) ────────────────────────
+.card-flush {
+  @include card;
+  padding: 0;
+  overflow: hidden;
+}
+
+// ─── CARD HEADER ───────────────────────────────────────────
+.card-header {
+  @include flex-between;
+  margin-bottom: $space-5;
+
+  .card-title {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $neutral-900;
+    margin: 0;
+  }
+
+  .card-link {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    color: $primary;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.card-title {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $neutral-900;
+  margin: 0 0 $space-4 0;
+}
+
+// ─── CARD BODY ─────────────────────────────────────────────
+.card-body {
+  color: $neutral-700;
+  font-size: $font-size-base;
+}
+
+// ─── CARD FOOTER ───────────────────────────────────────────
+.card-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: $space-3;
+  padding-top: $space-5;
+  margin-top: $space-5;
+  border-top: 1px solid $neutral-400;
+}
+
+// ─── KPI CARD (para Dashboards) ────────────────────────────
+.kpi-card {
+  @include card;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $space-4;
+
+  .kpi-content {
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+  }
+
+  .kpi-label {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    color: $neutral-700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .kpi-value {
+    font-size: $font-size-4xl;    // 32px
+    font-weight: $font-weight-bold;
+    color: $primary;
+    line-height: 1;
+    margin: $space-2 0;
+  }
+
+  .kpi-meta {
+    font-size: $font-size-xs;
+    color: $neutral-700;
+
+    &.is-success { color: $secondary; }
+    &.is-danger  { color: $danger; }
+    &.is-warning { color: $warning; }
+  }
+
+  .kpi-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: $radius-md;
+    background-color: $primary-light;
+    color: $primary;
+    flex-shrink: 0;
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    &.is-warning {
+      background-color: $badge-pendiente-bg;
+      color: $badge-pendiente-fg;
+    }
+
+    &.is-success {
+      background-color: $badge-confirmada-bg;
+      color: $badge-confirmada-fg;
+    }
+
+    &.is-danger {
+      background-color: $badge-cancelada-bg;
+      color: $badge-cancelada-fg;
+    }
+  }
+}
+
+// ─── QUICK ACCESS CARD (accesos rápidos) ───────────────────
+.quick-access-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $space-3;
+  padding: $space-5;
+  background-color: $neutral-100;
+  border-radius: $radius-md;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all $transition-normal;
+  text-decoration: none;
+
+  &:hover {
+    background-color: $primary-light;
+    border-color: $primary;
+    transform: translateY(-2px);
+
+    .quick-access-icon {
+      background-color: $primary;
+      color: $white;
+    }
+  }
+
+  .quick-access-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: $radius-md;
+    background-color: $white;
+    color: $primary;
+    transition: all $transition-normal;
+
+    svg {
+      width: 22px;
+      height: 22px;
+    }
+  }
+
+  .quick-access-label {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    color: $neutral-900;
+    text-align: center;
+  }
+}
+
+// ─── BANNER CARD (grande con gradiente) ────────────────────
+.banner-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-6;
+  padding: $space-6;
+  background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
+  border-radius: $radius-lg;
+  color: $white;
+
+  .banner-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: $radius-md;
+    background-color: rgba($white, 0.2);
+    color: $white;
+    flex-shrink: 0;
+
+    svg {
+      width: 28px;
+      height: 28px;
+    }
+  }
+
+  .banner-content {
+    flex: 1;
+
+    .banner-label {
+      font-size: $font-size-xs;
+      font-weight: $font-weight-medium;
+      letter-spacing: 0.1em;
+      color: rgba($white, 0.8);
+      text-transform: uppercase;
+      margin-bottom: $space-1;
+    }
+
+    .banner-title {
+      font-size: $font-size-2xl;
+      font-weight: $font-weight-bold;
+      color: $white;
+      margin: 0;
+    }
+
+    .banner-subtitle {
+      font-size: $font-size-sm;
+      color: rgba($white, 0.9);
+      margin-top: $space-1;
+    }
+  }
+
+  .banner-action {
+    .btn {
+      background-color: $white;
+      color: $primary;
+      border: none;
+
+      &:hover {
+        background-color: $neutral-100;
+      }
+    }
+  }
+}
+
+// ─── PATIENT CARD (mis pacientes) ──────────────────────────
+.patient-card {
+  @include card;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: $space-3;
+  @include hover-lift;
+
+  .patient-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: $primary-light;
+    color: $primary;
+    font-weight: $font-weight-semibold;
+    font-size: $font-size-lg;
+  }
+
+  .patient-name {
+    font-size: $font-size-md;
+    font-weight: $font-weight-semibold;
+    color: $neutral-900;
+    margin: 0;
+  }
+
+  .patient-meta {
+    font-size: $font-size-xs;
+    color: $neutral-700;
+    margin: 0;
+  }
+
+  .patient-action {
+    margin-top: $space-2;
+  }
+}
+
+// ─── DOCTOR CARD (equipo médico) ───────────────────────────
+.doctor-card {
+  @include card;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: $space-2;
+  @include hover-lift;
+
+  .doctor-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: $primary-light;
+    margin-bottom: $space-2;
+  }
+
+  .doctor-name {
+    font-size: $font-size-md;
+    font-weight: $font-weight-semibold;
+    color: $neutral-900;
+    margin: 0;
+  }
+
+  .doctor-specialty {
+    font-size: $font-size-sm;
+    color: $neutral-700;
+    margin: 0;
+  }
+
+  .doctor-action {
+    margin-top: $space-3;
+  }
+}

@@ -1,0 +1,198 @@
+// ═══════════════════════════════════════════════════════════
+// BOTONES — Clínica Salud Integral S.A.C.
+// ═══════════════════════════════════════════════════════════
+// ─── BOTÓN BASE ────────────────────────────────────────────
+.btn {
+  @include button-base;
+}
+
+// ─── VARIANTES ─────────────────────────────────────────────
+
+// Botón primario (relleno azul)
+.btn-primary {
+  @include button-base;
+  background-color: $primary;
+  color: $white;
+  box-shadow: $shadow-primary;
+
+  &:hover:not(:disabled) {
+    background-color: $primary-dark;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(11, 94, 215, 0.35);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: $shadow-primary;
+  }
+}
+
+// Botón secundario (outline azul)
+.btn-secondary {
+  @include button-base;
+  background-color: transparent;
+  color: $primary;
+  border: 1.5px solid $primary;
+
+  &:hover:not(:disabled) {
+    background-color: $primary-light;
+  }
+}
+
+// Botón outline gris (cancelar, volver)
+.btn-outline {
+  @include button-base;
+  background-color: $white;
+  color: $neutral-700;
+  border: 1.5px solid $neutral-400;
+
+  &:hover:not(:disabled) {
+    background-color: $neutral-100;
+    border-color: $neutral-700;
+  }
+}
+
+// Botón de peligro (eliminar, cancelar)
+.btn-danger {
+  @include button-base;
+  background-color: $danger;
+  color: $white;
+
+  &:hover:not(:disabled) {
+    background-color: darken($danger, 8%);
+    transform: translateY(-1px);
+  }
+}
+
+// Botón de éxito
+.btn-success {
+  @include button-base;
+  background-color: $secondary;
+  color: $white;
+
+  &:hover:not(:disabled) {
+    background-color: darken($secondary, 8%);
+    transform: translateY(-1px);
+  }
+}
+
+// Botón ghost (sin fondo, sin borde)
+.btn-ghost {
+  @include button-base;
+  background-color: transparent;
+  color: $primary;
+  padding: 8px 12px;
+
+  &:hover:not(:disabled) {
+    background-color: $primary-light;
+  }
+}
+
+// ─── TAMAÑOS ───────────────────────────────────────────────
+
+// Botón grande (banners, CTAs)
+.btn-lg {
+  height: 52px;
+  padding: 0 28px;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+}
+
+// Botón pequeño (acciones de tabla)
+.btn-sm {
+  height: 36px;
+  padding: 0 16px;
+  font-size: $font-size-sm;
+}
+
+// Botón extra pequeño (chips)
+.btn-xs {
+  height: 30px;
+  padding: 0 12px;
+  font-size: $font-size-xs;
+}
+
+// ─── ANCHO COMPLETO ────────────────────────────────────────
+.btn-block {
+  display: flex;
+  width: 100%;
+}
+
+// ─── BOTÓN CON ÍCONO ───────────────────────────────────────
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: $radius-md;
+  background-color: $neutral-100;
+  color: $neutral-700;
+  border: none;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    background-color: $primary-light;
+    color: $primary;
+  }
+
+  &.btn-icon-sm {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+// ─── BOTÓN DE CARGA (loading) ──────────────────────────────
+.btn-loading {
+  position: relative;
+  color: transparent !important;
+  pointer-events: none;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin-top: -10px;
+    margin-left: -10px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: $white;
+    border-radius: 50%;
+    animation: btn-spin 0.6s linear infinite;
+  }
+}
+
+@keyframes btn-spin {
+  to { transform: rotate(360deg); }
+}
+
+// ─── GRUPO DE BOTONES ──────────────────────────────────────
+.btn-group {
+  display: inline-flex;
+  gap: $space-2;
+}
+
+// ─── BOTONES DE ACCIÓN DE TABLA ────────────────────────────
+.btn-action {
+  @include icon-button(32px);
+  background-color: transparent;
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  &:hover {
+    background-color: $primary-light;
+    color: $primary;
+  }
+
+  &.btn-action-danger:hover {
+    background-color: rgba($danger, 0.1);
+    color: $danger;
+  }
+}

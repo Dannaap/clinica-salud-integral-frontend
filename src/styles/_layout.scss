@@ -1,0 +1,396 @@
+// ═══════════════════════════════════════════════════════════
+// LAYOUT — Clínica Salud Integral S.A.C.
+// ═══════════════════════════════════════════════════════════
+// ─── RESET ─────────────────────────────────────────────────
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background-color: $neutral-100;
+}
+
+// ─── APP SHELL (contenedor principal) ──────────────────────
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+  background-color: $neutral-100;
+}
+
+// ─── SIDEBAR ───────────────────────────────────────────────
+.sidebar {
+  width: $sidebar-width;
+  min-height: 100vh;
+  background-color: $primary;
+  display: flex;
+  flex-direction: column;
+  padding: $space-5 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: $z-fixed;
+  transition: width $transition-normal;
+
+  // ─── LOGO ──────────────────────────────────────────────
+  .sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    padding: 0 $space-5 $space-5;
+    border-bottom: 1px solid rgba($white, 0.15);
+    margin-bottom: $space-5;
+
+    .logo-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: $radius-md;
+      background-color: rgba($white, 0.15);
+      color: $white;
+
+      svg {
+        width: 22px;
+        height: 22px;
+      }
+    }
+
+    .logo-text {
+      font-size: $font-size-base;
+      font-weight: $font-weight-bold;
+      color: $white;
+      line-height: 1.2;
+    }
+  }
+
+  // ─── MENÚ ──────────────────────────────────────────────
+  .sidebar-menu {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+    padding: 0 $space-3;
+    overflow-y: auto;
+    @include custom-scrollbar;
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: $space-3;
+      height: 48px;
+      padding: 0 $space-4;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-medium;
+      color: rgba($white, 0.9);
+      text-decoration: none;
+      border-radius: $radius-md;
+      transition: all $transition-fast;
+      cursor: pointer;
+
+      svg {
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+      }
+
+      &:hover {
+        background-color: rgba($white, 0.15);
+        color: $white;
+      }
+
+      &.is-active {
+        background-color: rgba($white, 0.2);
+        color: $white;
+        border-left: 3px solid $white;
+        padding-left: 13px;
+      }
+    }
+  }
+
+  // ─── MINI PERFIL AL PIE ────────────────────────────────
+  .sidebar-profile {
+    @include flex-between;
+    gap: $space-3;
+    margin: $space-5 $space-3 0;
+    padding: $space-3;
+    background-color: rgba($white, 0.15);
+    border-radius: $radius-md;
+
+    .profile-avatar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: rgba($white, 0.25);
+      color: $white;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-semibold;
+      flex-shrink: 0;
+    }
+
+    .profile-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+
+      .profile-name {
+        font-size: $font-size-sm;
+        font-weight: $font-weight-semibold;
+        color: $white;
+        @include truncate;
+      }
+
+      .profile-role {
+        font-size: $font-size-xs;
+        color: rgba($white, 0.7);
+      }
+    }
+
+    .profile-logout {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: none;
+      color: rgba($white, 0.8);
+      cursor: pointer;
+      border-radius: $radius-sm;
+      transition: all $transition-fast;
+
+      &:hover {
+        background-color: rgba($white, 0.2);
+        color: $white;
+      }
+
+      svg {
+        width: 18px;
+        height: 18px;
+      }
+    }
+  }
+}
+
+// ─── MAIN CONTENT (área a la derecha del sidebar) ──────────
+.main-content {
+  flex: 1;
+  margin-left: $sidebar-width;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  transition: margin-left $transition-normal;
+}
+
+// ─── HEADER ────────────────────────────────────────────────
+.header {
+  @include flex-between;
+  height: $header-height;
+  padding: 0 $space-7;
+  background-color: $white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  position: sticky;
+  top: 0;
+  z-index: $z-sticky;
+
+  // ─── TÍTULO ────────────────────────────────────────────
+  .header-title {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    .title-main {
+      font-size: $font-size-xl;
+      font-weight: $font-weight-semibold;
+      color: $neutral-900;
+      margin: 0;
+    }
+
+    .title-subtitle {
+      font-size: $font-size-xs;
+      color: $neutral-700;
+      margin: 0;
+    }
+  }
+
+  // ─── BUSCADOR ──────────────────────────────────────────
+  .header-search {
+    flex: 1;
+    max-width: 400px;
+    margin: 0 $space-6;
+  }
+
+  // ─── ACCIONES ──────────────────────────────────────────
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: $space-4;
+
+    .notification-btn {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: $radius-md;
+      background-color: transparent;
+      border: none;
+      color: $neutral-700;
+      cursor: pointer;
+      transition: all $transition-fast;
+
+      &:hover {
+        background-color: $neutral-100;
+        color: $primary;
+      }
+
+      svg {
+        width: 20px;
+        height: 20px;
+      }
+
+      .badge-count {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+      }
+    }
+
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: $space-3;
+      padding: $space-1 $space-2;
+      border-radius: $radius-md;
+      cursor: pointer;
+      transition: background-color $transition-fast;
+
+      &:hover {
+        background-color: $neutral-100;
+      }
+
+      .user-avatar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background-color: $primary-light;
+        color: $primary;
+        font-size: $font-size-sm;
+        font-weight: $font-weight-semibold;
+      }
+
+      .user-name {
+        font-size: $font-size-sm;
+        font-weight: $font-weight-medium;
+        color: $neutral-900;
+      }
+
+      .user-arrow {
+        color: $neutral-700;
+
+        svg {
+          width: 16px;
+          height: 16px;
+        }
+      }
+    }
+  }
+}
+
+// ─── PAGE CONTENT (contenido scrolleable) ──────────────────
+.page-content {
+  flex: 1;
+  padding: $container-padding;
+  background-color: $neutral-100;
+  @include custom-scrollbar;
+}
+
+// ─── BREADCRUMB ────────────────────────────────────────────
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  font-size: $font-size-xs;
+  color: $neutral-700;
+  margin-bottom: $space-4;
+
+  .breadcrumb-item {
+    color: $neutral-700;
+    text-decoration: none;
+
+    &:hover {
+      color: $primary;
+    }
+
+    &.is-active {
+      color: $primary;
+      font-weight: $font-weight-medium;
+    }
+  }
+
+  .breadcrumb-separator {
+    color: $neutral-400;
+  }
+}
+
+// ─── PAGE HEADER (título + acciones) ───────────────────────
+.page-header {
+  @include flex-between;
+  gap: $space-5;
+  margin-bottom: $space-6;
+
+  .page-header-title {
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+  }
+
+  .page-header-actions {
+    display: flex;
+    gap: $space-3;
+    flex-shrink: 0;
+  }
+}
+
+// ─── GRID HELPERS ──────────────────────────────────────────
+.grid-2 { @include grid(2, $space-6); }
+.grid-3 { @include grid(3, $space-6); }
+.grid-4 { @include grid(4, $space-6); }
+
+@include tablet {
+  .grid-4 { @include grid(2, $space-5); }
+  .grid-3 { @include grid(1, $space-5); }
+}
+
+@include mobile {
+  .grid-2 { @include grid(1, $space-4); }
+}
+
+// ─── RESPONSIVE SIDEBAR ────────────────────────────────────
+@include tablet {
+  .sidebar {
+    width: $sidebar-width-collapsed;
+
+    .sidebar-logo .logo-text,
+    .sidebar-menu .menu-item span,
+    .sidebar-profile .profile-info {
+      display: none;
+    }
+  }
+
+  .main-content {
+    margin-left: $sidebar-width-collapsed;
+  }
+}
