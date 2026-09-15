@@ -1,4 +1,4 @@
-# 🎨 Frontend — Clínica Salud Integral S.A.C.
+# 🎨 Frontend — Clínica Salud Integral S.A.C. 
 
 Aplicación web SPA construida con **Angular 20 + SASS** para la intranet de la **Clínica Salud Integral S.A.C.**
 
