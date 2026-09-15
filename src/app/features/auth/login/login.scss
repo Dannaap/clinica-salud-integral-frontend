@@ -1,0 +1,497 @@
+// ═══════════════════════════════════════════════════════════
+// LOGIN — Clínica Salud Integral S.A.C.
+// ═══════════════════════════════════════════════════════════
+
+// ─── IMPORTAR VARIABLES Y MIXINS GLOBALES ─────────────────
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+// ═══════════════════════════════════════════════════════════
+// WRAPPER PRINCIPAL
+// ═══════════════════════════════════════════════════════════
+.login-wrapper {
+  display: flex;
+  min-height: 100vh;
+  background-color: $white;
+}
+
+// ═══════════════════════════════════════════════════════════
+// PANEL IZQUIERDO — BRANDING
+// ═══════════════════════════════════════════════════════════
+.login-branding {
+  flex: 0 0 55%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: $space-7;
+  background:
+    linear-gradient(
+      135deg,
+      rgba($primary, 0.92) 0%,
+      rgba($primary-dark, 0.95) 100%
+    ),
+    url('https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=1600&q=80')
+      center / cover no-repeat;
+  color: $white;
+  overflow: hidden;
+
+  // ─── DECORACIÓN: círculos sutiles ────────────────────────
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    background: rgba($white, 0.06);
+    pointer-events: none;
+  }
+
+  &::before {
+    width: 380px;
+    height: 380px;
+    top: -100px;
+    right: -100px;
+  }
+
+  &::after {
+    width: 280px;
+    height: 280px;
+    bottom: -80px;
+    left: -80px;
+  }
+
+  // ─── HEADER (logo) ───────────────────────────────────────
+  .branding-header {
+    position: relative;
+    z-index: 2;
+
+    .branding-logo {
+      display: flex;
+      align-items: center;
+      gap: $space-3;
+
+      lucide-icon {
+        display: inline-flex;
+
+        svg {
+          width: 32px;
+          height: 32px;
+        }
+      }
+
+      .branding-logo-text {
+        font-size: $font-size-base;
+        font-weight: $font-weight-bold;
+        color: $white;
+      }
+    }
+  }
+
+  // ─── CONTENIDO CENTRAL ───────────────────────────────────
+  .branding-content {
+    position: relative;
+    z-index: 2;
+    max-width: 520px;
+
+    .branding-title {
+      font-size: 40px;
+      font-weight: $font-weight-bold;
+      line-height: 1.15;
+      color: $white;
+      margin: 0 0 $space-4;
+      letter-spacing: -0.02em;
+    }
+
+    .branding-subtitle {
+      font-size: $font-size-md;
+      color: rgba($white, 0.9);
+      margin: 0 0 $space-8;
+      line-height: 1.5;
+    }
+
+    .branding-features {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: $space-4;
+
+      .feature-item {
+        display: flex;
+        align-items: center;
+        gap: $space-3;
+        font-size: $font-size-sm;
+        color: rgba($white, 0.95);
+
+        lucide-icon {
+          display: inline-flex;
+          flex-shrink: 0;
+
+          svg {
+            width: 20px;
+            height: 20px;
+          }
+        }
+      }
+    }
+  }
+
+  // ─── FOOTER ──────────────────────────────────────────────
+  .branding-footer {
+    position: relative;
+    z-index: 2;
+    font-size: $font-size-xs;
+    color: rgba($white, 0.6);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// PANEL DERECHO — FORMULARIO
+// ═══════════════════════════════════════════════════════════
+.login-form-panel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $space-7;
+  background-color: $white;
+
+  .login-form-container {
+    width: 100%;
+    max-width: 420px;
+  }
+
+  // ─── HEADER FORM ─────────────────────────────────────────
+  .form-header {
+    margin-bottom: $space-7;
+
+    .form-title {
+      font-size: $font-size-4xl;
+      font-weight: $font-weight-bold;
+      color: $neutral-900;
+      margin: 0 0 $space-2;
+      letter-spacing: -0.02em;
+    }
+
+    .form-subtitle {
+      font-size: $font-size-base;
+      color: $neutral-700;
+      margin: 0;
+      line-height: 1.5;
+    }
+  }
+
+  // ─── FORM ────────────────────────────────────────────────
+  .login-form {
+    display: flex;
+    flex-direction: column;
+    gap: $space-5;
+  }
+
+  // ─── FORM GROUP ──────────────────────────────────────────
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .form-label {
+    display: block;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    color: $neutral-700;
+    margin-bottom: $space-2;
+  }
+
+  .form-control {
+    width: 100%;
+    height: 48px;
+    padding: 0 $space-3;
+    font-family: $font-family;
+    font-size: $font-size-base;
+    color: $neutral-900;
+    background-color: $white;
+    border: 1px solid $neutral-400;
+    border-radius: $radius-md;
+    outline: none;
+    transition: border-color 150ms ease-in-out, box-shadow 150ms ease-in-out;
+
+    &::placeholder {
+      color: $neutral-700;
+      opacity: 0.6;
+    }
+
+    &:focus {
+      border-color: $primary;
+      box-shadow: 0 0 0 4px rgba($primary, 0.15);
+    }
+
+    &.is-invalid {
+      border-color: $danger;
+
+      &:focus {
+        box-shadow: 0 0 0 4px rgba($danger, 0.15);
+      }
+    }
+  }
+
+  // ─── INPUT CON ÍCONOS ────────────────────────────────────
+  .input-icon-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    .input-icon-left {
+      position: absolute;
+      left: 16px;
+      color: $neutral-700;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+
+      svg {
+        width: 18px;
+        height: 18px;
+      }
+    }
+
+    .input-icon-right {
+      position: absolute;
+      right: 12px;
+      color: $neutral-700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      padding: 4px;
+      background: none;
+      border: none;
+      transition: color 150ms ease-in-out;
+
+      &:hover {
+        color: $primary;
+      }
+
+      svg {
+        width: 18px;
+        height: 18px;
+      }
+    }
+
+    .form-control {
+      padding-left: 48px;
+    }
+
+    &.has-icon-right .form-control {
+      padding-right: 48px;
+    }
+  }
+
+  // ─── MENSAJE DE ERROR ────────────────────────────────────
+  .form-error {
+    display: block;
+    font-size: $font-size-xs;
+    color: $danger;
+    margin-top: $space-1;
+  }
+
+  // ─── OPCIONES (recordarme + olvidé) ──────────────────────
+  .form-options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-3;
+
+    .form-checkbox {
+      display: inline-flex;
+      align-items: center;
+      gap: $space-2;
+      font-size: $font-size-sm;
+      color: $neutral-700;
+      cursor: pointer;
+
+      input[type='checkbox'] {
+        width: 18px;
+        height: 18px;
+        accent-color: $primary;
+        cursor: pointer;
+      }
+    }
+
+    .form-link {
+      font-size: $font-size-sm;
+      color: $primary;
+      text-decoration: none;
+      font-weight: $font-weight-medium;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  // ─── ALERTA DE ERROR ─────────────────────────────────────
+  .form-alert-error {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    padding: $space-3 $space-4;
+    background-color: rgba($danger, 0.08);
+    border: 1px solid rgba($danger, 0.25);
+    border-radius: $radius-md;
+    color: $danger;
+    font-size: $font-size-sm;
+
+    lucide-icon {
+      display: inline-flex;
+      flex-shrink: 0;
+
+      svg {
+        width: 18px;
+        height: 18px;
+      }
+    }
+  }
+
+  // ─── BOTÓN ───────────────────────────────────────────────
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: $space-2;
+    font-family: $font-family;
+    font-size: $font-size-base;
+    font-weight: $font-weight-medium;
+    border-radius: $radius-md;
+    border: none;
+    padding: 12px 24px;
+    cursor: pointer;
+    transition: all 250ms ease-in-out;
+    text-decoration: none;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  .btn-primary {
+    background-color: $primary;
+    color: $white;
+    box-shadow: 0 2px 6px rgba($primary, 0.25);
+
+    &:hover:not(:disabled) {
+      background-color: $primary-dark;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba($primary, 0.35);
+    }
+  }
+
+  .btn-secondary {
+    background-color: transparent;
+    color: $primary;
+    border: 1.5px solid $primary;
+
+    &:hover:not(:disabled) {
+      background-color: $primary-light;
+    }
+  }
+
+  .btn-block {
+    width: 100%;
+  }
+
+  .btn-lg {
+    height: 52px;
+    font-size: $font-size-md;
+    font-weight: $font-weight-semibold;
+  }
+
+  .btn-loading {
+    position: relative;
+    color: transparent !important;
+    pointer-events: none;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      margin-top: -10px;
+      margin-left: -10px;
+      border: 2px solid rgba($white, 0.3);
+      border-top-color: $white;
+      border-radius: 50%;
+      animation: btn-spin 0.6s linear infinite;
+    }
+  }
+
+  @keyframes btn-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  // ─── SEPARADOR ───────────────────────────────────────────
+  .form-separator {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    color: $neutral-700;
+    font-size: $font-size-xs;
+
+    &::before,
+    &::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background-color: $neutral-400;
+    }
+  }
+
+  // ─── FOOTER FORM ─────────────────────────────────────────
+  .form-footer {
+    margin-top: $space-7;
+    text-align: center;
+    font-size: $font-size-xs;
+    color: $neutral-700;
+
+    a {
+      color: $primary;
+      text-decoration: none;
+      font-weight: $font-weight-medium;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// RESPONSIVE
+// ═══════════════════════════════════════════════════════════
+
+// Tablet: ocultar panel izquierdo
+@media (max-width: 1024px) {
+  .login-branding {
+    display: none;
+  }
+
+  .login-form-panel {
+    flex: 1;
+    padding: $space-6;
+  }
+}
+
+// Mobile: ajustar padding y títulos
+@media (max-width: 640px) {
+  .login-form-panel {
+    padding: $space-5;
+
+    .form-header .form-title {
+      font-size: $font-size-3xl;
+    }
+  }
+}
