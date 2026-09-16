@@ -1,6 +1,6 @@
-# 🎨 Frontend — Clínica Salud Integral S.A.C.
+# 🎨 Frontend — Clínica Salud Integral S.A.C. 
 
-Aplicación web SPA construida con **Angular 17 + SASS** para la intranet de la **Clínica Salud Integral S.A.C.**
+Aplicación web SPA construida con **Angular 20 + SASS** para la intranet de la **Clínica Salud Integral S.A.C.**
 
 Interfaz de usuario para el personal de la clínica que consume la API REST del backend.
 
@@ -43,7 +43,7 @@ Proporcionar una interfaz ágil, intuitiva y responsive para que el personal de 
 
 | Capa | Tecnología |
 |---|---|
-| Framework | Angular 17 |
+| Framework | Angular 20 |
 | Lenguaje | TypeScript |
 | Estilos | SASS (SCSS) |
 | Estado | RxJS |
