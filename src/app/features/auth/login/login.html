@@ -1,20 +1,26 @@
 <div class="login-wrapper">
 
-  <!-- ═══════════ PANEL IZQUIERDO — BRANDING ═══════════ -->
   <aside class="login-branding">
 
-    <!-- Logo arriba -->
     <header class="branding-header">
       <div class="branding-logo">
-        <lucide-icon [img]="iconHeartPulse"></lucide-icon>
-        <span class="branding-logo-text">Clínica Salud Integral S.A.C.</span>
+        <img
+          src="logo.png"
+          alt="Clínica Salud Integral S.A.C."
+          class="branding-logo-img"
+        />
       </div>
     </header>
 
-    <!-- Contenido central -->
     <div class="branding-content">
-      <h1 class="branding-title">Clínica Salud Integral S.A.C.</h1>
-      <p class="branding-subtitle">Sistema de Gestión de Citas y Atenciones Médicas</p>
+      <h1 class="branding-title">
+        Tu salud,<br>
+        <span class="branding-title-accent">nuestra prioridad</span>
+      </h1>
+      <p class="branding-subtitle">
+        Gestiona citas, pacientes e historias clínicas desde un solo lugar,
+        de forma rápida y segura.
+      </p>
 
       <ul class="branding-features">
         <li class="feature-item">
@@ -32,33 +38,30 @@
       </ul>
     </div>
 
-    <!-- Pie del panel -->
     <footer class="branding-footer">
       <span>© 2026 Clínica Salud Integral S.A.C. — v1.0</span>
     </footer>
 
   </aside>
 
-  <!-- ═══════════ PANEL DERECHO — FORMULARIO ═══════════ -->
   <main class="login-form-panel">
 
     <div class="login-form-container">
 
-      <!-- Título -->
       <header class="form-header">
         <h2 class="form-title">Bienvenido de nuevo</h2>
         <p class="form-subtitle">Ingresa tus credenciales para acceder al sistema</p>
       </header>
 
-      <!-- Formulario -->
       <form [formGroup]="formLogin" (ngSubmit)="onSubmit()" class="login-form">
 
-        <!-- Campo: Usuario -->
         <div class="form-group">
-          <label class="form-label" for="email">Usuario o correo</label>
+          <label class="form-label" for="email">
+            Correo electrónico <span class="required">*</span>
+          </label>
           <div class="input-icon-wrapper">
             <span class="input-icon-left">
-              <lucide-icon [img]="iconUser"></lucide-icon>
+              <lucide-icon [img]="iconMail"></lucide-icon>
             </span>
             <input
               id="email"
@@ -66,7 +69,7 @@
               class="form-control"
               [class.is-invalid]="email.invalid && email.touched"
               formControlName="email"
-              placeholder="ej. admin@clinica.com"
+              placeholder="tucorreo@clinica.com"
               autocomplete="email"
             />
           </div>
@@ -78,37 +81,86 @@
           }
         </div>
 
-        <!-- Campo: Contraseña -->
         <div class="form-group">
-          <label class="form-label" for="password">Contraseña</label>
-          <div class="input-icon-wrapper has-icon-right">
-            <span class="input-icon-left">
-              <lucide-icon [img]="iconLock"></lucide-icon>
-            </span>
-            <input
-              id="password"
-              [type]="mostrarPassword() ? 'text' : 'password'"
-              class="form-control"
-              [class.is-invalid]="password.invalid && password.touched"
-              formControlName="password"
-              placeholder="••••••••"
-              autocomplete="current-password"
-            />
-            <button
-              type="button"
-              class="input-icon-right"
-              (click)="togglePassword()"
-              [attr.aria-label]="mostrarPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
-            >
-              <lucide-icon [img]="mostrarPassword() ? iconEye : iconEyeOff"></lucide-icon>
-            </button>
+          <label class="form-label" for="password">
+            Contraseña <span class="required">*</span>
+          </label>
+
+          <div class="password-wrapper">
+
+            <div class="input-icon-wrapper has-icon-right">
+              <span class="input-icon-left">
+                <lucide-icon [img]="iconLock"></lucide-icon>
+              </span>
+              <input
+                id="password"
+                [type]="mostrarPassword() ? 'text' : 'password'"
+                class="form-control"
+                [class.is-invalid]="password.invalid && password.touched"
+                formControlName="password"
+                placeholder="Ingresa tu contraseña"
+                autocomplete="current-password"
+                (focus)="mostrarRequisitos.set(true)"
+                (blur)="onBlurPassword()"
+              />
+              <button
+                type="button"
+                class="input-icon-right"
+                (click)="togglePassword()"
+                [attr.aria-label]="mostrarPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+              >
+                <lucide-icon [img]="mostrarPassword() ? iconEyeOff : iconEye"></lucide-icon>
+              </button>
+            </div>
+
+            @if (mostrarRequisitos() && password.value) {
+              <div class="password-tooltip">
+                <p class="tooltip-title">Tu contraseña debe tener:</p>
+                <ul class="password-checklist">
+                  <li [class.is-valid]="passwordChecks().minLength">
+                    <span class="check-indicator">
+                      <lucide-icon [img]="passwordChecks().minLength ? iconCheckCircle : iconCircle"></lucide-icon>
+                    </span>
+                    <span>Mínimo 8 caracteres</span>
+                  </li>
+                  <li [class.is-valid]="passwordChecks().hasUppercase">
+                    <span class="check-indicator">
+                      <lucide-icon [img]="passwordChecks().hasUppercase ? iconCheckCircle : iconCircle"></lucide-icon>
+                    </span>
+                    <span>Una letra mayúscula</span>
+                  </li>
+                  <li [class.is-valid]="passwordChecks().hasLowercase">
+                    <span class="check-indicator">
+                      <lucide-icon [img]="passwordChecks().hasLowercase ? iconCheckCircle : iconCircle"></lucide-icon>
+                    </span>
+                    <span>Una letra minúscula</span>
+                  </li>
+                  <li [class.is-valid]="passwordChecks().hasNumber">
+                    <span class="check-indicator">
+                      <lucide-icon [img]="passwordChecks().hasNumber ? iconCheckCircle : iconCircle"></lucide-icon>
+                    </span>
+                    <span>Un número</span>
+                  </li>
+                  <li [class.is-valid]="passwordChecks().hasSpecial">
+                    <span class="check-indicator">
+                      <lucide-icon [img]="passwordChecks().hasSpecial ? iconCheckCircle : iconCircle"></lucide-icon>
+                    </span>
+                    <span>Un símbolo (!@#$%^&*)</span>
+                  </li>
+                </ul>
+              </div>
+            }
+
           </div>
+
           @if (password.invalid && password.touched) {
-            <span class="form-error">La contraseña es obligatoria</span>
+            <span class="form-error">
+              @if (password.errors?.['required']) { La contraseña es obligatoria }
+              @if (password.errors?.['minlength']) { Debe tener al menos 8 caracteres }
+            </span>
           }
         </div>
 
-        <!-- Recordarme + Olvidé mi contraseña -->
         <div class="form-options">
           <label class="form-checkbox">
             <input type="checkbox" formControlName="recordarme" />
@@ -117,7 +169,6 @@
           <a href="#" class="form-link">¿Olvidaste tu contraseña?</a>
         </div>
 
-        <!-- Error general -->
         @if (errorMensaje()) {
           <div class="form-alert-error">
             <lucide-icon [img]="iconAlertCircle"></lucide-icon>
@@ -125,7 +176,6 @@
           </div>
         }
 
-        <!-- Botón principal -->
         <button
           type="submit"
           class="btn btn-primary btn-block btn-lg"
@@ -139,19 +189,8 @@
           }
         </button>
 
-        <!-- Separador -->
-        <div class="form-separator">
-          <span>o</span>
-        </div>
-
-        <!-- Botón secundario -->
-        <button type="button" class="btn btn-secondary btn-block">
-          Contactar al administrador
-        </button>
-
       </form>
 
-      <!-- Pie del formulario -->
       <footer class="form-footer">
         ¿Problemas para acceder? <a href="mailto:soporte@saludintegral.pe">soporte&#64;saludintegral.pe</a>
       </footer>

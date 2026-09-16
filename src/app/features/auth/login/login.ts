@@ -1,9 +1,4 @@
-// ═══════════════════════════════════════════════════════════
-// COMPONENTE: Login
-// Clínica Salud Integral S.A.C.
-// ═══════════════════════════════════════════════════════════
-
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -12,17 +7,19 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
 import {
   LucideAngularModule,
-  User,
+  Mail,
   Lock,
   Eye,
   EyeOff,
   AlertCircle,
-  HeartPulse,
   Stethoscope,
   CalendarCheck,
   ClipboardList,
+  CheckCircle2,
+  Circle,
 } from 'lucide-angular';
 
 import { AuthService } from '../../../core/services/auth.service';
@@ -41,35 +38,48 @@ import { LoginRequest } from '../../../core/models/usuario.model';
 })
 export class Login {
 
-  // ─── Inyecciones ──────────────────────────────────────────
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
 
-  // ─── Iconos de Lucide ─────────────────────────────────────
-  readonly iconUser = User;
+  readonly iconMail = Mail;
   readonly iconLock = Lock;
   readonly iconEye = Eye;
   readonly iconEyeOff = EyeOff;
   readonly iconAlertCircle = AlertCircle;
-  readonly iconHeartPulse = HeartPulse;
   readonly iconStethoscope = Stethoscope;
   readonly iconCalendarCheck = CalendarCheck;
   readonly iconClipboardList = ClipboardList;
+  readonly iconCheckCircle = CheckCircle2;
+  readonly iconCircle = Circle;
 
-  // ─── Estado ───────────────────────────────────────────────
   cargando = signal(false);
   errorMensaje = signal<string | null>(null);
   mostrarPassword = signal(false);
+  mostrarRequisitos = signal(false);
 
-  // ─── Formulario ───────────────────────────────────────────
   formLogin: FormGroup = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(6)]],
+    password: ['', [Validators.required, Validators.minLength(8)]],
     recordarme: [false],
   });
 
-  // ─── Getters ──────────────────────────────────────────────
+  private passwordValue = toSignal(
+    this.formLogin.get('password')!.valueChanges,
+    { initialValue: '' }
+  );
+
+  passwordChecks = computed(() => {
+    const pwd = this.passwordValue() || '';
+    return {
+      minLength: pwd.length >= 8,
+      hasUppercase: /[A-Z]/.test(pwd),
+      hasLowercase: /[a-z]/.test(pwd),
+      hasNumber: /[0-9]/.test(pwd),
+      hasSpecial: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pwd),
+    };
+  });
+
   get email() {
     return this.formLogin.get('email')!;
   }
@@ -78,9 +88,24 @@ export class Login {
     return this.formLogin.get('password')!;
   }
 
-  // ─── Métodos ──────────────────────────────────────────────
   togglePassword(): void {
     this.mostrarPassword.update((v) => !v);
+  }
+
+  onBlurPassword(): void {
+    setTimeout(() => {
+      const checks = this.passwordChecks();
+      const todosCumplen =
+        checks.minLength &&
+        checks.hasUppercase &&
+        checks.hasLowercase &&
+        checks.hasNumber &&
+        checks.hasSpecial;
+
+      if (todosCumplen) {
+        this.mostrarRequisitos.set(false);
+      }
+    }, 200);
   }
 
   onSubmit(): void {

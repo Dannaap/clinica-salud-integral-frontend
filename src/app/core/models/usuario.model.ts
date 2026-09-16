@@ -1,8 +1,3 @@
-// ═══════════════════════════════════════════════════════════
-// MODELO: Usuario
-// Clínica Salud Integral S.A.C.
-// ═══════════════════════════════════════════════════════════
-
 export type Rol = 'ADMIN' | 'RECEPCION' | 'MEDICO';
 
 export interface Usuario {
