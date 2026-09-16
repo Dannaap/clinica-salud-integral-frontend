@@ -1,0 +1,269 @@
+// ═══════════════════════════════════════════════════════════
+// TABLAS — Clínica Salud Integral S.A.C.
+// ═══════════════════════════════════════════════════════════
+// ─── WRAPPER DE TABLA (para scroll horizontal) ─────────────
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  @include custom-scrollbar;
+  border-radius: $radius-lg;
+}
+
+// ─── TABLA BASE ────────────────────────────────────────────
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: $font-family;
+  font-size: $font-size-sm;
+  color: $neutral-900;
+  background-color: $white;
+
+  // ─── HEADER ────────────────────────────────────────────
+  thead {
+    background-color: $neutral-100;
+
+    th {
+      padding: 16px;
+      text-align: left;
+      font-size: $font-size-xs;
+      font-weight: $font-weight-medium;
+      color: $neutral-700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid $neutral-400;
+      white-space: nowrap;
+
+      &.text-center {
+        text-align: center;
+      }
+
+      &.text-right {
+        text-align: right;
+      }
+    }
+  }
+
+  // ─── BODY ──────────────────────────────────────────────
+  tbody {
+    tr {
+      transition: background-color $transition-fast;
+
+      &:hover {
+        background-color: $primary-light;
+      }
+
+      &:not(:last-child) {
+        border-bottom: 1px solid $neutral-400;
+      }
+    }
+
+    td {
+      padding: 16px;
+      font-size: $font-size-sm;
+      color: $neutral-900;
+      vertical-align: middle;
+
+      &.text-muted {
+        color: $neutral-700;
+      }
+
+      &.text-center {
+        text-align: center;
+      }
+
+      &.text-right {
+        text-align: right;
+      }
+
+      &.text-nowrap {
+        white-space: nowrap;
+      }
+    }
+  }
+
+  // ─── FILA ALTERNA (opcional) ────────────────────────────
+  &.table-striped {
+    tbody tr:nth-child(even) {
+      background-color: rgba($neutral-100, 0.5);
+    }
+  }
+
+  // ─── SIN BORDES ─────────────────────────────────────────
+  &.table-borderless {
+    tbody tr,
+    thead th {
+      border: none;
+    }
+  }
+}
+
+// ─── CELDA DE PACIENTE (con avatar) ────────────────────────
+.cell-patient {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+
+  .patient-avatar-sm {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: $primary-light;
+    color: $primary;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+    flex-shrink: 0;
+  }
+
+  .patient-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    .patient-name {
+      font-weight: $font-weight-medium;
+      color: $neutral-900;
+    }
+
+    .patient-email {
+      font-size: $font-size-xs;
+      color: $neutral-700;
+    }
+  }
+}
+
+// ─── CELDA DE ACCIONES ─────────────────────────────────────
+.cell-actions {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+
+  .btn-action {
+    @include icon-button(32px);
+    background-color: transparent;
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
+
+// ─── FILA VACÍA (empty state) ──────────────────────────────
+.table-empty {
+  padding: $space-10 $space-6;
+  text-align: center;
+
+  .empty-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background-color: $neutral-100;
+    color: $neutral-700;
+    margin-bottom: $space-4;
+
+    svg {
+      width: 32px;
+      height: 32px;
+    }
+  }
+
+  .empty-title {
+    font-size: $font-size-md;
+    font-weight: $font-weight-semibold;
+    color: $neutral-900;
+    margin-bottom: $space-2;
+  }
+
+  .empty-description {
+    font-size: $font-size-sm;
+    color: $neutral-700;
+  }
+}
+
+// ─── PAGINACIÓN ────────────────────────────────────────────
+.table-pagination {
+  @include flex-between;
+  padding: $space-5 $space-6;
+  border-top: 1px solid $neutral-400;
+
+  .pagination-info {
+    font-size: $font-size-sm;
+    color: $neutral-700;
+  }
+
+  .pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: $space-1;
+
+    .page-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 36px;
+      height: 36px;
+      padding: 0 $space-2;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-medium;
+      color: $neutral-700;
+      background-color: $white;
+      border: 1px solid $neutral-400;
+      border-radius: $radius-sm;
+      cursor: pointer;
+      transition: all $transition-fast;
+
+      &:hover:not(:disabled) {
+        background-color: $primary-light;
+        border-color: $primary;
+        color: $primary;
+      }
+
+      &.is-active {
+        background-color: $primary;
+        border-color: $primary;
+        color: $white;
+      }
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+// ─── TABLA RESPONSIVE (cards en móvil) ─────────────────────
+@include mobile {
+  .table {
+    thead { display: none; }
+    tbody tr {
+      display: flex;
+      flex-direction: column;
+      padding: $space-4;
+      margin-bottom: $space-3;
+      border: 1px solid $neutral-400;
+      border-radius: $radius-md;
+
+      td {
+        padding: $space-2 0;
+        border: none;
+        display: flex;
+        justify-content: space-between;
+
+        &::before {
+          content: attr(data-label);
+          font-weight: $font-weight-medium;
+          color: $neutral-700;
+          font-size: $font-size-xs;
+          text-transform: uppercase;
+        }
+      }
+    }
+  }
+}

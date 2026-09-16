@@ -1,0 +1,265 @@
+// ═══════════════════════════════════════════════════════════
+// INPUTS Y FORMULARIOS — Clínica Salud Integral S.A.C.
+// ═══════════════════════════════════════════════════════════
+// ─── GRUPO DE FORMULARIO ───────────────────────────────────
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: $space-5;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $space-5;
+
+  @include tablet {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-full {
+  grid-column: 1 / -1;
+}
+
+// ─── LABEL ─────────────────────────────────────────────────
+.form-label {
+  @include label-base;
+
+  .required {
+    color: $danger;
+    margin-left: 2px;
+  }
+}
+
+// ─── INPUT DE TEXTO / EMAIL / PASSWORD / NUMBER ────────────
+.form-control {
+  @include input-base;
+}
+
+// ─── TEXTAREA ──────────────────────────────────────────────
+textarea.form-control {
+  height: auto;
+  min-height: 96px;
+  padding: $space-3;
+  resize: vertical;
+  line-height: $line-height-base;
+}
+
+// ─── SELECT ────────────────────────────────────────────────
+select.form-control {
+  @include input-base;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23495057' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  padding-right: 40px;
+  cursor: pointer;
+}
+
+// ─── INPUT CON ÍCONO ───────────────────────────────────────
+.input-icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .input-icon-left {
+    position: absolute;
+    left: 16px;
+    color: $neutral-700;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  .input-icon-right {
+    position: absolute;
+    right: 12px;
+    color: $neutral-700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 4px;
+
+    &:hover {
+      color: $primary;
+    }
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  .form-control {
+    padding-left: 48px;
+  }
+
+  &.has-icon-right .form-control {
+    padding-right: 48px;
+  }
+}
+
+// ─── ESTADOS DEL INPUT ─────────────────────────────────────
+
+// FOCUS (ya está en el mixin, pero por si acaso)
+.form-control:focus {
+  border-color: $primary;
+  box-shadow: 0 0 0 4px rgba($primary, 0.15);
+}
+
+// ERROR
+.form-control.is-invalid {
+  border-color: $danger;
+
+  &:focus {
+    box-shadow: 0 0 0 4px rgba($danger, 0.15);
+  }
+}
+
+// SUCCESS
+.form-control.is-valid {
+  border-color: $secondary;
+
+  &:focus {
+    box-shadow: 0 0 0 4px rgba($secondary, 0.15);
+  }
+}
+
+// DISABLED
+.form-control:disabled {
+  background-color: $neutral-100;
+  color: $neutral-700;
+  cursor: not-allowed;
+}
+
+// ─── MENSAJES DE ERROR ─────────────────────────────────────
+.form-error {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: $font-size-xs;
+  color: $danger;
+  margin-top: $space-1;
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.form-hint {
+  font-size: $font-size-xs;
+  color: $neutral-700;
+  opacity: 0.8;
+  margin-top: $space-1;
+}
+
+// ─── CHECKBOX ──────────────────────────────────────────────
+.form-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  cursor: pointer;
+  user-select: none;
+  font-size: $font-size-sm;
+  color: $neutral-700;
+
+  input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: $primary;
+    cursor: pointer;
+  }
+}
+
+// ─── RADIO ─────────────────────────────────────────────────
+.form-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  cursor: pointer;
+  font-size: $font-size-sm;
+  color: $neutral-700;
+
+  input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    accent-color: $primary;
+    cursor: pointer;
+  }
+}
+
+// ─── TOGGLE / SWITCH ───────────────────────────────────────
+.form-switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+
+  input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .switch-slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background-color: $neutral-400;
+    transition: $transition-normal;
+    border-radius: $radius-full;
+
+    &::before {
+      position: absolute;
+      content: '';
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: $white;
+      transition: $transition-normal;
+      border-radius: 50%;
+      box-shadow: $shadow-sm;
+    }
+  }
+
+  input:checked + .switch-slider {
+    background-color: $primary;
+
+    &::before {
+      transform: translateX(20px);
+    }
+  }
+}
+
+// ─── BARRA DE BÚSQUEDA ─────────────────────────────────────
+.search-bar {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+
+  .search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $neutral-700;
+    pointer-events: none;
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  .form-control {
+    padding-left: 48px;
+  }
+}

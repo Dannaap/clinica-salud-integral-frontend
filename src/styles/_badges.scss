@@ -1,0 +1,173 @@
+// ═══════════════════════════════════════════════════════════
+// BADGES Y ETIQUETAS DE ESTADO — Clínica Salud Integral S.A.C.
+// ═══════════════════════════════════════════════════════════
+// ─── BADGE BASE (tipo pill) ────────────────────────────────
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  font-family: $font-family;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  border-radius: $radius-full;
+  white-space: nowrap;
+}
+
+// ─── BADGES DE ESTADO DE CITA ──────────────────────────────
+
+// 🟢 Confirmada
+.badge-confirmada,
+.badge-success {
+  @extend .badge;
+  background-color: $badge-confirmada-bg;
+  color: $badge-confirmada-fg;
+}
+
+// 🟡 Pendiente
+.badge-pendiente,
+.badge-warning {
+  @extend .badge;
+  background-color: $badge-pendiente-bg;
+  color: $badge-pendiente-fg;
+}
+
+// 🔵 Atendida
+.badge-atendida,
+.badge-info {
+  @extend .badge;
+  background-color: $badge-atendida-bg;
+  color: $badge-atendida-fg;
+}
+
+// 🔴 Cancelada
+.badge-cancelada,
+.badge-danger {
+  @extend .badge;
+  background-color: $badge-cancelada-bg;
+  color: $badge-cancelada-fg;
+}
+
+// ⚫ No asistió
+.badge-noasistio,
+.badge-secondary {
+  @extend .badge;
+  background-color: $badge-noasistio-bg;
+  color: $badge-noasistio-fg;
+}
+
+// ─── BADGES DE ROL ─────────────────────────────────────────
+
+// Admin
+.badge-rol-admin {
+  @extend .badge;
+  background-color: $badge-atendida-bg;
+  color: $badge-atendida-fg;
+}
+
+// Recepción
+.badge-rol-recepcion {
+  @extend .badge;
+  background-color: $badge-confirmada-bg;
+  color: $badge-confirmada-fg;
+}
+
+// Médico
+.badge-rol-medico {
+  @extend .badge;
+  background-color: $badge-pendiente-bg;
+  color: $badge-pendiente-fg;
+}
+
+// ─── BADGE CON PUNTO ───────────────────────────────────────
+.badge-dot {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: $font-size-xs;
+  color: $neutral-700;
+
+  &::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: currentColor;
+  }
+
+  &.is-success::before  { background-color: $secondary; }
+  &.is-warning::before  { background-color: $warning; }
+  &.is-danger::before   { background-color: $danger; }
+  &.is-info::before     { background-color: $primary; }
+  &.is-neutral::before  { background-color: $neutral-700; }
+}
+
+// ─── BADGE CON CONTADOR (para notificaciones) ──────────────
+.badge-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  font-size: 11px;
+  font-weight: $font-weight-semibold;
+  color: $white;
+  background-color: $danger;
+  border-radius: $radius-full;
+}
+
+// ─── BADGE DE DISPONIBILIDAD ───────────────────────────────
+.badge-availability {
+  @extend .badge;
+  background-color: $badge-confirmada-bg;
+  color: $badge-confirmada-fg;
+
+  &.is-unavailable {
+    background-color: $badge-cancelada-bg;
+    color: $badge-cancelada-fg;
+  }
+}
+
+// ─── CHIP (etiqueta más grande) ────────────────────────────
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  padding: 6px 14px;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $neutral-700;
+  background-color: $neutral-100;
+  border: 1px solid $neutral-400;
+  border-radius: $radius-full;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    background-color: $primary-light;
+    border-color: $primary;
+    color: $primary;
+  }
+
+  &.is-active {
+    background-color: $primary;
+    color: $white;
+    border-color: $primary;
+  }
+}
+
+// ─── INDICADOR DE ESTADO (punto de color) ──────────────────
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+
+  &.is-success { background-color: $secondary; }
+  &.is-warning { background-color: $warning; }
+  &.is-danger  { background-color: $danger; }
+  &.is-info    { background-color: $primary; }
+  &.is-neutral { background-color: $neutral-700; }
+}

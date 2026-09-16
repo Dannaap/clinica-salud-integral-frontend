@@ -1,0 +1,202 @@
+<div class="login-wrapper">
+
+  <aside class="login-branding">
+
+    <header class="branding-header">
+      <div class="branding-logo">
+        <img
+          src="logo.png"
+          alt="Clínica Salud Integral S.A.C."
+          class="branding-logo-img"
+        />
+      </div>
+    </header>
+
+    <div class="branding-content">
+      <h1 class="branding-title">
+        Tu salud,<br>
+        <span class="branding-title-accent">nuestra prioridad</span>
+      </h1>
+      <p class="branding-subtitle">
+        Gestiona citas, pacientes e historias clínicas desde un solo lugar,
+        de forma rápida y segura.
+      </p>
+
+      <ul class="branding-features">
+        <li class="feature-item">
+          <lucide-icon [img]="iconStethoscope"></lucide-icon>
+          <span>Atención especializada</span>
+        </li>
+        <li class="feature-item">
+          <lucide-icon [img]="iconCalendarCheck"></lucide-icon>
+          <span>Citas en tiempo real</span>
+        </li>
+        <li class="feature-item">
+          <lucide-icon [img]="iconClipboardList"></lucide-icon>
+          <span>Historia clínica digital</span>
+        </li>
+      </ul>
+    </div>
+
+    <footer class="branding-footer">
+      <span>© 2026 Clínica Salud Integral S.A.C. — v1.0</span>
+    </footer>
+
+  </aside>
+
+  <main class="login-form-panel">
+
+    <div class="login-form-container">
+
+      <header class="form-header">
+        <h2 class="form-title">Bienvenido de nuevo</h2>
+        <p class="form-subtitle">Ingresa tus credenciales para acceder al sistema</p>
+      </header>
+
+      <form [formGroup]="formLogin" (ngSubmit)="onSubmit()" class="login-form">
+
+        <div class="form-group">
+          <label class="form-label" for="email">
+            Correo electrónico <span class="required">*</span>
+          </label>
+          <div class="input-icon-wrapper">
+            <span class="input-icon-left">
+              <lucide-icon [img]="iconMail"></lucide-icon>
+            </span>
+            <input
+              id="email"
+              type="email"
+              class="form-control"
+              [class.is-invalid]="email.invalid && email.touched"
+              formControlName="email"
+              placeholder="tucorreo@clinica.com"
+              autocomplete="email"
+            />
+          </div>
+          @if (email.invalid && email.touched) {
+            <span class="form-error">
+              @if (email.errors?.['required']) { El correo es obligatorio }
+              @if (email.errors?.['email']) { Ingresa un correo válido }
+            </span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">
+            Contraseña <span class="required">*</span>
+          </label>
+
+          <div class="password-wrapper">
+
+            <div class="input-icon-wrapper has-icon-right">
+              <span class="input-icon-left">
+                <lucide-icon [img]="iconLock"></lucide-icon>
+              </span>
+              <input
+                id="password"
+                [type]="mostrarPassword() ? 'text' : 'password'"
+                class="form-control"
+                [class.is-invalid]="password.invalid && password.touched"
+                formControlName="password"
+                placeholder="Ingresa tu contraseña"
+                autocomplete="current-password"
+                (focus)="mostrarRequisitos.set(true)"
+                (blur)="onBlurPassword()"
+              />
+              <button
+                type="button"
+                class="input-icon-right"
+                (click)="togglePassword()"
+                [attr.aria-label]="mostrarPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+              >
+                <lucide-icon [img]="mostrarPassword() ? iconEyeOff : iconEye"></lucide-icon>
+              </button>
+            </div>
+
+            @if (mostrarRequisitos() && password.value) {
+              <div class="password-tooltip">
+                <p class="tooltip-title">Tu contraseña debe tener:</p>
+                <ul class="password-checklist">
+                  <li [class.is-valid]="passwordChecks().minLength">
+                    <span class="check-indicator">
+                      <lucide-icon [img]="passwordChecks().minLength ? iconCheckCircle : iconCircle"></lucide-icon>
+                    </span>
+                    <span>Mínimo 8 caracteres</span>
+                  </li>
+                  <li [class.is-valid]="passwordChecks().hasUppercase">
+                    <span class="check-indicator">
+                      <lucide-icon [img]="passwordChecks().hasUppercase ? iconCheckCircle : iconCircle"></lucide-icon>
+                    </span>
+                    <span>Una letra mayúscula</span>
+                  </li>
+                  <li [class.is-valid]="passwordChecks().hasLowercase">
+                    <span class="check-indicator">
+                      <lucide-icon [img]="passwordChecks().hasLowercase ? iconCheckCircle : iconCircle"></lucide-icon>
+                    </span>
+                    <span>Una letra minúscula</span>
+                  </li>
+                  <li [class.is-valid]="passwordChecks().hasNumber">
+                    <span class="check-indicator">
+                      <lucide-icon [img]="passwordChecks().hasNumber ? iconCheckCircle : iconCircle"></lucide-icon>
+                    </span>
+                    <span>Un número</span>
+                  </li>
+                  <li [class.is-valid]="passwordChecks().hasSpecial">
+                    <span class="check-indicator">
+                      <lucide-icon [img]="passwordChecks().hasSpecial ? iconCheckCircle : iconCircle"></lucide-icon>
+                    </span>
+                    <span>Un símbolo (!@#$%^&*)</span>
+                  </li>
+                </ul>
+              </div>
+            }
+
+          </div>
+
+          @if (password.invalid && password.touched) {
+            <span class="form-error">
+              @if (password.errors?.['required']) { La contraseña es obligatoria }
+              @if (password.errors?.['minlength']) { Debe tener al menos 8 caracteres }
+            </span>
+          }
+        </div>
+
+        <div class="form-options">
+          <label class="form-checkbox">
+            <input type="checkbox" formControlName="recordarme" />
+            <span>Recordarme</span>
+          </label>
+          <a href="#" class="form-link">¿Olvidaste tu contraseña?</a>
+        </div>
+
+        @if (errorMensaje()) {
+          <div class="form-alert-error">
+            <lucide-icon [img]="iconAlertCircle"></lucide-icon>
+            <span>{{ errorMensaje() }}</span>
+          </div>
+        }
+
+        <button
+          type="submit"
+          class="btn btn-primary btn-block btn-lg"
+          [class.btn-loading]="cargando()"
+          [disabled]="cargando() || formLogin.invalid"
+        >
+          @if (!cargando()) {
+            Iniciar sesión
+          } @else {
+            Ingresando...
+          }
+        </button>
+
+      </form>
+
+      <footer class="form-footer">
+        ¿Problemas para acceder? <a href="mailto:soporte@saludintegral.pe">soporte&#64;saludintegral.pe</a>
+      </footer>
+
+    </div>
+
+  </main>
+
+</div>
