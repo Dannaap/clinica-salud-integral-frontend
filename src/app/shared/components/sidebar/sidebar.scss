@@ -1,0 +1,193 @@
+@use '../../../../styles/variables' as *;
+
+.sidebar-container {
+  width: 240px;
+  height: 100vh;
+  background-color: #0b5ed7;
+  color: $white;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.08);
+  font-family: $font-family;
+  user-select: none;
+}
+
+// ─── CABECERA ───────────────────────────────────────────────
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 20px 20px;
+
+  .logo-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background-color: rgba($white, 0.2);
+    border: 1px solid rgba($white, 0.4);
+    color: $white;
+    flex-shrink: 0;
+
+    .logo-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  .logo-details {
+    display: flex;
+    flex-direction: column;
+
+    .brand-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: $white;
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    .brand-tag {
+      font-size: 11px;
+      font-weight: 500;
+      color: rgba($white, 0.75);
+      letter-spacing: 0.04em;
+    }
+  }
+}
+
+// ─── NAVEGACIÓN ─────────────────────────────────────────────
+.sidebar-nav {
+  flex: 1;
+  padding: 16px 12px;
+  overflow-y: auto;
+
+  .nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    height: 44px;
+    padding: 0 14px;
+    color: rgba($white, 0.85);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 150ms ease;
+
+    .link-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      opacity: 0.9;
+    }
+
+    &:hover {
+      background-color: rgba($white, 0.12);
+      color: $white;
+    }
+
+    &.is-active {
+      background-color: rgba($white, 0.22);
+      color: $white;
+      font-weight: 600;
+
+      .link-icon {
+        opacity: 1;
+      }
+    }
+  }
+}
+
+// ─── FOOTER PERFIL ──────────────────────────────────────────
+.sidebar-footer {
+  padding: 16px 12px;
+  border-top: 1px solid rgba($white, 0.15);
+
+  .user-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 8px;
+    border-radius: 8px;
+
+    .user-avatar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: rgba($white, 0.25);
+      color: $white;
+      font-size: 13px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .user-details {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+
+      .user-name {
+        font-size: 13px;
+        font-weight: 600;
+        color: $white;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .user-role {
+        font-size: 11px;
+        color: rgba($white, 0.7);
+      }
+    }
+
+    .logout-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      background: transparent;
+      border: none;
+      color: rgba($white, 0.8);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 150ms ease;
+
+      &:hover {
+        background-color: rgba($white, 0.18);
+        color: $white;
+      }
+
+      lucide-icon {
+        width: 18px;
+        height: 18px;
+      }
+    }
+  }
+}

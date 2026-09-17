@@ -1,0 +1,604 @@
+@use '../../../../styles/variables' as *;
+
+.usuarios-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  font-family: $font-family;
+  color: #0f172a;
+}
+
+// ─── 1. BREADCRUMBS ─────────────────────────────────────────
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+
+  .breadcrumb-link {
+    color: #64748b;
+    text-decoration: none;
+    transition: color 150ms ease;
+
+    &:hover {
+      color: #0b5ed7;
+    }
+  }
+
+  .breadcrumb-separator {
+    color: #cbd5e1;
+  }
+
+  .breadcrumb-current {
+    color: #0b5ed7;
+    font-weight: 600;
+  }
+}
+
+// ─── 2. ENCABEZADO SUPERIOR ─────────────────────────────────
+.page-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 4px;
+
+  .page-title-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .page-main-title {
+      font-size: 26px;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    .page-description {
+      font-size: 13.5px;
+      color: #64748b;
+      margin: 0;
+    }
+  }
+
+  .btn-new-user {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 42px;
+    padding: 0 20px;
+    background-color: #0b5ed7;
+    color: $white;
+    border: none;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-weight: 600;
+    font-family: $font-family;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(11, 94, 215, 0.25);
+    transition: all 150ms ease;
+
+    .btn-icon {
+      width: 16px;
+      height: 16px;
+    }
+
+    &:hover {
+      background-color: #084298;
+      box-shadow: 0 4px 10px rgba(11, 94, 215, 0.35);
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}
+
+// ─── 3. TARJETAS KPI ────────────────────────────────────────
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.kpi-card-item {
+  background-color: $white;
+  border-radius: 14px;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  border: 1px solid #f1f5f9;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  .kpi-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    .kpi-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: #64748b;
+      text-transform: uppercase;
+    }
+
+    .kpi-number {
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1.1;
+      margin: 4px 0 2px;
+
+      &.text-primary {
+        color: #0b5ed7;
+      }
+      &.text-dark-blue {
+        color: #1e3a8a;
+      }
+      &.text-green {
+        color: #16a34a;
+      }
+      &.text-amber {
+        color: #d97706;
+      }
+    }
+
+    .kpi-subtext {
+      font-size: 12px;
+      color: #64748b;
+    }
+  }
+
+  .kpi-icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    flex-shrink: 0;
+
+    lucide-icon {
+      width: 22px;
+      height: 22px;
+    }
+
+    &.bg-soft-indigo {
+      background-color: #ede9fe;
+      .icon-indigo {
+        color: #4f46e5;
+      }
+    }
+
+    &.bg-soft-purple {
+      background-color: #f3e8ff;
+      .icon-purple {
+        color: #7c3aed;
+      }
+    }
+
+    &.bg-soft-brown {
+      background-color: #fef3c7;
+      .icon-brown {
+        color: #854d0e;
+      }
+    }
+
+    &.bg-soft-orange {
+      background-color: #ffedd5;
+      .icon-orange {
+        color: #ea580c;
+      }
+    }
+  }
+}
+
+// ─── 4. BARRA DE FILTROS ────────────────────────────────────
+.filters-card {
+  background-color: $white;
+  border-radius: 12px;
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+
+  @media (max-width: 900px) {
+    flex-wrap: wrap;
+  }
+
+  .filter-search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 1;
+    min-width: 220px;
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      width: 16px;
+      height: 16px;
+      color: #94a3b8;
+      pointer-events: none;
+    }
+
+    .filter-search-input {
+      width: 100%;
+      height: 38px;
+      padding: 0 12px 0 36px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: $font-family;
+      color: #1e293b;
+      background-color: #ffffff;
+      transition: all 150ms ease;
+
+      &::placeholder {
+        color: #94a3b8;
+      }
+
+      &:focus {
+        outline: none;
+        border-color: #0b5ed7;
+        box-shadow: 0 0 0 3px rgba(11, 94, 215, 0.1);
+      }
+    }
+  }
+
+  .filter-select-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    @media (max-width: 600px) {
+      width: 100%;
+      flex-direction: column;
+    }
+
+    .select-wrapper {
+      position: relative;
+
+      @media (max-width: 600px) {
+        width: 100%;
+      }
+    }
+
+    .filter-select {
+      height: 38px;
+      padding: 0 28px 0 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: $font-family;
+      color: #334155;
+      background-color: #ffffff;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      transition: all 150ms ease;
+
+      @media (max-width: 600px) {
+        width: 100%;
+      }
+
+      &:focus {
+        outline: none;
+        border-color: #0b5ed7;
+        box-shadow: 0 0 0 3px rgba(11, 94, 215, 0.1);
+      }
+    }
+  }
+
+  .btn-clear-filters {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: none;
+    color: #0b5ed7;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: $font-family;
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 6px;
+    transition: all 150ms ease;
+    white-space: nowrap;
+    margin-left: auto;
+
+    .clear-icon {
+      width: 14px;
+      height: 14px;
+    }
+
+    &:hover {
+      background-color: #eff6ff;
+      color: #084298;
+    }
+  }
+}
+
+// ─── 5. TABLA DE USUARIOS ───────────────────────────────────
+.table-card {
+  background-color: $white;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+
+  .table-responsive {
+    width: 100%;
+    overflow-x: auto;
+  }
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: $font-family;
+
+  thead {
+    background-color: #ffffff;
+    border-bottom: 1px solid #f1f5f9;
+
+    th {
+      padding: 16px 20px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      color: #0f172a;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      white-space: nowrap;
+
+      &.th-acciones {
+        text-align: right;
+        width: 60px;
+      }
+    }
+  }
+
+  tbody {
+    .table-row {
+      border-bottom: 1px solid #f8fafc;
+      transition: background-color 150ms ease;
+
+      &:hover {
+        background-color: #f8fafc;
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      td {
+        padding: 16px 20px;
+        font-size: 13.5px;
+        vertical-align: middle;
+      }
+    }
+  }
+}
+
+// ─── CELDAS ESPECÍFICAS ─────────────────────────────────────
+
+// Usuario (Avatar + Nombres)
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  .user-avatar-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #dbeafe;
+    color: #1d4ed8;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .user-text-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    .user-fullname {
+      font-size: 14px;
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    .user-role-detail {
+      font-size: 12px;
+      color: #64748b;
+    }
+  }
+}
+
+// Correo
+.td-correo {
+  .email-text {
+    font-size: 13px;
+    color: #475569;
+  }
+}
+
+// Badges de Rol
+.badge-role {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 14px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+
+  &.badge-role-admin {
+    background-color: #dbeafe;
+    color: #1e40af;
+  }
+
+  &.badge-role-recepcion {
+    background-color: #d1fae5;
+    color: #065f46;
+  }
+
+  &.badge-role-medico {
+    background-color: #fef3c7;
+    color: #92400e;
+  }
+}
+
+// Último Acceso
+.access-datetime {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+
+  .access-date {
+    font-size: 13px;
+    font-weight: 500;
+    color: #1e293b;
+  }
+
+  .access-time {
+    font-size: 12px;
+    color: #64748b;
+  }
+}
+
+// Estado Activo / Inactivo con punto
+.badge-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+
+  &.status-active {
+    background-color: #ecfdf5;
+    color: #047857;
+    border: 1px solid #a7f3d0;
+
+    .status-dot {
+      background-color: #10b981;
+    }
+  }
+
+  &.status-inactive {
+    background-color: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+
+    .status-dot {
+      background-color: #ef4444;
+    }
+  }
+}
+
+// Botón de acción con ojo
+.btn-view-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background-color: #ffffff;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 150ms ease;
+
+  lucide-icon {
+    width: 15px;
+    height: 15px;
+  }
+
+  &:hover {
+    background-color: #f1f5f9;
+    color: #0b5ed7;
+    border-color: #cbd5e1;
+  }
+}
+
+// Estado Vacío
+.empty-state-box {
+  padding: 48px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+
+  .empty-text {
+    font-size: 14px;
+    color: #64748b;
+    margin: 0;
+  }
+
+  .btn-empty-reset {
+    padding: 8px 16px;
+    background-color: #eff6ff;
+    color: #0b5ed7;
+    border: 1px solid #bfdbfe;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 150ms ease;
+
+    &:hover {
+      background-color: #dbeafe;
+    }
+  }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

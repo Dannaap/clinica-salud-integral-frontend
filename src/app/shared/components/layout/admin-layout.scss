@@ -1,0 +1,29 @@
+@use '../../../../styles/variables' as *;
+
+.layout-wrapper {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f8fafc;
+}
+
+.layout-main {
+  flex: 1;
+  margin-left: 240px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-width: 0;
+  transition: margin-left $transition-normal;
+}
+
+.layout-content {
+  flex: 1;
+  padding: 24px 32px 48px;
+  background-color: #f8fafc;
+}
+
+@media (max-width: 768px) {
+  .layout-main {
+    margin-left: 72px;
+  }
+}
