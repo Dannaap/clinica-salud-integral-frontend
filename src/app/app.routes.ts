@@ -7,5 +7,10 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/auth/login/login').then((m) => m.Login),
   },
+  {
+    path: 'pacientes',
+    loadChildren: () =>
+      import('./features/pacientes/pacientes.routes').then((m) => m.pacientesRoutes),
+  },
   { path: '**', redirectTo: 'login' },
 ];
