@@ -1,0 +1,203 @@
+<app-pacientes-layout pageTitle="Pacientes" pageSubtitle="Listado y búsqueda de pacientes">
+  <div class="patients-page">
+    <div class="breadcrumb" aria-label="Migas de pan">
+      <a class="breadcrumb-item" routerLink="/pacientes/listado">Inicio</a>
+      <span class="breadcrumb-separator">/</span>
+      <span class="breadcrumb-item is-active">Pacientes</span>
+    </div>
+
+    <header class="page-header">
+      <div class="page-header-title">
+        <h2 class="page-title">Listado de pacientes</h2>
+        <p class="page-description">
+          Consulta, filtra y gestiona los expedientes clínicos y citas activas del sistema.
+        </p>
+      </div>
+      <div class="page-header-actions">
+        <a class="btn btn-primary" routerLink="/pacientes/registro">
+          <lucide-icon [img]="iconPlus" aria-hidden="true"></lucide-icon>
+          Nuevo paciente
+        </a>
+      </div>
+    </header>
+
+    <div class="summary-grid" aria-label="Resumen de pacientes">
+      <article class="summary-card">
+        <span class="summary-label">Total pacientes</span>
+        <strong class="summary-value">{{ resumen.total }}</strong>
+        <span class="summary-meta">Padrón activo en clínica</span>
+        <span class="summary-icon summary-icon-blue"><lucide-icon [img]="iconUser" aria-hidden="true"></lucide-icon></span>
+      </article>
+      <article class="summary-card">
+        <span class="summary-label">Nuevos este mes</span>
+        <strong class="summary-value">+{{ resumen.nuevos }}</strong>
+        <span class="summary-meta summary-meta-success">+12% vs mes anterior</span>
+        <span class="summary-icon summary-icon-green"><lucide-icon [img]="iconPlus" aria-hidden="true"></lucide-icon></span>
+      </article>
+      <article class="summary-card">
+        <span class="summary-label">Con citas activas</span>
+        <strong class="summary-value">{{ resumen.citasActivas }}</strong>
+        <span class="summary-meta">Programadas esta semana</span>
+        <span class="summary-icon summary-icon-purple"><lucide-icon [img]="iconCalendarPlus" aria-hidden="true"></lucide-icon></span>
+      </article>
+    </div>
+
+    <section class="card filters-card" aria-label="Filtros de pacientes">
+      <div class="filters-toolbar">
+        <div class="search-field">
+          <lucide-icon [img]="iconSearch" aria-hidden="true"></lucide-icon>
+          <input
+            type="search"
+            aria-label="Buscar por DNI o nombre"
+            placeholder="Buscar por DNI o nombre..."
+            [value]="busqueda()"
+            (input)="actualizarBusqueda($event)"
+          />
+        </div>
+
+        <label class="filter-control">
+          <span>Sexo</span>
+          <select [value]="filtroSexo()" (change)="cambiarSexo($event)">
+            <option>Todos</option>
+            <option>Masculino</option>
+            <option>Femenino</option>
+            <option>Otro</option>
+          </select>
+        </label>
+
+        <label class="filter-control">
+          <span>Sangre</span>
+          <select [value]="filtroSangre()" (change)="cambiarSangre($event)">
+            <option>Todos</option>
+            <option>O+</option>
+            <option>O-</option>
+            <option>A+</option>
+            <option>A-</option>
+            <option>B+</option>
+            <option>B-</option>
+            <option>AB+</option>
+            <option>AB-</option>
+          </select>
+        </label>
+
+        <button class="btn btn-outline filter-button" type="button">
+          <lucide-icon [img]="iconSliders" aria-hidden="true"></lucide-icon>
+          Más filtros
+        </button>
+        <button class="btn btn-ghost filter-button" type="button" (click)="limpiarFiltros()">
+          <lucide-icon [img]="iconX" aria-hidden="true"></lucide-icon>
+          Limpiar filtros
+        </button>
+      </div>
+    </section>
+
+    @if (mensaje(); as aviso) {
+      <div class="feedback-message" role="status">
+        <lucide-icon [img]="iconCalendarPlus" aria-hidden="true"></lucide-icon>
+        {{ aviso }}
+      </div>
+    }
+
+    <section class="card card-flush patients-table-card">
+      <div class="table-heading">
+        <div>
+          <h3>Pacientes registrados</h3>
+          <p>{{ pacientesFiltrados().length }} resultados encontrados</p>
+        </div>
+        <span class="table-context"><lucide-icon [img]="iconList" aria-hidden="true"></lucide-icon> Padrón clínico</span>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="table patients-table">
+          <thead>
+            <tr>
+              <th>DNI</th>
+              <th>Paciente</th>
+              <th>Edad</th>
+              <th>Teléfono</th>
+              <th>Última atención</th>
+              <th>Citas activas</th>
+              <th>Estado</th>
+              <th class="text-right">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (paciente of pacientesPagina(); track paciente.id) {
+              <tr>
+                <td class="patient-dni">{{ paciente.dni }}</td>
+                <td>
+                  <div class="cell-patient">
+                    <span class="patient-avatar-sm">{{ iniciales(paciente) }}</span>
+                    <span class="patient-info">
+                      <strong class="patient-name">{{ nombreCompleto(paciente) }}</strong>
+                      <span class="patient-email">{{ paciente.correo || 'Sin correo registrado' }}</span>
+                    </span>
+                  </div>
+                </td>
+                <td>{{ edad(paciente.fechaNacimiento) }} años</td>
+                <td>{{ paciente.telefono }}</td>
+                <td>{{ paciente.ultimaAtencion || '— Sin registro —' }}</td>
+                <td class="text-center">{{ paciente.citasActivas }}</td>
+                <td><span class="status-pill" [class]="'status-' + paciente.estado.toLowerCase()">{{ paciente.estado }}</span></td>
+                <td>
+                  <div class="cell-actions">
+                    <button class="btn-action" type="button" aria-label="Ver detalle" title="Ver detalle" (click)="abrirDetalle(paciente)">
+                      <lucide-icon [img]="iconEye" aria-hidden="true"></lucide-icon>
+                    </button>
+                    <button class="btn-action btn-action-primary" type="button" aria-label="Agendar cita" title="Agendar cita" (click)="agendarCita()">
+                      <lucide-icon [img]="iconCalendarPlus" aria-hidden="true"></lucide-icon>
+                    </button>
+                    <button class="btn-action" type="button" aria-label="Editar paciente" title="Editar paciente" (click)="editarPaciente(paciente)">
+                      <lucide-icon [img]="iconEdit" aria-hidden="true"></lucide-icon>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="8" class="empty-state">
+                  <lucide-icon [img]="iconSearch" aria-hidden="true"></lucide-icon>
+                  No encontramos pacientes con los filtros seleccionados.
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <footer class="table-footer">
+        <span>Mostrando {{ pacientesPagina().length }} de {{ pacientesFiltrados().length }} pacientes</span>
+        <nav class="pagination" aria-label="Paginación de pacientes">
+          <button class="pagination-button" type="button" aria-label="Página anterior" [disabled]="paginaActual() === 1" (click)="cambiarPagina(paginaActual() - 1)">‹</button>
+          @for (pagina of paginas(); track pagina) {
+            <button class="pagination-button" type="button" [class.is-current]="pagina === paginaActual()" (click)="cambiarPagina(pagina)">{{ pagina }}</button>
+          }
+          <button class="pagination-button" type="button" aria-label="Página siguiente" [disabled]="paginaActual() === totalPaginas()" (click)="cambiarPagina(paginaActual() + 1)">›</button>
+        </nav>
+      </footer>
+    </section>
+  </div>
+</app-pacientes-layout>
+
+@if (pacienteSeleccionado(); as paciente) {
+  <div class="modal-backdrop" role="presentation" (click)="cerrarDetalle()">
+    <section class="patient-modal" role="dialog" aria-modal="true" aria-labelledby="patient-detail-title" (click)="$event.stopPropagation()">
+      <button class="modal-close" type="button" aria-label="Cerrar detalle" (click)="cerrarDetalle()">×</button>
+      <div class="modal-avatar">{{ iniciales(paciente) }}</div>
+      <h2 id="patient-detail-title">{{ nombreCompleto(paciente) }}</h2>
+      <p class="modal-subtitle">Ficha médica digital · DNI {{ paciente.dni }}</p>
+      <div class="detail-grid">
+        <div><span>Fecha de nacimiento</span><strong>{{ paciente.fechaNacimiento }}</strong></div>
+        <div><span>Sexo</span><strong>{{ paciente.sexo }}</strong></div>
+        <div><span>Teléfono</span><strong>{{ paciente.telefono }}</strong></div>
+        <div><span>Tipo de sangre</span><strong>{{ paciente.tipoSangre || 'No registrado' }}</strong></div>
+        <div class="detail-full"><span>Dirección</span><strong>{{ paciente.direccion || 'No registrada' }}</strong></div>
+        <div class="detail-full"><span>Alergias o antecedentes</span><strong>{{ paciente.alergias || 'No registrados' }}</strong></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" type="button" (click)="cerrarDetalle()">Cerrar</button>
+        <button class="btn btn-primary" type="button" (click)="editarPaciente(paciente)">Editar paciente</button>
+      </div>
+    </section>
+  </div>
+}

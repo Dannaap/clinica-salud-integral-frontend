@@ -7,6 +7,13 @@ export const routes: Routes = [
       import('./features/auth/login/login').then((m) => m.Login),
   },
   {
+    path: 'pacientes',
+    loadChildren: () =>
+      import('./features/pacientes/pacientes.routes').then(
+        (m) => m.pacientesRoutes
+      ),
+  },
+  {
     path: '',
     loadComponent: () =>
       import('./shared/components/layout/admin-layout').then(
@@ -22,7 +29,6 @@ export const routes: Routes = [
           ),
       },
       { path: 'dashboard', redirectTo: 'usuarios' },
-      { path: 'pacientes', redirectTo: 'usuarios' },
       { path: 'citas', redirectTo: 'usuarios' },
       { path: 'turnos', redirectTo: 'usuarios' },
       { path: 'atenciones', redirectTo: 'usuarios' },
