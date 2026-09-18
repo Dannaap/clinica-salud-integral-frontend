@@ -374,6 +374,11 @@
       text-transform: uppercase;
       white-space: nowrap;
 
+      &.th-rol,
+      &.th-estado {
+        text-align: center;
+      }
+
       &.th-acciones {
         text-align: right;
         width: 60px;
@@ -398,6 +403,11 @@
         padding: 16px 20px;
         font-size: 13.5px;
         vertical-align: middle;
+      }
+
+      .td-rol,
+      .td-estado {
+        text-align: center;
       }
     }
   }
