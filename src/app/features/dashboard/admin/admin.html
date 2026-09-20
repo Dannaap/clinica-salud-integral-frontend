@@ -1,0 +1,230 @@
+<app-sidebar
+  [nombre]="usuario.nombre"
+  [rol]="usuario.rol"
+  [iniciales]="usuario.iniciales"
+  [esAdmin]="true"
+  [abierto]="sidebarAbierto">
+</app-sidebar>
+
+<div class="sidebar-overlay" *ngIf="sidebarAbierto" (click)="sidebarAbierto = false"></div>
+
+<div class="main-wrapper">
+  <app-header
+    titulo="Inicio"
+    subtitulo="Resumen general del día"
+    placeholder="Buscar paciente por DNI, nombre o cita..."
+    [notificaciones]="3"
+    [nombre]="usuario.nombre"
+    [iniciales]="usuario.iniciales"
+    (menuToggle)="toggleSidebar()">
+  </app-header>
+
+  <main class="content">
+    <section class="greeting-section">
+      <h1 class="greeting-title">Buenos días, Dr. Juan <span class="wave">👋</span></h1>
+      <p class="greeting-subtitle">
+        Hoy es lunes, 14 de septiembre de 2026
+        <span class="separator">•</span>
+        12 citas programadas
+        <span class="separator">•</span>
+        <span class="highlight">3 pacientes en espera</span>
+      </p>
+    </section>
+
+    <section class="kpi-row">
+
+      <div class="kpi-item">
+        <div class="kpi-top">
+          <div class="kpi-text">
+            <span class="kpi-item-label">Citas hoy</span>
+            <span class="kpi-item-value is-primary">{{ kpis.citasHoy }}</span>
+          </div>
+          <div class="kpi-item-icon is-primary">
+            <span class="material-symbols-outlined">calendar_today</span>
+          </div>
+        </div>
+        <div class="kpi-item-footer">
+          <span>3 pendientes</span>
+          <span class="dot"></span>
+          <span class="strong">9 confirmadas</span>
+        </div>
+      </div>
+
+      <!-- KPI 2 -->
+      <div class="kpi-item">
+        <div class="kpi-top">
+          <div class="kpi-text">
+            <span class="kpi-item-label">Pacientes registrados</span>
+            <span class="kpi-item-value">{{ kpis.pacientesRegistrados }}</span>
+          </div>
+          <div class="kpi-item-icon is-primary">
+            <span class="material-symbols-outlined">group</span>
+          </div>
+        </div>
+        <div class="kpi-item-footer is-success">
+          <span class="material-symbols-outlined">trending_up</span>
+          <span>+5 esta semana</span>
+        </div>
+      </div>
+
+      <!-- KPI 3 -->
+      <div class="kpi-item">
+        <div class="kpi-top">
+          <div class="kpi-text">
+            <span class="kpi-item-label">Tasa de inasistencias</span>
+            <span class="kpi-item-value is-danger">{{ kpis.tasaInasistencias }}%</span>
+          </div>
+          <div class="kpi-item-icon is-danger">
+            <span class="material-symbols-outlined">warning</span>
+          </div>
+        </div>
+        <div class="kpi-item-footer is-success">
+          <span class="material-symbols-outlined">arrow_downward</span>
+          <span>-2% vs semana pasada</span>
+        </div>
+      </div>
+
+      <!-- KPI 4 -->
+      <div class="kpi-item">
+        <div class="kpi-top">
+          <div class="kpi-text">
+            <span class="kpi-item-label">Historias clínicas</span>
+            <span class="kpi-item-value">{{ kpis.historiasClinicas }}</span>
+          </div>
+          <div class="kpi-item-icon is-primary">
+            <span class="material-symbols-outlined">assignment</span>
+          </div>
+        </div>
+        <div class="kpi-item-footer is-success">
+          <span class="material-symbols-outlined">check_circle</span>
+          <span>0 registros duplicados</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="main-grid">
+      <div class="card table-card">
+        <div class="card-header">
+          <div class="card-title-wrapper">
+            <span class="material-symbols-outlined text-primary">event_available</span>
+            <h2 class="card-title">Próximas citas de hoy</h2>
+          </div>
+          <a href="#" class="link-primary">
+            <span>Ver todas</span>
+            <span class="material-symbols-outlined">arrow_forward</span>
+          </a>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Hora</th>
+                <th>Paciente</th>
+                <th>Médico</th>
+                <th>Especialidad</th>
+                <th>Estado</th>
+                <th class="text-center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let cita of citas">
+                <td class="time-cell">{{ cita.hora }}</td>
+                <td class="patient-cell">{{ cita.paciente }}</td>
+                <td>{{ cita.medico }}</td>
+                <td>{{ cita.especialidad }}</td>
+                <td>
+                  <span class="badge" [ngClass]="getEstadoClass(cita.estado)">
+                    {{ cita.estado }}
+                  </span>
+                </td>
+                <td class="text-center">
+                  <div class="action-buttons">
+                    <button class="btn-icon" title="Ver detalles" type="button">
+                      <span class="material-symbols-outlined">visibility</span>
+                    </button>
+                    <button class="btn-icon" title="Editar cita" type="button">
+                      <span class="material-symbols-outlined">edit</span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card quick-access-card">
+        <div class="card-header">
+          <h2 class="card-title">Accesos rápidos</h2>
+          <span class="material-symbols-outlined text-muted">bolt</span>
+        </div>
+
+        <div class="quick-actions-grid">
+          <button class="quick-action-btn" type="button">
+            <div class="quick-action-icon">
+              <span class="material-symbols-outlined">person_add</span>
+            </div>
+            <span class="quick-action-label">Registrar paciente</span>
+          </button>
+
+          <button class="quick-action-btn" type="button">
+            <div class="quick-action-icon">
+              <span class="material-symbols-outlined">add_task</span>
+            </div>
+            <span class="quick-action-label">Agendar cita</span>
+          </button>
+
+          <button class="quick-action-btn" type="button">
+            <div class="quick-action-icon">
+              <span class="material-symbols-outlined">calendar_month</span>
+            </div>
+            <span class="quick-action-label">Gestionar turnos</span>
+          </button>
+
+          <button class="quick-action-btn" type="button">
+            <div class="quick-action-icon">
+              <span class="material-symbols-outlined">query_stats</span>
+            </div>
+            <span class="quick-action-label">Ver reportes</span>
+          </button>
+        </div>
+
+        <div class="info-notice">
+          <span class="material-symbols-outlined text-primary">info</span>
+          <div class="notice-content">
+            <span class="notice-title">Módulo de triaje activo</span>
+            <span class="notice-text"
+              >Los turnos del turno tarde inician registro a las 13:30 hrs.</span
+            >
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card team-card">
+      <div class="card-header">
+        <div class="card-title-wrapper">
+          <span class="material-symbols-outlined text-primary">medical_services</span>
+          <h2 class="card-title">Nuestro equipo médico</h2>
+        </div>
+        <a href="#" class="link-primary">
+          <span>Ver todos</span>
+          <span class="material-symbols-outlined">arrow_forward</span>
+        </a>
+      </div>
+
+      <div class="doctor-grid">
+        <div class="doctor-card" *ngFor="let doctor of doctores">
+          <div class="doctor-photo-wrapper">
+            <img [src]="doctor.foto" [alt]="doctor.nombre" class="doctor-photo" />
+            <span class="status-dot" [class.available]="doctor.disponible"></span>
+          </div>
+          <h3 class="doctor-name">{{ doctor.nombre }}</h3>
+          <span class="doctor-specialty">{{ doctor.especialidad }}</span>
+          <button class="btn-doctor" type="button">Ver agenda</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
