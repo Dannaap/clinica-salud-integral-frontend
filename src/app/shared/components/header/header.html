@@ -9,11 +9,11 @@
 
   <div class="search-box">
     <span class="material-symbols-outlined search-icon">search</span>
-    <input type="search" [placeholder]="placeholder">
+    <input #inputBusqueda type="search" [placeholder]="placeholder" (keyup.enter)="buscar(inputBusqueda.value)">
   </div>
 
   <div class="header-actions">
-    <button class="btn-notification" title="Notificaciones">
+    <button class="btn-notification" title="Notificaciones" type="button">
       <span class="material-symbols-outlined">notifications</span>
       <span class="notification-badge">{{ notificaciones }}</span>
     </button>
