@@ -1,0 +1,155 @@
+import { CommonModule } from '@angular/common';
+import { Component, computed, inject, signal } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
+import {
+  CalendarPlus,
+  Eye,
+  FilePenLine,
+  ListFilter,
+  Plus,
+  Search,
+  SlidersHorizontal,
+  UserRound,
+  X,
+} from 'lucide-angular';
+import { LucideAngularModule } from 'lucide-angular';
+
+import { PacientesLayout } from '../components/pacientes-layout/pacientes-layout';
+import { Paciente } from '../paciente.model';
+import { PacienteService } from '../paciente.service';
+
+@Component({
+  selector: 'app-listado',
+  imports: [CommonModule, RouterLink, LucideAngularModule, PacientesLayout],
+  templateUrl: './listado.html',
+  styleUrl: './listado.scss',
+})
+export class Listado {
+  private readonly pacienteService = inject(PacienteService);
+  private readonly router = inject(Router);
+
+  readonly iconPlus = Plus;
+  readonly iconSearch = Search;
+  readonly iconSliders = SlidersHorizontal;
+  readonly iconEye = Eye;
+  readonly iconEdit = FilePenLine;
+  readonly iconCalendarPlus = CalendarPlus;
+  readonly iconUser = UserRound;
+  readonly iconX = X;
+  readonly iconList = ListFilter;
+
+  readonly pacientes = this.pacienteService.pacientes;
+  readonly busqueda = signal('');
+  readonly filtroSexo = signal('Todos');
+  readonly filtroSangre = signal('Todos');
+  readonly paginaActual = signal(1);
+  readonly tamanoPagina = 8;
+  readonly pacienteSeleccionado = signal<Paciente | null>(null);
+  readonly mensaje = signal<string | null>(null);
+
+  readonly pacientesFiltrados = computed(() => {
+    const termino = this.busqueda().trim().toLowerCase();
+    const sexo = this.filtroSexo();
+    const sangre = this.filtroSangre();
+
+    return this.pacientes().filter((paciente) => {
+      const coincideBusqueda =
+        !termino ||
+        `${paciente.nombres} ${paciente.apellidos}`.toLowerCase().includes(termino) ||
+        paciente.dni.includes(termino);
+      const coincideSexo = sexo === 'Todos' || paciente.sexo === sexo;
+      const coincideSangre = sangre === 'Todos' || paciente.tipoSangre === sangre;
+
+      return coincideBusqueda && coincideSexo && coincideSangre;
+    });
+  });
+
+  readonly pacientesPagina = computed(() => {
+    const inicio = (this.paginaActual() - 1) * this.tamanoPagina;
+    return this.pacientesFiltrados().slice(inicio, inicio + this.tamanoPagina);
+  });
+
+  readonly totalPaginas = computed(() =>
+    Math.max(1, Math.ceil(this.pacientesFiltrados().length / this.tamanoPagina)),
+  );
+
+  readonly paginas = computed(() =>
+    Array.from({ length: this.totalPaginas() }, (_, index) => index + 1),
+  );
+
+  readonly resumen = {
+    total: 348,
+    nuevos: 18,
+    citasActivas: 42,
+  };
+
+  actualizarBusqueda(event: Event): void {
+    this.busqueda.set((event.target as HTMLInputElement).value);
+    this.paginaActual.set(1);
+  }
+
+  cambiarSexo(event: Event): void {
+    this.filtroSexo.set((event.target as HTMLSelectElement).value);
+    this.paginaActual.set(1);
+  }
+
+  cambiarSangre(event: Event): void {
+    this.filtroSangre.set((event.target as HTMLSelectElement).value);
+    this.paginaActual.set(1);
+  }
+
+  limpiarFiltros(): void {
+    this.busqueda.set('');
+    this.filtroSexo.set('Todos');
+    this.filtroSangre.set('Todos');
+    this.paginaActual.set(1);
+  }
+
+  cambiarPagina(pagina: number): void {
+    if (pagina >= 1 && pagina <= this.totalPaginas()) {
+      this.paginaActual.set(pagina);
+    }
+  }
+
+  abrirDetalle(paciente: Paciente): void {
+    this.pacienteSeleccionado.set(paciente);
+  }
+
+  cerrarDetalle(): void {
+    this.pacienteSeleccionado.set(null);
+  }
+
+  editarPaciente(paciente: Paciente): void {
+    this.router.navigate(['/pacientes/registro'], {
+      queryParams: { editar: paciente.id },
+    });
+  }
+
+  agendarCita(): void {
+    this.mensaje.set('La agenda de citas se habilitará en el Sprint 2.');
+    window.setTimeout(() => this.mensaje.set(null), 3500);
+  }
+
+  nombreCompleto(paciente: Paciente): string {
+    return `${paciente.nombres} ${paciente.apellidos}`;
+  }
+
+  iniciales(paciente: Paciente): string {
+    return `${paciente.nombres.charAt(0)}${paciente.apellidos.charAt(0)}`;
+  }
+
+  edad(fechaNacimiento: string): number {
+    const hoy = new Date();
+    const nacimiento = new Date(`${fechaNacimiento}T00:00:00`);
+    let edad = hoy.getFullYear() - nacimiento.getFullYear();
+    const cumpleanosPendiente =
+      hoy.getMonth() < nacimiento.getMonth() ||
+      (hoy.getMonth() === nacimiento.getMonth() && hoy.getDate() < nacimiento.getDate());
+
+    if (cumpleanosPendiente) {
+      edad--;
+    }
+
+    return edad;
+  }
+}

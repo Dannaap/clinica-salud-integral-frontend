@@ -1,0 +1,77 @@
+@use '../../../../../styles/variables' as *;
+
+:host {
+  display: block;
+}
+
+.pacientes-shell {
+  min-height: 100vh;
+}
+
+.logo-icon {
+  font-size: 24px;
+  font-weight: $font-weight-bold;
+}
+
+.menu-item.is-disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
+.badge-count {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: $danger;
+  color: $white;
+  font-size: 10px;
+  font-weight: $font-weight-semibold;
+}
+
+@media (max-width: 760px) {
+  .sidebar {
+    width: $sidebar-width-collapsed;
+
+    .sidebar-logo .logo-text,
+    .sidebar-menu .menu-item span,
+    .sidebar-profile .profile-info,
+    .sidebar-profile .profile-logout {
+      display: none;
+    }
+
+    .sidebar-logo {
+      justify-content: center;
+      padding: 0 0 $space-5;
+    }
+
+    .sidebar-menu .menu-item {
+      justify-content: center;
+      padding: 0;
+    }
+
+    .sidebar-profile {
+      justify-content: center;
+      margin-inline: $space-2;
+    }
+  }
+
+  .main-content {
+    margin-left: $sidebar-width-collapsed;
+  }
+
+  .header {
+    padding: 0 $space-4;
+  }
+
+  .user-name,
+  .user-arrow {
+    display: none;
+  }
+}

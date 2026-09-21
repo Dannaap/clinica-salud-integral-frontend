@@ -1,0 +1,179 @@
+<app-pacientes-layout [pageTitle]="editando ? 'Editar paciente' : 'Registrar paciente'" pageSubtitle="Registro y búsqueda de pacientes">
+  <div class="registration-page">
+    <div class="breadcrumb" aria-label="Migas de pan">
+      <a class="breadcrumb-item" routerLink="/pacientes/listado">Pacientes</a>
+      <span class="breadcrumb-separator">/</span>
+      <span class="breadcrumb-item is-active">{{ editando ? 'Editar paciente' : 'Registrar nuevo paciente' }}</span>
+    </div>
+
+    <header class="page-header registration-header">
+      <div class="page-header-title">
+        <h2 class="page-title">{{ editando ? 'Editar paciente' : 'Registrar nuevo paciente' }}</h2>
+        <p class="page-description">
+          {{ editando ? 'Actualiza los datos personales y de contacto del paciente.' : 'Ingresa los datos personales y de contacto para generar la historia clínica digital.' }}
+        </p>
+      </div>
+      <a class="btn btn-outline" routerLink="/pacientes/listado">
+        <lucide-icon [img]="iconArrowLeft" aria-hidden="true"></lucide-icon>
+        Volver al listado
+      </a>
+    </header>
+
+    @if (mensaje(); as aviso) {
+      <div class="feedback-message feedback-success" role="status">
+        <lucide-icon [img]="iconCheck" aria-hidden="true"></lucide-icon>
+        <span>{{ aviso }}</span>
+      </div>
+    }
+
+    @if (error(); as errorMensaje) {
+      <div class="feedback-message feedback-error" role="alert">
+        <lucide-icon [img]="iconX" aria-hidden="true"></lucide-icon>
+        <span>{{ errorMensaje }}</span>
+      </div>
+    }
+
+    <section class="card dni-card">
+      <div class="section-heading">
+        <div class="section-icon"><lucide-icon [img]="iconSearch" aria-hidden="true"></lucide-icon></div>
+        <div>
+          <h3>Buscar paciente existente</h3>
+          <p>Verifica primero si el paciente ya está registrado para evitar duplicados en el sistema.</p>
+        </div>
+      </div>
+
+      <div class="dni-search-row">
+        <div class="dni-input-group">
+          <label class="form-label" for="dni">DNI <span class="required">*</span></label>
+          <div class="input-icon-wrapper has-icon-right">
+            <input
+              id="dni"
+              class="form-control"
+              type="text"
+              inputmode="numeric"
+              maxlength="8"
+              placeholder="Ingresa 8 dígitos"
+              [formControl]="dni"
+              [class.is-invalid]="tieneError('dni') || dniEstado() === 'duplicado'"
+              [class.is-valid]="dniEstado() === 'disponible'"
+              (input)="limpiarResultadoDni()"
+            />
+            <span class="input-icon-right" aria-hidden="true"><lucide-icon [img]="iconUser"></lucide-icon></span>
+          </div>
+          @if (tieneError('dni')) {
+            <span class="form-error">
+              @if (dni.errors?.['required']) { El DNI es obligatorio. }
+              @if (dni.errors?.['dniFormato']) { El DNI debe tener 8 dígitos. }
+            </span>
+          }
+        </div>
+        <button class="btn btn-secondary dni-button" type="button" (click)="buscarDni()">
+          <lucide-icon [img]="iconSearch" aria-hidden="true"></lucide-icon>
+          Buscar
+        </button>
+      </div>
+
+      @if (dniEstado() === 'disponible') {
+        <div class="validation-state state-available" role="status">
+          <lucide-icon [img]="iconCheck" aria-hidden="true"></lucide-icon>
+          DNI disponible. Puedes continuar con el registro.
+        </div>
+      }
+
+      @if (dniEstado() === 'duplicado' && pacienteEncontrado(); as paciente) {
+        <div class="validation-state state-duplicate" role="alert">
+          <div>
+            <strong>Ya existe un paciente con este DNI</strong>
+            <span>{{ paciente.nombres }} {{ paciente.apellidos }} · DNI {{ paciente.dni }}</span>
+          </div>
+          <button class="btn btn-outline btn-sm" type="button" (click)="cancelar()">Ver expediente</button>
+        </div>
+      }
+    </section>
+
+    <form class="card patient-form" [formGroup]="formulario" (ngSubmit)="guardarPaciente()" novalidate>
+      <div class="section-heading">
+        <div class="section-icon"><lucide-icon [img]="iconUser" aria-hidden="true"></lucide-icon></div>
+        <div>
+          <h3>Datos personales del paciente</h3>
+          <p>Todos los campos marcados con <span class="required">*</span> son obligatorios.</p>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label" for="nombres">Nombres <span class="required">*</span></label>
+          <input id="nombres" class="form-control" type="text" formControlName="nombres" placeholder="Ej. Renato Andrés" [class.is-invalid]="tieneError('nombres')" />
+          @if (tieneError('nombres')) { <span class="form-error">Ingresa los nombres del paciente.</span> }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="apellidos">Apellidos <span class="required">*</span></label>
+          <input id="apellidos" class="form-control" type="text" formControlName="apellidos" placeholder="Ej. Vargas Silva" [class.is-invalid]="tieneError('apellidos')" />
+          @if (tieneError('apellidos')) { <span class="form-error">Ingresa los apellidos del paciente.</span> }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="fechaNacimiento">Fecha de nacimiento <span class="required">*</span></label>
+          <input id="fechaNacimiento" class="form-control" type="date" formControlName="fechaNacimiento" [class.is-invalid]="tieneError('fechaNacimiento')" />
+          @if (edad() !== null) { <span class="form-hint">Edad: {{ edad() }} años</span> }
+          @if (tieneError('fechaNacimiento')) { <span class="form-error">Selecciona la fecha de nacimiento.</span> }
+        </div>
+
+        <fieldset class="form-group radio-group">
+          <legend class="form-label">Sexo <span class="required">*</span></legend>
+          <div class="radio-options">
+            <label class="form-radio"><input type="radio" formControlName="sexo" value="Masculino" /> Masculino</label>
+            <label class="form-radio"><input type="radio" formControlName="sexo" value="Femenino" /> Femenino</label>
+            <label class="form-radio"><input type="radio" formControlName="sexo" value="Otro" /> Otro</label>
+          </div>
+          @if (tieneError('sexo')) { <span class="form-error">Selecciona una opción.</span> }
+        </fieldset>
+
+        <div class="form-group">
+          <label class="form-label" for="telefono">Teléfono <span class="required">*</span></label>
+          <input id="telefono" class="form-control" type="tel" formControlName="telefono" placeholder="+51 987 654 321" [class.is-invalid]="tieneError('telefono')" />
+          @if (tieneError('telefono')) { <span class="form-error">Ingresa un teléfono válido.</span> }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="correo">Correo electrónico</label>
+          <input id="correo" class="form-control" type="email" formControlName="correo" placeholder="paciente@email.com" [class.is-invalid]="tieneError('correo')" />
+          @if (tieneError('correo')) { <span class="form-error">Ingresa un correo válido.</span> }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="tipoSangre">Tipo de sangre</label>
+          <select id="tipoSangre" class="form-control" formControlName="tipoSangre">
+            <option value="">Seleccionar tipo sanguíneo...</option>
+            <option>O+</option><option>O-</option><option>A+</option><option>A-</option>
+            <option>B+</option><option>B-</option><option>AB+</option><option>AB-</option>
+          </select>
+        </div>
+
+        <div class="form-group form-full">
+          <label class="form-label" for="direccion">Dirección de residencia</label>
+          <input id="direccion" class="form-control" type="text" formControlName="direccion" placeholder="Av. Guardia Civil 450, San Borja, Lima" />
+        </div>
+
+        <div class="form-group form-full">
+          <label class="form-label" for="alergias">Alergias conocidas o antecedentes médicos relevantes</label>
+          <textarea id="alergias" class="form-control" rows="4" formControlName="alergias" placeholder="Describe alergias, antecedentes o escribe 'Ninguna registrada'"></textarea>
+        </div>
+      </div>
+
+      <div class="secure-note">
+        <lucide-icon [img]="iconShield" aria-hidden="true"></lucide-icon>
+        <span>Conexión segura al padrón de pacientes de Clínica Salud Integral S.A.C.</span>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-outline" type="button" (click)="cancelar()">Cancelar</button>
+        <button class="btn btn-primary" type="submit" [disabled]="guardando()">
+          <lucide-icon [img]="iconCheck" aria-hidden="true"></lucide-icon>
+          {{ guardando() ? 'Guardando...' : (editando ? 'Guardar cambios' : 'Guardar paciente') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</app-pacientes-layout>
