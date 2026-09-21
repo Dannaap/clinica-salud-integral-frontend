@@ -123,10 +123,9 @@ export class Login {
     };
 
     this.authService.login(credenciales).subscribe({
-      next: (response) => {
-        console.log('Login exitoso:', response);
+      next: () => {
         this.cargando.set(false);
-        this.redirigirPorRol(response.usuario.rol);
+        this.router.navigate([this.authService.obtenerRutaDashboard()]);
       },
       error: (error) => {
         console.error('Error de login:', error);
@@ -136,21 +135,5 @@ export class Login {
         );
       },
     });
-  }
-
-  private redirigirPorRol(rol: string): void {
-    switch (rol) {
-      case 'ADMIN':
-        this.router.navigate(['/dashboard/admin']);
-        break;
-      case 'RECEPCION':
-        this.router.navigate(['/dashboard/recepcion']);
-        break;
-      case 'MEDICO':
-        this.router.navigate(['/dashboard/medico']);
-        break;
-      default:
-        this.router.navigate(['/']);
-    }
   }
 }

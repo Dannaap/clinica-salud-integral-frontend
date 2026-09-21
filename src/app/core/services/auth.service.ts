@@ -1,11 +1,34 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, computed, signal } from '@angular/core';
 import { Observable, of, throwError, delay } from 'rxjs';
 import {
   LoginRequest,
   LoginResponse,
+  Rol,
   SesionUsuario,
   Usuario,
 } from '../models/usuario.model';
+
+export interface UsuarioSesionInfo {
+  nombreCompleto: string;
+  iniciales: string;
+  rolLabel: string;
+  especialidad?: string;
+  esAdmin: boolean;
+  esRecepcion: boolean;
+  esMedico: boolean;
+}
+
+const ETIQUETAS_ROL: Record<Rol, string> = {
+  ADMIN: 'Administrador',
+  RECEPCION: 'Recepción',
+  MEDICO: 'Médico',
+};
+
+const RUTAS_DASHBOARD_POR_ROL: Record<Rol, string> = {
+  ADMIN: '/dashboard/admin',
+  RECEPCION: '/dashboard/reception',
+  MEDICO: '/dashboard/medical',
+};
 
 @Injectable({
   providedIn: 'root',
@@ -14,11 +37,28 @@ export class AuthService {
   private readonly USUARIOS_FAKE: Array<Usuario & { password: string }> = [
     { id: 1, nombre: 'Juan', apellidos: 'Pérez', email: 'admin@clinica.com', rol: 'ADMIN', activo: true, password: 'Admin@123' },
     { id: 2, nombre: 'Lucía', apellidos: 'Fernández', email: 'recepcion@clinica.com', rol: 'RECEPCION', activo: true, password: 'Recepcion@123' },
-    { id: 3, nombre: 'Axel', apellidos: 'Rojas', email: 'medico@clinica.com', rol: 'MEDICO', activo: true, password: 'Medico@123' },
+    { id: 3, nombre: 'Axel', apellidos: 'Rojas', email: 'medico@clinica.com', rol: 'MEDICO', activo: true, especialidad: 'Cardiólogo', password: 'Medico@123' },
   ];
 
   private sesionActual = signal<SesionUsuario | null>(null);
   public sesion = this.sesionActual.asReadonly();
+
+  public readonly usuarioActual = computed<UsuarioSesionInfo | null>(() => {
+    const usuario = this.sesionActual()?.usuario;
+    if (!usuario) {
+      return null;
+    }
+
+    return {
+      nombreCompleto: `${usuario.nombre} ${usuario.apellidos}`,
+      iniciales: `${usuario.nombre.charAt(0)}${usuario.apellidos.charAt(0)}`.toUpperCase(),
+      rolLabel: ETIQUETAS_ROL[usuario.rol] ?? usuario.rol,
+      especialidad: usuario.especialidad,
+      esAdmin: usuario.rol === 'ADMIN',
+      esRecepcion: usuario.rol === 'RECEPCION',
+      esMedico: usuario.rol === 'MEDICO',
+    };
+  });
 
   login(credentials: LoginRequest): Observable<LoginResponse> {
     const usuario = this.USUARIOS_FAKE.find(
@@ -73,4 +113,9 @@ export class AuthService {
   obtenerToken(): string | null { return this.sesionActual()?.token ?? null; }
   obtenerUsuario(): Usuario | null { return this.sesionActual()?.usuario ?? null; }
   obtenerRol(): string | null { return this.sesionActual()?.usuario.rol ?? null; }
+
+  obtenerRutaDashboard(): string {
+    const rol = this.obtenerRol() as Rol | null;
+    return (rol && RUTAS_DASHBOARD_POR_ROL[rol]) || '/login';
+  }
 }

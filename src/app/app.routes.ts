@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard, rolGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -9,6 +10,7 @@ export const routes: Routes = [
   },
   {
     path: 'pacientes',
+    canActivate: [authGuard],
     loadChildren: () =>
       import('./features/pacientes/pacientes.routes').then(
         (m) => m.pacientesRoutes
@@ -17,11 +19,13 @@ export const routes: Routes = [
   // Rutas de Dashboard por rol
   {
     path: 'dashboard/admin',
+    canActivate: [rolGuard(['ADMIN'])],
     loadComponent: () =>
       import('./features/dashboard/admin/admin').then((m) => m.AdminComponent),
   },
   {
     path: 'dashboard/reception',
+    canActivate: [rolGuard(['RECEPCION'])],
     loadComponent: () =>
       import('./features/dashboard/reception/reception').then((m) => m.ReceptionComponent),
   },
@@ -32,6 +36,7 @@ export const routes: Routes = [
   },
   {
     path: 'dashboard/medical',
+    canActivate: [rolGuard(['MEDICO'])],
     loadComponent: () =>
       import('./features/dashboard/medical/medical').then((m) => m.MedicalComponent),
   },
@@ -48,6 +53,7 @@ export const routes: Routes = [
   // Rutas bajo el layout de administración
   {
     path: '',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./shared/components/layout/admin-layout').then(
         (m) => m.AdminLayoutComponent
@@ -55,6 +61,7 @@ export const routes: Routes = [
     children: [
       {
         path: 'usuarios',
+        canActivate: [rolGuard(['ADMIN'])],
         loadComponent: () =>
           import('./features/usuarios/listado/usuarios-listado').then(
             (m) => m.UsuariosListadoComponent

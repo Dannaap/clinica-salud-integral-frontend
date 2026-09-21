@@ -6,7 +6,7 @@
     </div>
 
     <nav class="sidebar-menu">
-      <a class="menu-item" routerLink="/pacientes/listado">
+      <a class="menu-item" [routerLink]="rutaInicio">
         <lucide-icon [img]="iconHome" aria-hidden="true"></lucide-icon>
         <span>Inicio</span>
       </a>
@@ -29,12 +29,12 @@
     </nav>
 
     <div class="sidebar-profile">
-      <div class="profile-avatar" aria-hidden="true">LF</div>
+      <div class="profile-avatar" aria-hidden="true">{{ iniciales }}</div>
       <div class="profile-info">
-        <span class="profile-name">Lucía Fernández</span>
-        <span class="profile-role">Recepción</span>
+        <span class="profile-name">{{ nombre }}</span>
+        <span class="profile-role">{{ rol }}</span>
       </div>
-      <button class="profile-logout" type="button" aria-label="Cerrar sesión">
+      <button class="profile-logout" type="button" aria-label="Cerrar sesión" (click)="cerrarSesion()">
         <lucide-icon [img]="iconLogout" aria-hidden="true"></lucide-icon>
       </button>
     </div>
@@ -53,8 +53,8 @@
           <span class="badge-count">2</span>
         </button>
         <div class="user-menu" aria-label="Usuario actual">
-          <span class="user-avatar" aria-hidden="true">LF</span>
-          <span class="user-name">Lucía Fernández</span>
+          <span class="user-avatar" aria-hidden="true">{{ iniciales }}</span>
+          <span class="user-name">{{ nombre }}</span>
           <span class="user-arrow" aria-hidden="true">⌄</span>
         </div>
       </div>

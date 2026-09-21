@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { SidebarComponent } from '../../../shared/components/sidebar/sidebar';
 import { HeaderComponent } from '../../../shared/components/header/header';
+import { AuthService } from '../../../core/services/auth.service';
 
 interface CitaAgenda {
   hora: string;
@@ -33,7 +34,15 @@ interface PacienteReciente {
   styleUrl: './medical.scss'
 })
 export class MedicalComponent {
-  usuario = { nombre: 'Dr. Axel Rojas', especialidad: 'Cardiólogo', iniciales: 'AR' };
+  private readonly authService = inject(AuthService);
+
+  private readonly infoSesion = this.authService.usuarioActual();
+
+  usuario = {
+    nombre: this.infoSesion?.nombreCompleto ?? 'Dr. Axel Rojas',
+    especialidad: this.infoSesion?.especialidad ?? 'Médico general',
+    iniciales: this.infoSesion?.iniciales ?? 'AR',
+  };
 
   kpis = { consultasHoy: 8, enEspera: 2, atencionesMes: 47 };
 

@@ -1,5 +1,5 @@
-import { Component, Input } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, Input, inject } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import {
   Bell,
   CalendarDays,
@@ -10,6 +10,7 @@ import {
   Users,
 } from 'lucide-angular';
 import { LucideAngularModule } from 'lucide-angular';
+import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-pacientes-layout',
@@ -18,6 +19,9 @@ import { LucideAngularModule } from 'lucide-angular';
   styleUrl: './pacientes-layout.scss',
 })
 export class PacientesLayout {
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
+
   @Input() pageTitle = 'Pacientes';
   @Input() pageSubtitle = 'Listado y búsqueda de pacientes';
 
@@ -28,4 +32,16 @@ export class PacientesLayout {
   readonly iconProfile = UserCircle;
   readonly iconBell = Bell;
   readonly iconLogout = LogOut;
+
+  readonly infoSesion = this.authService.usuarioActual();
+
+  readonly nombre = this.infoSesion?.nombreCompleto ?? 'Usuario';
+  readonly rol = this.infoSesion?.rolLabel ?? '';
+  readonly iniciales = this.infoSesion?.iniciales ?? 'US';
+  readonly rutaInicio = this.authService.obtenerRutaDashboard();
+
+  cerrarSesion(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
 }

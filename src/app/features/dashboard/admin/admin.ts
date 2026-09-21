@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { SidebarComponent } from '../../../shared/components/sidebar/sidebar';
 import { HeaderComponent } from '../../../shared/components/header/header';
+import { AuthService } from '../../../core/services/auth.service';
 
 interface Cita {
   hora: string;
@@ -27,10 +28,14 @@ interface Doctor {
   styleUrl: './admin.scss'
 })
 export class AdminComponent {
+  private readonly authService = inject(AuthService);
+
+  private readonly infoSesion = this.authService.usuarioActual();
+
   usuario = {
-    nombre: 'Dr. Juan Pérez',
-    rol: 'Administrador',
-    iniciales: 'JP'
+    nombre: this.infoSesion?.nombreCompleto ?? 'Dr. Juan Pérez',
+    rol: this.infoSesion?.rolLabel ?? 'Administrador',
+    iniciales: this.infoSesion?.iniciales ?? 'JP'
   };
 
   kpis = {
