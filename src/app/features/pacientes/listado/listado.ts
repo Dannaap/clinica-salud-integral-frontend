@@ -17,6 +17,7 @@ import { LucideAngularModule } from 'lucide-angular';
 import { PacientesLayout } from '../components/pacientes-layout/pacientes-layout';
 import { Paciente } from '../paciente.model';
 import { PacienteService } from '../paciente.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-listado',
@@ -26,8 +27,13 @@ import { PacienteService } from '../paciente.service';
 })
 export class Listado {
   private readonly pacienteService = inject(PacienteService);
+  private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+
+  get rutaDashboard(): string {
+    return this.authService.obtenerRutaDashboard();
+  }
 
   readonly iconPlus = Plus;
   readonly iconSearch = Search;
@@ -41,8 +47,9 @@ export class Listado {
 
   readonly pacientes = this.pacienteService.pacientes;
   readonly busqueda = signal('');
-  readonly filtroSexo = signal('Todos');
-  readonly filtroSangre = signal('Todos');
+  readonly filtroEstado = signal<'Todos' | 'Activo' | 'Inactivo' | 'Nuevo'>('Todos');
+  readonly filtroSexo = signal<'Todos' | 'Masculino' | 'Femenino' | 'Otro'>('Todos');
+  readonly filtroSangre = signal<string>('Todos');
   readonly paginaActual = signal(1);
   readonly tamanoPagina = 8;
   readonly pacienteSeleccionado = signal<Paciente | null>(null);
@@ -57,6 +64,7 @@ export class Listado {
 
   readonly pacientesFiltrados = computed(() => {
     const termino = this.busqueda().trim().toLowerCase();
+    const estado = this.filtroEstado();
     const sexo = this.filtroSexo();
     const sangre = this.filtroSangre();
 
@@ -65,10 +73,11 @@ export class Listado {
         !termino ||
         `${paciente.nombres} ${paciente.apellidos}`.toLowerCase().includes(termino) ||
         paciente.dni.includes(termino);
+      const coincideEstado = estado === 'Todos' || paciente.estado === estado;
       const coincideSexo = sexo === 'Todos' || paciente.sexo === sexo;
       const coincideSangre = sangre === 'Todos' || paciente.tipoSangre === sangre;
 
-      return coincideBusqueda && coincideSexo && coincideSangre;
+      return coincideBusqueda && coincideEstado && coincideSexo && coincideSangre;
     });
   });
 
@@ -99,8 +108,13 @@ export class Listado {
     this.paginaActual.set(1);
   }
 
+  cambiarEstado(event: Event): void {
+    this.filtroEstado.set((event.target as HTMLSelectElement).value as any);
+    this.paginaActual.set(1);
+  }
+
   cambiarSexo(event: Event): void {
-    this.filtroSexo.set((event.target as HTMLSelectElement).value);
+    this.filtroSexo.set((event.target as HTMLSelectElement).value as any);
     this.paginaActual.set(1);
   }
 
@@ -111,6 +125,7 @@ export class Listado {
 
   limpiarFiltros(): void {
     this.busqueda.set('');
+    this.filtroEstado.set('Todos');
     this.filtroSexo.set('Todos');
     this.filtroSangre.set('Todos');
     this.paginaActual.set(1);
