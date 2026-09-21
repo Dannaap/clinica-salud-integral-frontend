@@ -19,6 +19,38 @@ function soloNumeros(control: AbstractControl): ValidationErrors | null {
   return /^\d{8}$/.test(control.value ?? '') ? null : { dniFormato: true };
 }
 
+function soloLetras(control: AbstractControl): ValidationErrors | null {
+  const val = control.value?.trim();
+  if (!val) return null;
+  return /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s'-]+$/.test(val) ? null : { soloLetras: true };
+}
+
+function fechaNacimientoValida(control: AbstractControl): ValidationErrors | null {
+  if (!control.value) return null;
+  const fecha = new Date(`${control.value}T00:00:00`);
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+  if (isNaN(fecha.getTime())) return { fechaInvalida: true };
+  if (fecha > hoy) return { fechaFutura: true };
+  const anioMinimo = hoy.getFullYear() - 130;
+  if (fecha.getFullYear() < anioMinimo) return { fechaAntigua: true };
+  return null;
+}
+
+function telefonoValido(control: AbstractControl): ValidationErrors | null {
+  const val = control.value?.trim();
+  if (!val) return null;
+  const limpio = val.replace(/[\s+-]/g, '');
+  const sinPais = limpio.startsWith('51') && limpio.length === 11 ? limpio.substring(2) : limpio;
+  return /^9\d{8}$/.test(sinPais) ? null : { telefonoInvalido: true };
+}
+
+function correoOpcional(control: AbstractControl): ValidationErrors | null {
+  const val = control.value?.trim();
+  if (!val) return null;
+  return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(val) ? null : { emailInvalido: true };
+}
+
 @Component({
   selector: 'app-registro',
   imports: [CommonModule, ReactiveFormsModule, RouterLink, LucideAngularModule, PacientesLayout],
@@ -49,15 +81,15 @@ export class Registro {
 
   readonly formulario = this.fb.group({
     dni: ['', [Validators.required, soloNumeros]],
-    nombres: ['', [Validators.required, Validators.minLength(2)]],
-    apellidos: ['', [Validators.required, Validators.minLength(2)]],
-    fechaNacimiento: ['', Validators.required],
+    nombres: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50), soloLetras]],
+    apellidos: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50), soloLetras]],
+    fechaNacimiento: ['', [Validators.required, fechaNacimientoValida]],
     sexo: ['', Validators.required],
-    telefono: ['', [Validators.required, Validators.pattern(/^\+?\d[\d\s-]{8,}$/)]],
-    correo: ['', Validators.email],
+    telefono: ['', [Validators.required, telefonoValido]],
+    correo: ['', [correoOpcional]],
     tipoSangre: [''],
-    direccion: [''],
-    alergias: [''],
+    direccion: ['', [Validators.maxLength(200)]],
+    alergias: ['', [Validators.maxLength(500)]],
   });
 
   constructor() {
