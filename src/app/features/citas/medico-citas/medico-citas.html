@@ -1,0 +1,474 @@
+<app-sidebar
+  [nombre]="usuario.nombre"
+  [rol]="usuario.especialidad"
+  [iniciales]="usuario.iniciales"
+  [esAdmin]="false"
+  [esMedico]="true"
+  [abierto]="sidebarAbierto">
+</app-sidebar>
+
+<div class="sidebar-overlay" *ngIf="sidebarAbierto" (click)="sidebarAbierto = false"></div>
+
+<div class="main-wrapper">
+  <app-header
+    titulo="Citas Médicas"
+    subtitulo="Agenda de consultas y gestión de pacientes"
+    placeholder="Buscar por paciente, DNI o historia clínica..."
+    [notificaciones]="3"
+    [nombre]="usuario.nombre"
+    [rol]="usuario.especialidad"
+    [iniciales]="usuario.iniciales"
+    (searchChange)="onBuscar($event)"
+    (menuToggle)="toggleSidebar()">
+  </app-header>
+
+  <main class="content">
+    <!-- Feedback Toast -->
+    <div class="feedback-banner" *ngIf="mensajeFeedback(); as fb" [ngClass]="fb.tipo">
+      <span class="material-symbols-outlined">{{ fb.tipo === 'success' ? 'check_circle' : 'error' }}</span>
+      <span>{{ fb.texto }}</span>
+    </div>
+
+    <!-- Header / Banner de sección -->
+    <section class="page-title-row">
+      <div class="title-info">
+        <h1 class="page-main-heading">Agenda de Consultas</h1>
+        <p class="page-sub-heading">
+          Gestión de pacientes citados para <span class="highlight">Dr. Axel Rojas</span> • Especialidad de Cardiología
+        </p>
+      </div>
+
+      <div class="assigned-office">
+        <span class="material-symbols-outlined">meeting_room</span>
+        <div>
+          <span class="office-label">Consultorio Asignado</span>
+          <span class="office-value">Consultorio 3 • Piso 2</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- KPI Summary Row -->
+    <section class="kpi-grid">
+      <div class="kpi-card" (click)="setEstadoFiltro('TODOS')">
+        <div class="kpi-icon total">
+          <span class="material-symbols-outlined">calendar_month</span>
+        </div>
+        <div class="kpi-body">
+          <span class="kpi-number">{{ kpis().totalHoy }}</span>
+          <span class="kpi-label">Citas del día</span>
+        </div>
+      </div>
+
+      <div class="kpi-card" (click)="setEstadoFiltro('PENDIENTE')">
+        <div class="kpi-icon pending">
+          <span class="material-symbols-outlined">hourglass_top</span>
+        </div>
+        <div class="kpi-body">
+          <span class="kpi-number">{{ kpis().pendientes }}</span>
+          <span class="kpi-label">En espera / Pendientes</span>
+        </div>
+      </div>
+
+      <div class="kpi-card" (click)="setEstadoFiltro('CONFIRMADA')">
+        <div class="kpi-icon confirmed">
+          <span class="material-symbols-outlined">verified</span>
+        </div>
+        <div class="kpi-body">
+          <span class="kpi-number">{{ kpis().confirmadas }}</span>
+          <span class="kpi-label">Confirmadas</span>
+        </div>
+      </div>
+
+      <div class="kpi-card" (click)="setEstadoFiltro('ATENDIDA')">
+        <div class="kpi-icon attended">
+          <span class="material-symbols-outlined">task_alt</span>
+        </div>
+        <div class="kpi-body">
+          <span class="kpi-number">{{ kpis().atendidas }}</span>
+          <span class="kpi-label">Atendidas</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Filtros y pestañas -->
+    <section class="filter-card">
+      <div class="filter-top">
+        <div class="time-tabs">
+          <button
+            type="button"
+            class="tab-btn"
+            [class.active]="pestanaActiva() === 'hoy'"
+            (click)="cambiarPestana('hoy')">
+            <span class="material-symbols-outlined">today</span>
+            <span>Hoy (14 Sep)</span>
+          </button>
+          <button
+            type="button"
+            class="tab-btn"
+            [class.active]="pestanaActiva() === 'proximas'"
+            (click)="cambiarPestana('proximas')">
+            <span class="material-symbols-outlined">event_upcoming</span>
+            <span>Próximas</span>
+          </button>
+          <button
+            type="button"
+            class="tab-btn"
+            [class.active]="pestanaActiva() === 'todas'"
+            (click)="cambiarPestana('todas')">
+            <span class="material-symbols-outlined">date_range</span>
+            <span>Todas</span>
+          </button>
+        </div>
+
+        <div class="search-field">
+          <span class="material-symbols-outlined search-icon">search</span>
+          <input
+            type="text"
+            placeholder="Buscar por nombre, DNI o HC..."
+            [ngModel]="busqueda()"
+            (ngModelChange)="onBuscar($event)" />
+        </div>
+      </div>
+
+      <div class="filter-status-chips">
+        <span class="chips-label">Estado:</span>
+        <button
+          type="button"
+          class="chip-btn"
+          [class.active]="estadoFiltro() === 'TODOS'"
+          (click)="setEstadoFiltro('TODOS')">
+          Todos
+        </button>
+        <button
+          type="button"
+          class="chip-btn"
+          [class.active]="estadoFiltro() === 'CONFIRMADA'"
+          (click)="setEstadoFiltro('CONFIRMADA')">
+          Confirmadas
+        </button>
+        <button
+          type="button"
+          class="chip-btn"
+          [class.active]="estadoFiltro() === 'PENDIENTE'"
+          (click)="setEstadoFiltro('PENDIENTE')">
+          Pendientes
+        </button>
+        <button
+          type="button"
+          class="chip-btn"
+          [class.active]="estadoFiltro() === 'ATENDIDA'"
+          (click)="setEstadoFiltro('ATENDIDA')">
+          Atendidas
+        </button>
+        <button
+          type="button"
+          class="chip-btn"
+          [class.active]="estadoFiltro() === 'CANCELADA'"
+          (click)="setEstadoFiltro('CANCELADA')">
+          Canceladas
+        </button>
+      </div>
+    </section>
+
+    <!-- Lista de citas -->
+    <section class="table-container">
+      <div class="table-header">
+        <h2 class="table-title">
+          Listado de Consultas
+          <span class="badge-count">{{ citasFiltradas().length }}</span>
+        </h2>
+      </div>
+
+      <div class="table-responsive" *ngIf="citasFiltradas().length > 0; else emptyState">
+        <table class="citas-table">
+          <thead>
+            <tr>
+              <th>Hora / Fecha</th>
+              <th>Paciente</th>
+              <th>Motivo / Diagnóstico</th>
+              <th>Tipo</th>
+              <th>Estado</th>
+              <th class="text-right">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let cita of citasFiltradas()">
+              <td class="col-time">
+                <div class="time-box">
+                  <span class="time-main">{{ cita.hora }}</span>
+                  <span class="date-sub">{{ cita.fecha }}</span>
+                </div>
+              </td>
+
+              <td class="col-patient">
+                <div class="patient-profile">
+                  <div class="patient-avatar">
+                    {{ cita.pacienteNombre.charAt(0) }}
+                  </div>
+                  <div class="patient-meta">
+                    <span class="patient-name">{{ cita.pacienteNombre }}</span>
+                    <span class="patient-sub">
+                      DNI: <strong>{{ cita.pacienteDni }}</strong> • {{ cita.historiaClinica }}
+                    </span>
+                  </div>
+                </div>
+              </td>
+
+              <td class="col-reason">
+                <span class="reason-text">{{ cita.motivo || 'Consulta médica programada' }}</span>
+              </td>
+
+              <td class="col-type">
+                <span class="type-badge">{{ getTipoLabel(cita.tipo) }}</span>
+              </td>
+
+              <td class="col-status">
+                <span class="badge" [ngClass]="getEstadoClass(cita.estado)">
+                  {{ cita.estado }}
+                </span>
+              </td>
+
+              <td class="col-actions text-right">
+                <div class="actions-group">
+                  <!-- Iniciar consulta o marcar atendida -->
+                  <button
+                    *ngIf="cita.estado !== 'ATENDIDA' && cita.estado !== 'CANCELADA'"
+                    class="btn-action btn-attend"
+                    type="button"
+                    title="Atender consulta"
+                    (click)="iniciarConsulta(cita)">
+                    <span class="material-symbols-outlined">stethoscope</span>
+                    <span>Atender</span>
+                  </button>
+
+                  <!-- Ver detalle -->
+                  <button
+                    class="btn-action btn-view"
+                    type="button"
+                    title="Ver detalle del paciente"
+                    (click)="abrirDetalle(cita)">
+                    <span class="material-symbols-outlined">visibility</span>
+                  </button>
+
+                  <!-- Reprogramar -->
+                  <button
+                    *ngIf="cita.estado !== 'ATENDIDA' && cita.estado !== 'CANCELADA'"
+                    class="btn-action btn-reschedule"
+                    type="button"
+                    title="Reprogramar cita"
+                    (click)="abrirReprogramar(cita)">
+                    <span class="material-symbols-outlined">schedule</span>
+                  </button>
+
+                  <!-- Cancelar -->
+                  <button
+                    *ngIf="cita.estado !== 'ATENDIDA' && cita.estado !== 'CANCELADA'"
+                    class="btn-action btn-cancel"
+                    type="button"
+                    title="Cancelar cita"
+                    (click)="abrirCancelar(cita)">
+                    <span class="material-symbols-outlined">close</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Estado vacío -->
+      <ng-template #emptyState>
+        <div class="empty-state">
+          <span class="material-symbols-outlined empty-icon">event_busy</span>
+          <h3 class="empty-title">No se encontraron citas</h3>
+          <p class="empty-desc">No hay citas programadas que coincidan con los filtros seleccionados.</p>
+          <button class="btn btn-outline" (click)="setEstadoFiltro('TODOS'); onBuscar('')">
+            Limpiar filtros
+          </button>
+        </div>
+      </ng-template>
+    </section>
+  </main>
+</div>
+
+<!-- MODAL: Detalle de Cita -->
+<div class="modal-backdrop" *ngIf="modalDetalleAbierto() && citaSeleccionada(); as cita" (click)="cerrarModales()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title-box">
+        <span class="material-symbols-outlined icon-header">assignment_ind</span>
+        <div>
+          <h3 class="modal-title">Expediente de Cita</h3>
+          <span class="modal-subtitle">{{ cita.historiaClinica }} • {{ cita.fecha }} - {{ cita.hora }} hrs</span>
+        </div>
+      </div>
+      <button class="btn-close" (click)="cerrarModales()" type="button" aria-label="Cerrar">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="detail-section">
+        <h4 class="section-label">Datos del Paciente</h4>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="item-title">Nombre Completo:</span>
+            <span class="item-value">{{ cita.pacienteNombre }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="item-title">Documento DNI:</span>
+            <span class="item-value">{{ cita.pacienteDni }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="item-title">Historia Clínica:</span>
+            <span class="item-value">{{ cita.historiaClinica }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="item-title">Consultorio:</span>
+            <span class="item-value">{{ cita.consultorio }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <h4 class="section-label">Información de la Consulta</h4>
+        <div class="detail-grid">
+          <div class="detail-item full-width">
+            <span class="item-title">Motivo de la Cita:</span>
+            <p class="item-text">{{ cita.motivo }}</p>
+          </div>
+          <div class="detail-item">
+            <span class="item-title">Tipo:</span>
+            <span class="type-badge">{{ getTipoLabel(cita.tipo) }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="item-title">Estado Actual:</span>
+            <span class="badge" [ngClass]="getEstadoClass(cita.estado)">{{ cita.estado }}</span>
+          </div>
+          <div class="detail-item full-width">
+            <span class="item-title">Observaciones Clínicas / Antecedentes:</span>
+            <p class="item-text">{{ cita.observaciones || 'Sin observaciones adicionales registradas.' }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-outline" type="button" (click)="cerrarModales()">Cerrar</button>
+      <button
+        *ngIf="cita.estado !== 'ATENDIDA' && cita.estado !== 'CANCELADA'"
+        class="btn btn-primary"
+        type="button"
+        (click)="cerrarModales(); iniciarConsulta(cita)">
+        <span class="material-symbols-outlined">stethoscope</span>
+        <span>Atender Consulta</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Acción (Atender / Reprogramar / Cancelar) -->
+<div class="modal-backdrop" *ngIf="modalAccionAbierto() && citaSeleccionada(); as cita" (click)="cerrarModales()">
+  <div class="modal-card modal-sm" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title-box">
+        <span class="material-symbols-outlined icon-header" [ngClass]="accionTipo()">
+          {{ accionTipo() === 'atender' ? 'stethoscope' : (accionTipo() === 'reprogramar' ? 'schedule' : 'cancel') }}
+        </span>
+        <div>
+          <h3 class="modal-title">
+            {{ accionTipo() === 'atender' ? 'Registrar Atención de Consulta' : (accionTipo() === 'reprogramar' ? 'Reprogramar Cita Médica' : 'Cancelar Cita') }}
+          </h3>
+          <span class="modal-subtitle">{{ cita.pacienteNombre }} • DNI {{ cita.pacienteDni }}</span>
+        </div>
+      </div>
+      <button class="btn-close" (click)="cerrarModales()" type="button" aria-label="Cerrar">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Caso ATENDER -->
+      <div *ngIf="accionTipo() === 'atender'" class="form-modal">
+        <p class="modal-desc">
+          Vas a registrar la atención médica con <strong>{{ cita.pacienteNombre }}</strong>. Ingresa las notas clínicas o indicaciones para el expediente.
+        </p>
+        <div class="form-group">
+          <label class="form-label" for="notasAtencion">Notas de la consulta y diagnóstico</label>
+          <textarea
+            id="notasAtencion"
+            class="form-control"
+            rows="4"
+            placeholder="Escribe el diagnóstico, indicaciones o tratamiento recetado..."
+            [ngModel]="observacionesAtencion()"
+            (ngModelChange)="observacionesAtencion.set($event)"></textarea>
+        </div>
+      </div>
+
+      <!-- Caso REPROGRAMAR -->
+      <div *ngIf="accionTipo() === 'reprogramar'" class="form-modal">
+        <p class="modal-desc">
+          Selecciona la nueva fecha y hora para la consulta de <strong>{{ cita.pacienteNombre }}</strong>.
+        </p>
+        <div class="form-group">
+          <label class="form-label" for="nuevaFecha">Nueva Fecha</label>
+          <input
+            id="nuevaFecha"
+            type="date"
+            class="form-control"
+            [ngModel]="nuevaFechaReprogramar()"
+            (ngModelChange)="nuevaFechaReprogramar.set($event)" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="nuevaHora">Nueva Hora</label>
+          <select
+            id="nuevaHora"
+            class="form-control"
+            [ngModel]="nuevaHoraReprogramar()"
+            (ngModelChange)="nuevaHoraReprogramar.set($event)">
+            <option value="09:00">09:00 hrs</option>
+            <option value="09:30">09:30 hrs</option>
+            <option value="10:00">10:00 hrs</option>
+            <option value="10:30">10:30 hrs</option>
+            <option value="11:00">11:00 hrs</option>
+            <option value="11:30">11:30 hrs</option>
+            <option value="12:00">12:00 hrs</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Caso CANCELAR -->
+      <div *ngIf="accionTipo() === 'cancelar'" class="form-modal">
+        <p class="modal-desc modal-warning-desc">
+          ¿Estás seguro de cancelar la cita médica programada con <strong>{{ cita.pacienteNombre }}</strong> para las {{ cita.hora }}?
+        </p>
+        <div class="form-group">
+          <label class="form-label" for="motivoCancel">Motivo de cancelación (opcional)</label>
+          <input
+            id="motivoCancel"
+            type="text"
+            class="form-control"
+            placeholder="Ej. Paciente solicitó reprogramación o no se presentó..."
+            [ngModel]="motivoCancelacion()"
+            (ngModelChange)="motivoCancelacion.set($event)" />
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-outline" type="button" (click)="cerrarModales()">Cancelar</button>
+      <button
+        class="btn"
+        [ngClass]="accionTipo() === 'cancelar' ? 'btn-danger' : 'btn-primary'"
+        type="button"
+        (click)="ejecutarAccion()">
+        <span class="material-symbols-outlined">
+          {{ accionTipo() === 'atender' ? 'check_circle' : (accionTipo() === 'reprogramar' ? 'save' : 'delete') }}
+        </span>
+        <span>
+          {{ accionTipo() === 'atender' ? 'Finalizar y Atender' : (accionTipo() === 'reprogramar' ? 'Guardar Cambios' : 'Confirmar Cancelación') }}
+        </span>
+      </button>
+    </div>
+  </div>
+</div>
