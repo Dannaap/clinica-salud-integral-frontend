@@ -1,6 +1,7 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -10,6 +11,9 @@ import { RouterModule } from '@angular/router';
   styleUrl: './sidebar.scss'
 })
 export class SidebarComponent {
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
   @Input() nombre: string = 'Dr. Juan Pérez';
   @Input() rol: string = 'Administrador';
   @Input() iniciales: string = 'JP';
@@ -17,7 +21,13 @@ export class SidebarComponent {
   @Input() esMedico: boolean = false;
   @Input() abierto: boolean = false;
 
+  mostrarProximamente(modulo: string): void {
+    console.log(`${modulo} estará disponible en un próximo sprint`);
+    alert(`${modulo} estará disponible en un próximo sprint.`);
+  }
+
   logout() {
-    console.log('Cerrar sesión');
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
 }

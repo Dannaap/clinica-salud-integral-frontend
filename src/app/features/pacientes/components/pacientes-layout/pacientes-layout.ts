@@ -1,5 +1,6 @@
-import { Component, Input } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, Input, inject } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { AuthService } from '../../../../core/services/auth.service';
 import {
   Bell,
   CalendarDays,
@@ -18,6 +19,9 @@ import { LucideAngularModule } from 'lucide-angular';
   styleUrl: './pacientes-layout.scss',
 })
 export class PacientesLayout {
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
   @Input() pageTitle = 'Pacientes';
   @Input() pageSubtitle = 'Listado y búsqueda de pacientes';
 
@@ -28,4 +32,9 @@ export class PacientesLayout {
   readonly iconProfile = UserCircle;
   readonly iconBell = Bell;
   readonly iconLogout = LogOut;
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
 }

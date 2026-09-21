@@ -16,30 +16,57 @@
       <span class="material-symbols-outlined">group</span>
       <span>Pacientes</span>
     </a>
-    <a routerLink="/citas" class="nav-item">
+    <button
+      type="button"
+      class="nav-item nav-item-disabled"
+      (click)="mostrarProximamente('Citas')"
+    >
       <span class="material-symbols-outlined">calendar_month</span>
       <span>Citas</span>
-    </a>
-    <a routerLink="/turnos" class="nav-item" *ngIf="esAdmin">
+    </button>
+    <button
+      type="button"
+      class="nav-item nav-item-disabled"
+      (click)="mostrarProximamente('Turnos médicos')"
+      *ngIf="esAdmin"
+    >
       <span class="material-symbols-outlined">stethoscope</span>
       <span>Turnos médicos</span>
-    </a>
-    <a routerLink="/atenciones" class="nav-item" *ngIf="esAdmin || esMedico">
+    </button>
+    <button
+      type="button"
+      class="nav-item nav-item-disabled"
+      (click)="mostrarProximamente('Atenciones')"
+      *ngIf="esAdmin || esMedico"
+    >
       <span class="material-symbols-outlined">assignment</span>
       <span>Atenciones</span>
-    </a>
-    <a routerLink="/reportes" class="nav-item">
+    </button>
+    <button
+      type="button"
+      class="nav-item nav-item-disabled"
+      (click)="mostrarProximamente('Reportes')"
+    >
       <span class="material-symbols-outlined">bar_chart</span>
       <span>Reportes</span>
-    </a>
-    <a routerLink="/usuarios" class="nav-item" *ngIf="esAdmin">
+    </button>
+    <button
+      type="button"
+      class="nav-item nav-item-disabled"
+      (click)="mostrarProximamente('Usuarios')"
+      *ngIf="esAdmin"
+    >
       <span class="material-symbols-outlined">manage_accounts</span>
       <span>Usuarios</span>
-    </a>
-    <a routerLink="/perfil" class="nav-item">
+    </button>
+    <button
+      type="button"
+      class="nav-item nav-item-disabled"
+      (click)="mostrarProximamente('Perfil')"
+    >
       <span class="material-symbols-outlined">account_circle</span>
       <span>Perfil</span>
-    </a>
+    </button>
   </nav>
 
   <div class="sidebar-footer">

@@ -44,6 +44,7 @@ export class Registro {
   readonly mensaje = signal<string | null>(null);
   readonly error = signal<string | null>(null);
   readonly pacienteEditando = signal<Paciente | null>(null);
+  readonly hoy = new Date().toISOString().split('T')[0];
 
   readonly formulario = this.fb.group({
     dni: ['', [Validators.required, soloNumeros]],

@@ -20,6 +20,10 @@ export class AuthService {
   private sesionActual = signal<SesionUsuario | null>(null);
   public sesion = this.sesionActual.asReadonly();
 
+  constructor() {
+    this.cargarSesion();
+  }
+
   login(credentials: LoginRequest): Observable<LoginResponse> {
     const usuario = this.USUARIOS_FAKE.find(
       (u) => u.email === credentials.email && u.password === credentials.password
@@ -73,4 +77,13 @@ export class AuthService {
   obtenerToken(): string | null { return this.sesionActual()?.token ?? null; }
   obtenerUsuario(): Usuario | null { return this.sesionActual()?.usuario ?? null; }
   obtenerRol(): string | null { return this.sesionActual()?.usuario.rol ?? null; }
+
+  obtenerRutaDashboard(): string {
+    switch (this.obtenerRol()) {
+      case 'ADMIN': return '/dashboard/admin';
+      case 'RECEPCION': return '/dashboard/recepcion';
+      case 'MEDICO': return '/dashboard/medico';
+      default: return '/login';
+    }
+  }
 }
