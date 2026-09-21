@@ -24,19 +24,19 @@
     <div class="summary-grid" aria-label="Resumen de pacientes">
       <article class="summary-card">
         <span class="summary-label">Total pacientes</span>
-        <strong class="summary-value">{{ resumen.total }}</strong>
+        <strong class="summary-value">{{ resumen().total }}</strong>
         <span class="summary-meta">Padrón activo en clínica</span>
         <span class="summary-icon summary-icon-blue"><lucide-icon [img]="iconUser" aria-hidden="true"></lucide-icon></span>
       </article>
       <article class="summary-card">
         <span class="summary-label">Nuevos este mes</span>
-        <strong class="summary-value">+{{ resumen.nuevos }}</strong>
+        <strong class="summary-value">+{{ resumen().nuevos }}</strong>
         <span class="summary-meta summary-meta-success">+12% vs mes anterior</span>
         <span class="summary-icon summary-icon-green"><lucide-icon [img]="iconPlus" aria-hidden="true"></lucide-icon></span>
       </article>
       <article class="summary-card">
         <span class="summary-label">Con citas activas</span>
-        <strong class="summary-value">{{ resumen.citasActivas }}</strong>
+        <strong class="summary-value">{{ resumen().citasActivas }}</strong>
         <span class="summary-meta">Programadas esta semana</span>
         <span class="summary-icon summary-icon-purple"><lucide-icon [img]="iconCalendarPlus" aria-hidden="true"></lucide-icon></span>
       </article>

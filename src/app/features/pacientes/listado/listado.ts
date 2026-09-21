@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   CalendarPlus,
   Eye,
@@ -27,6 +27,7 @@ import { PacienteService } from '../paciente.service';
 export class Listado {
   private readonly pacienteService = inject(PacienteService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   readonly iconPlus = Plus;
   readonly iconSearch = Search;
@@ -46,6 +47,13 @@ export class Listado {
   readonly tamanoPagina = 8;
   readonly pacienteSeleccionado = signal<Paciente | null>(null);
   readonly mensaje = signal<string | null>(null);
+
+  constructor() {
+    const dniParam = this.route.snapshot.queryParamMap.get('dni');
+    if (dniParam) {
+      this.busqueda.set(dniParam);
+    }
+  }
 
   readonly pacientesFiltrados = computed(() => {
     const termino = this.busqueda().trim().toLowerCase();
@@ -77,11 +85,14 @@ export class Listado {
     Array.from({ length: this.totalPaginas() }, (_, index) => index + 1),
   );
 
-  readonly resumen = {
-    total: 348,
-    nuevos: 18,
-    citasActivas: 42,
-  };
+  readonly resumen = computed(() => {
+    const lista = this.pacientes();
+    return {
+      total: lista.length,
+      nuevos: lista.filter((p) => p.estado === 'Nuevo').length,
+      citasActivas: lista.reduce((acc, p) => acc + (p.citasActivas || 0), 0),
+    };
+  });
 
   actualizarBusqueda(event: Event): void {
     this.busqueda.set((event.target as HTMLInputElement).value);

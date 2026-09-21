@@ -41,6 +41,7 @@ export class Registro {
   readonly dniEstado = signal<'neutral' | 'disponible' | 'duplicado'>('neutral');
   readonly pacienteEncontrado = signal<Paciente | null>(null);
   readonly guardando = signal(false);
+  readonly redirigiendo = signal(false);
   readonly mensaje = signal<string | null>(null);
   readonly error = signal<string | null>(null);
   readonly pacienteEditando = signal<Paciente | null>(null);
@@ -118,6 +119,17 @@ export class Registro {
     if (!this.editando) {
       this.dniEstado.set('neutral');
       this.pacienteEncontrado.set(null);
+      return;
+    }
+
+    const dniActual = (this.dni.value ?? '').trim();
+    const pacienteOriginal = this.pacienteEditando();
+    if (pacienteOriginal && dniActual !== pacienteOriginal.dni) {
+      this.dniEstado.set('neutral');
+      this.pacienteEncontrado.set(null);
+    } else if (pacienteOriginal && dniActual === pacienteOriginal.dni) {
+      this.dniEstado.set('disponible');
+      this.pacienteEncontrado.set(null);
     }
   }
 
@@ -151,9 +163,14 @@ export class Registro {
     }
 
     this.guardando.set(false);
+    this.redirigiendo.set(true);
     this.mensaje.set(
       pacienteEditando ? 'Los datos del paciente fueron actualizados.' : 'Paciente registrado correctamente.',
     );
+
+    setTimeout(() => {
+      this.router.navigate(['/pacientes/listado']);
+    }, 1200);
   }
 
   cancelar(): void {
