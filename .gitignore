@@ -144,3 +144,22 @@ vite.config.ts.timestamp-*
 
 # Angular cache
 /.angular/
+.angular/
+
+# IDEs and Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+
+# Temporary files
+*.tmp
+*.temp

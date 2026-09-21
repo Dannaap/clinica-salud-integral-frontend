@@ -1,6 +1,6 @@
 import { Component, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
@@ -11,8 +11,8 @@ import { AuthService } from '../../../core/services/auth.service';
   styleUrl: './sidebar.scss'
 })
 export class SidebarComponent {
-  private authService = inject(AuthService, { optional: true });
-  private router = inject(Router, { optional: true });
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
 
   @Input() nombre: string = 'Dr. Juan Pérez';
   @Input() rol: string = 'Administrador';
@@ -21,13 +21,18 @@ export class SidebarComponent {
   @Input() esMedico: boolean = false;
   @Input() abierto: boolean = false;
 
+  get rutaDashboard(): string {
+    return this.authService.obtenerRutaDashboard();
+  }
+
+  mostrarProximamente(modulo: string): void {
+    console.log(`${modulo} estará disponible en un próximo sprint`);
+    alert(`${modulo} estará disponible en un próximo sprint.`);
+  }
+
   logout(): void {
-    if (this.authService) {
-      this.authService.logout();
-    }
-    if (this.router) {
-      this.router.navigate(['/login']);
-    }
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
 
   cerrarSesion(): void {

@@ -1,7 +1,7 @@
 <app-pacientes-layout pageTitle="Pacientes" pageSubtitle="Listado y búsqueda de pacientes">
   <div class="patients-page">
     <div class="breadcrumb" aria-label="Migas de pan">
-      <a class="breadcrumb-item" routerLink="/pacientes/listado">Inicio</a>
+      <a class="breadcrumb-item" [routerLink]="rutaDashboard">Inicio</a>
       <span class="breadcrumb-separator">/</span>
       <span class="breadcrumb-item is-active">Pacientes</span>
     </div>
@@ -24,19 +24,19 @@
     <div class="summary-grid" aria-label="Resumen de pacientes">
       <article class="summary-card">
         <span class="summary-label">Total pacientes</span>
-        <strong class="summary-value">{{ resumen.total }}</strong>
+        <strong class="summary-value">{{ resumen().total }}</strong>
         <span class="summary-meta">Padrón activo en clínica</span>
         <span class="summary-icon summary-icon-blue"><lucide-icon [img]="iconUser" aria-hidden="true"></lucide-icon></span>
       </article>
       <article class="summary-card">
         <span class="summary-label">Nuevos este mes</span>
-        <strong class="summary-value">+{{ resumen.nuevos }}</strong>
+        <strong class="summary-value">+{{ resumen().nuevos }}</strong>
         <span class="summary-meta summary-meta-success">+12% vs mes anterior</span>
         <span class="summary-icon summary-icon-green"><lucide-icon [img]="iconPlus" aria-hidden="true"></lucide-icon></span>
       </article>
       <article class="summary-card">
         <span class="summary-label">Con citas activas</span>
-        <strong class="summary-value">{{ resumen.citasActivas }}</strong>
+        <strong class="summary-value">{{ resumen().citasActivas }}</strong>
         <span class="summary-meta">Programadas esta semana</span>
         <span class="summary-icon summary-icon-purple"><lucide-icon [img]="iconCalendarPlus" aria-hidden="true"></lucide-icon></span>
       </article>
@@ -56,34 +56,40 @@
         </div>
 
         <label class="filter-control">
-          <span>Sexo</span>
-          <select [value]="filtroSexo()" (change)="cambiarSexo($event)">
-            <option>Todos</option>
-            <option>Masculino</option>
-            <option>Femenino</option>
-            <option>Otro</option>
+          <span>Estado</span>
+          <select [value]="filtroEstado()" (change)="cambiarEstado($event)">
+            <option value="Todos">Todos</option>
+            <option value="Activo">Activo</option>
+            <option value="Inactivo">Inactivo</option>
+            <option value="Nuevo">Nuevo</option>
           </select>
         </label>
 
         <label class="filter-control">
-          <span>Sangre</span>
-          <select [value]="filtroSangre()" (change)="cambiarSangre($event)">
-            <option>Todos</option>
-            <option>O+</option>
-            <option>O-</option>
-            <option>A+</option>
-            <option>A-</option>
-            <option>B+</option>
-            <option>B-</option>
-            <option>AB+</option>
-            <option>AB-</option>
+          <span>Sexo</span>
+          <select [value]="filtroSexo()" (change)="cambiarSexo($event)">
+            <option value="Todos">Todos</option>
+            <option value="Masculino">Masculino</option>
+            <option value="Femenino">Femenino</option>
+            <option value="Otro">Otro</option>
           </select>
         </label>
 
-        <button class="btn btn-outline filter-button" type="button">
-          <lucide-icon [img]="iconSliders" aria-hidden="true"></lucide-icon>
-          Más filtros
-        </button>
+        <label class="filter-control">
+          <span>Tipo de sangre</span>
+          <select [value]="filtroSangre()" (change)="cambiarSangre($event)">
+            <option value="Todos">Todos</option>
+            <option value="O+">O+</option>
+            <option value="O-">O-</option>
+            <option value="A+">A+</option>
+            <option value="A-">A-</option>
+            <option value="B+">B+</option>
+            <option value="B-">B-</option>
+            <option value="AB+">AB+</option>
+            <option value="AB-">AB-</option>
+          </select>
+        </label>
+
         <button class="btn btn-ghost filter-button" type="button" (click)="limpiarFiltros()">
           <lucide-icon [img]="iconX" aria-hidden="true"></lucide-icon>
           Limpiar filtros
@@ -150,6 +156,14 @@
                     <button class="btn-action" type="button" aria-label="Editar paciente" title="Editar paciente" (click)="editarPaciente(paciente)">
                       <lucide-icon [img]="iconEdit" aria-hidden="true"></lucide-icon>
                     </button>
+                    <button
+                      class="btn-action btn-action-danger"
+                      type="button"
+                      aria-label="Eliminar paciente"
+                      title="Eliminar paciente"
+                      (click)="eliminarPaciente(paciente, $event)">
+                      <lucide-icon [img]="iconTrash" aria-hidden="true"></lucide-icon>
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -196,7 +210,27 @@
       </div>
       <div class="modal-actions">
         <button class="btn btn-outline" type="button" (click)="cerrarDetalle()">Cerrar</button>
+        <button class="btn btn-danger" type="button" (click)="eliminarPaciente(paciente)">Dar de baja</button>
         <button class="btn btn-primary" type="button" (click)="editarPaciente(paciente)">Editar paciente</button>
+      </div>
+    </section>
+  </div>
+}
+
+@if (pacienteAEliminar(); as paciente) {
+  <div class="modal-backdrop confirm-backdrop" role="presentation" (click)="cancelarEliminacion()">
+    <section class="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="confirm-delete-title" (click)="$event.stopPropagation()">
+      <button class="modal-close" type="button" aria-label="Cerrar modal" (click)="cancelarEliminacion()">×</button>
+      <div class="confirm-icon">
+        <lucide-icon [img]="iconTrash" aria-hidden="true"></lucide-icon>
+      </div>
+      <h2 id="confirm-delete-title">¿Eliminar paciente?</h2>
+      <p class="confirm-message">
+        ¿Estás seguro de eliminar el expediente de <strong>{{ nombreCompleto(paciente) }}</strong> (DNI: {{ paciente.dni }})? Esta acción no se puede deshacer.
+      </p>
+      <div class="modal-actions">
+        <button class="btn btn-outline" type="button" (click)="cancelarEliminacion()">Cancelar</button>
+        <button class="btn btn-danger" type="button" (click)="confirmarEliminacion()">Sí, eliminar</button>
       </div>
     </section>
   </div>

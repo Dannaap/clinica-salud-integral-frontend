@@ -1,47 +1,58 @@
 import { Component, Input, inject } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import {
-  Bell,
-  CalendarDays,
-  FileBarChart,
-  Home,
-  LogOut,
-  UserCircle,
-  Users,
-} from 'lucide-angular';
-import { LucideAngularModule } from 'lucide-angular';
+import { CommonModule } from '@angular/common';
+import { SidebarComponent } from '../../../../shared/components/sidebar/sidebar';
+import { HeaderComponent } from '../../../../shared/components/header/header';
 import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-pacientes-layout',
-  imports: [RouterLink, RouterLinkActive, LucideAngularModule],
+  standalone: true,
+  imports: [CommonModule, SidebarComponent, HeaderComponent],
   templateUrl: './pacientes-layout.html',
   styleUrl: './pacientes-layout.scss',
 })
 export class PacientesLayout {
   private readonly authService = inject(AuthService);
-  private readonly router = inject(Router);
 
   @Input() pageTitle = 'Pacientes';
   @Input() pageSubtitle = 'Listado y búsqueda de pacientes';
 
-  readonly iconHome = Home;
-  readonly iconUsers = Users;
-  readonly iconCalendar = CalendarDays;
-  readonly iconReports = FileBarChart;
-  readonly iconProfile = UserCircle;
-  readonly iconBell = Bell;
-  readonly iconLogout = LogOut;
+  sidebarAbierto = false;
 
-  readonly infoSesion = this.authService.usuarioActual();
+  toggleSidebar(): void {
+    this.sidebarAbierto = !this.sidebarAbierto;
+  }
 
-  readonly nombre = this.infoSesion?.nombreCompleto ?? 'Usuario';
-  readonly rol = this.infoSesion?.rolLabel ?? '';
-  readonly iniciales = this.infoSesion?.iniciales ?? 'US';
-  readonly rutaInicio = this.authService.obtenerRutaDashboard();
+  get usuario() {
+    const info = this.authService.usuarioActual();
+    if (info) {
+      return {
+        nombre: info.nombreCompleto,
+        rol: info.rolLabel,
+        iniciales: info.iniciales,
+      };
+    }
+    const u = this.authService.obtenerUsuario();
+    const nombre = u ? `${u.nombre} ${u.apellidos}`.trim() : 'Dr. Juan Pérez';
+    const rol =
+      u?.rol === 'ADMIN'
+        ? 'Administrador'
+        : u?.rol === 'RECEPCION'
+        ? 'Recepción'
+        : u?.rol === 'MEDICO'
+        ? 'Médico'
+        : 'Personal';
+    const iniciales = u
+      ? `${u.nombre.charAt(0)}${u.apellidos.charAt(0)}`.toUpperCase()
+      : 'JP';
+    return { nombre, rol, iniciales };
+  }
 
-  cerrarSesion(): void {
-    this.authService.logout();
-    this.router.navigate(['/login']);
+  get esAdmin(): boolean {
+    return this.authService.obtenerRol() === 'ADMIN';
+  }
+
+  get esMedico(): boolean {
+    return this.authService.obtenerRol() === 'MEDICO';
   }
 }

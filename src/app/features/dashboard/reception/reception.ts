@@ -38,13 +38,26 @@ interface Medico {
 export class ReceptionComponent {
   private readonly authService = inject(AuthService);
 
-  private readonly infoSesion = this.authService.usuarioActual();
-
-  usuario = {
-    nombre: this.infoSesion?.nombreCompleto ?? 'Lucía Fernández',
-    rol: this.infoSesion?.rolLabel ?? 'Recepción',
-    iniciales: this.infoSesion?.iniciales ?? 'LF',
-  };
+  get usuario() {
+    const info = this.authService.usuarioActual();
+    if (info) {
+      return {
+        nombre: info.nombreCompleto,
+        rol: info.rolLabel,
+        iniciales: info.iniciales,
+      };
+    }
+    const u = this.authService.obtenerUsuario();
+    const nombre = u ? `${u.nombre} ${u.apellidos}`.trim() : 'Lucía Fernández';
+    const iniciales = u
+      ? `${u.nombre.charAt(0)}${u.apellidos.charAt(0)}`.toUpperCase()
+      : 'LF';
+    return {
+      nombre,
+      rol: 'Recepción',
+      iniciales,
+    };
+  }
 
   kpis = { citasHoy: 12, pacientesEspera: 3, porConfirmar: 4 };
 
@@ -83,5 +96,10 @@ export class ReceptionComponent {
       'En espera': 'badge-en-espera'
     };
     return map[estado] || '';
+  }
+
+  mostrarProximamente(modulo: string): void {
+    console.log(`${modulo} estará disponible en un próximo sprint`);
+    alert(`${modulo} estará disponible en un próximo sprint.`);
   }
 }

@@ -26,8 +26,8 @@ const ETIQUETAS_ROL: Record<Rol, string> = {
 
 const RUTAS_DASHBOARD_POR_ROL: Record<Rol, string> = {
   ADMIN: '/dashboard/admin',
-  RECEPCION: '/dashboard/reception',
-  MEDICO: '/dashboard/medical',
+  RECEPCION: '/dashboard/recepcion',
+  MEDICO: '/dashboard/medico',
 };
 
 @Injectable({
@@ -59,6 +59,10 @@ export class AuthService {
       esMedico: usuario.rol === 'MEDICO',
     };
   });
+
+  constructor() {
+    this.cargarSesion();
+  }
 
   login(credentials: LoginRequest): Observable<LoginResponse> {
     const usuario = this.USUARIOS_FAKE.find(

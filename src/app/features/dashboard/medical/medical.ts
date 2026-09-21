@@ -36,13 +36,26 @@ interface PacienteReciente {
 export class MedicalComponent {
   private readonly authService = inject(AuthService);
 
-  private readonly infoSesion = this.authService.usuarioActual();
-
-  usuario = {
-    nombre: this.infoSesion?.nombreCompleto ?? 'Dr. Axel Rojas',
-    especialidad: this.infoSesion?.especialidad ?? 'Médico general',
-    iniciales: this.infoSesion?.iniciales ?? 'AR',
-  };
+  get usuario() {
+    const info = this.authService.usuarioActual();
+    if (info) {
+      return {
+        nombre: info.nombreCompleto,
+        especialidad: info.especialidad ?? 'Médico general',
+        iniciales: info.iniciales,
+      };
+    }
+    const u = this.authService.obtenerUsuario();
+    const nombre = u ? `Dr. ${u.nombre} ${u.apellidos}`.trim() : 'Dr. Axel Rojas';
+    const iniciales = u
+      ? `${u.nombre.charAt(0)}${u.apellidos.charAt(0)}`.toUpperCase()
+      : 'AR';
+    return {
+      nombre,
+      especialidad: 'Cardiólogo',
+      iniciales,
+    };
+  }
 
   kpis = { consultasHoy: 8, enEspera: 2, atencionesMes: 47 };
 
@@ -77,5 +90,10 @@ export class MedicalComponent {
       'Atendida': 'badge-atendida'
     };
     return map[estado] || '';
+  }
+
+  mostrarProximamente(modulo: string): void {
+    console.log(`${modulo} estará disponible en un próximo sprint`);
+    alert(`${modulo} estará disponible en un próximo sprint.`);
   }
 }

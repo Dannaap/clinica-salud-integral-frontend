@@ -63,7 +63,7 @@
           @if (tieneError('dni')) {
             <span class="form-error">
               @if (dni.errors?.['required']) { El DNI es obligatorio. }
-              @if (dni.errors?.['dniFormato']) { El DNI debe tener 8 dígitos. }
+              @if (dni.errors?.['dniFormato']) { El DNI debe tener exactamente 8 dígitos numéricos. }
             </span>
           }
         </div>
@@ -86,7 +86,7 @@
             <strong>Ya existe un paciente con este DNI</strong>
             <span>{{ paciente.nombres }} {{ paciente.apellidos }} · DNI {{ paciente.dni }}</span>
           </div>
-          <button class="btn btn-outline btn-sm" type="button" (click)="cancelar()">Ver expediente</button>
+          <a class="btn btn-outline btn-sm" [routerLink]="['/pacientes/listado']" [queryParams]="{ dni: paciente.dni }">Ver expediente</a>
         </div>
       }
     </section>
@@ -104,20 +104,38 @@
         <div class="form-group">
           <label class="form-label" for="nombres">Nombres <span class="required">*</span></label>
           <input id="nombres" class="form-control" type="text" formControlName="nombres" placeholder="Ej. Renato Andrés" [class.is-invalid]="tieneError('nombres')" />
-          @if (tieneError('nombres')) { <span class="form-error">Ingresa los nombres del paciente.</span> }
+          @if (tieneError('nombres')) {
+            <span class="form-error">
+              @if (formulario.controls.nombres.errors?.['required']) { Ingresa los nombres del paciente. }
+              @if (formulario.controls.nombres.errors?.['minlength']) { Debe tener al menos 2 caracteres. }
+              @if (formulario.controls.nombres.errors?.['soloLetras']) { Solo se permiten letras y espacios. }
+            </span>
+          }
         </div>
 
         <div class="form-group">
           <label class="form-label" for="apellidos">Apellidos <span class="required">*</span></label>
           <input id="apellidos" class="form-control" type="text" formControlName="apellidos" placeholder="Ej. Vargas Silva" [class.is-invalid]="tieneError('apellidos')" />
-          @if (tieneError('apellidos')) { <span class="form-error">Ingresa los apellidos del paciente.</span> }
+          @if (tieneError('apellidos')) {
+            <span class="form-error">
+              @if (formulario.controls.apellidos.errors?.['required']) { Ingresa los apellidos del paciente. }
+              @if (formulario.controls.apellidos.errors?.['minlength']) { Debe tener al menos 2 caracteres. }
+              @if (formulario.controls.apellidos.errors?.['soloLetras']) { Solo se permiten letras y espacios. }
+            </span>
+          }
         </div>
 
         <div class="form-group">
           <label class="form-label" for="fechaNacimiento">Fecha de nacimiento <span class="required">*</span></label>
-          <input id="fechaNacimiento" class="form-control" type="date" formControlName="fechaNacimiento" [class.is-invalid]="tieneError('fechaNacimiento')" />
+          <input id="fechaNacimiento" class="form-control" type="date" formControlName="fechaNacimiento" max="{{ hoy }}" [class.is-invalid]="tieneError('fechaNacimiento')" />
           @if (edad() !== null) { <span class="form-hint">Edad: {{ edad() }} años</span> }
-          @if (tieneError('fechaNacimiento')) { <span class="form-error">Selecciona la fecha de nacimiento.</span> }
+          @if (tieneError('fechaNacimiento')) {
+            <span class="form-error">
+              @if (formulario.controls.fechaNacimiento.errors?.['required']) { Selecciona la fecha de nacimiento. }
+              @if (formulario.controls.fechaNacimiento.errors?.['fechaFutura']) { La fecha de nacimiento no puede ser futura. }
+              @if (formulario.controls.fechaNacimiento.errors?.['fechaAntigua'] || formulario.controls.fechaNacimiento.errors?.['fechaInvalida']) { Ingresa una fecha de nacimiento válida. }
+            </span>
+          }
         </div>
 
         <fieldset class="form-group radio-group">
@@ -133,13 +151,20 @@
         <div class="form-group">
           <label class="form-label" for="telefono">Teléfono <span class="required">*</span></label>
           <input id="telefono" class="form-control" type="tel" formControlName="telefono" placeholder="+51 987 654 321" [class.is-invalid]="tieneError('telefono')" />
-          @if (tieneError('telefono')) { <span class="form-error">Ingresa un teléfono válido.</span> }
+          @if (tieneError('telefono')) {
+            <span class="form-error">
+              @if (formulario.controls.telefono.errors?.['required']) { El teléfono es obligatorio. }
+              @if (formulario.controls.telefono.errors?.['telefonoInvalido']) { Ingresa un número de celular válido de 9 dígitos que inicie con 9. }
+            </span>
+          }
         </div>
 
         <div class="form-group">
           <label class="form-label" for="correo">Correo electrónico</label>
           <input id="correo" class="form-control" type="email" formControlName="correo" placeholder="paciente@email.com" [class.is-invalid]="tieneError('correo')" />
-          @if (tieneError('correo')) { <span class="form-error">Ingresa un correo válido.</span> }
+          @if (tieneError('correo')) {
+            <span class="form-error">Ingresa un correo electrónico válido (ej. paciente@email.com).</span>
+          }
         </div>
 
         <div class="form-group">
@@ -153,12 +178,14 @@
 
         <div class="form-group form-full">
           <label class="form-label" for="direccion">Dirección de residencia</label>
-          <input id="direccion" class="form-control" type="text" formControlName="direccion" placeholder="Av. Guardia Civil 450, San Borja, Lima" />
+          <input id="direccion" class="form-control" type="text" formControlName="direccion" placeholder="Av. Guardia Civil 450, San Borja, Lima" [class.is-invalid]="tieneError('direccion')" />
+          @if (tieneError('direccion')) { <span class="form-error">La dirección no puede superar los 200 caracteres.</span> }
         </div>
 
         <div class="form-group form-full">
           <label class="form-label" for="alergias">Alergias conocidas o antecedentes médicos relevantes</label>
-          <textarea id="alergias" class="form-control" rows="4" formControlName="alergias" placeholder="Describe alergias, antecedentes o escribe 'Ninguna registrada'"></textarea>
+          <textarea id="alergias" class="form-control" rows="4" formControlName="alergias" placeholder="Describe alergias, antecedentes o escribe 'Ninguna registrada'" [class.is-invalid]="tieneError('alergias')"></textarea>
+          @if (tieneError('alergias')) { <span class="form-error">Este campo no puede superar los 500 caracteres.</span> }
         </div>
       </div>
 
@@ -169,9 +196,9 @@
 
       <div class="form-actions">
         <button class="btn btn-outline" type="button" (click)="cancelar()">Cancelar</button>
-        <button class="btn btn-primary" type="submit" [disabled]="guardando()">
+        <button class="btn btn-primary" type="submit" [disabled]="guardando() || redirigiendo()">
           <lucide-icon [img]="iconCheck" aria-hidden="true"></lucide-icon>
-          {{ guardando() ? 'Guardando...' : (editando ? 'Guardar cambios' : 'Guardar paciente') }}
+          {{ guardando() ? 'Guardando...' : (redirigiendo() ? 'Redirigiendo...' : (editando ? 'Guardar cambios' : 'Guardar paciente')) }}
         </button>
       </div>
     </form>

@@ -10,26 +10,20 @@
   <div class="search-box">
     <span class="material-symbols-outlined search-icon">search</span>
     <input
+      #inputBusqueda
       type="search"
       [placeholder]="placeholder"
       [value]="usuarioService?.busqueda() || ''"
       (input)="onSearchChange($event)"
+      (keyup.enter)="buscar(inputBusqueda.value)"
       aria-label="Buscar"
     />
   </div>
 
   <div class="header-actions">
-    <button class="btn-notification" type="button" title="Notificaciones" aria-label="Notificaciones">
+    <button class="btn-notification" title="Notificaciones" type="button" aria-label="Notificaciones" (click)="mostrarNotificaciones()">
       <span class="material-symbols-outlined">notifications</span>
       <span class="notification-badge" *ngIf="notificaciones > 0">{{ notificaciones }}</span>
     </button>
-    <div class="user-profile">
-      <div class="profile-avatar">{{ iniciales }}</div>
-      <div class="profile-info">
-        <span class="profile-name">{{ nombre }}</span>
-        <span class="profile-role" *ngIf="rol">{{ rol }}</span>
-      </div>
-      <span class="material-symbols-outlined">expand_more</span>
-    </div>
   </div>
 </header>

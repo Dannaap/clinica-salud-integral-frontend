@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   CalendarPlus,
   Eye,
@@ -9,6 +9,7 @@ import {
   Plus,
   Search,
   SlidersHorizontal,
+  Trash2,
   UserRound,
   X,
 } from 'lucide-angular';
@@ -17,6 +18,7 @@ import { LucideAngularModule } from 'lucide-angular';
 import { PacientesLayout } from '../components/pacientes-layout/pacientes-layout';
 import { Paciente } from '../paciente.model';
 import { PacienteService } from '../paciente.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-listado',
@@ -26,13 +28,21 @@ import { PacienteService } from '../paciente.service';
 })
 export class Listado {
   private readonly pacienteService = inject(PacienteService);
+  private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  private debounceTimer?: any;
+
+  get rutaDashboard(): string {
+    return this.authService.obtenerRutaDashboard();
+  }
 
   readonly iconPlus = Plus;
   readonly iconSearch = Search;
   readonly iconSliders = SlidersHorizontal;
   readonly iconEye = Eye;
   readonly iconEdit = FilePenLine;
+  readonly iconTrash = Trash2;
   readonly iconCalendarPlus = CalendarPlus;
   readonly iconUser = UserRound;
   readonly iconX = X;
@@ -40,15 +50,25 @@ export class Listado {
 
   readonly pacientes = this.pacienteService.pacientes;
   readonly busqueda = signal('');
-  readonly filtroSexo = signal('Todos');
-  readonly filtroSangre = signal('Todos');
+  readonly filtroEstado = signal<'Todos' | 'Activo' | 'Inactivo' | 'Nuevo'>('Todos');
+  readonly filtroSexo = signal<'Todos' | 'Masculino' | 'Femenino' | 'Otro'>('Todos');
+  readonly filtroSangre = signal<string>('Todos');
   readonly paginaActual = signal(1);
   readonly tamanoPagina = 8;
   readonly pacienteSeleccionado = signal<Paciente | null>(null);
+  readonly pacienteAEliminar = signal<Paciente | null>(null);
   readonly mensaje = signal<string | null>(null);
+
+  constructor() {
+    const dniParam = this.route.snapshot.queryParamMap.get('dni');
+    if (dniParam) {
+      this.busqueda.set(dniParam);
+    }
+  }
 
   readonly pacientesFiltrados = computed(() => {
     const termino = this.busqueda().trim().toLowerCase();
+    const estado = this.filtroEstado();
     const sexo = this.filtroSexo();
     const sangre = this.filtroSangre();
 
@@ -57,10 +77,11 @@ export class Listado {
         !termino ||
         `${paciente.nombres} ${paciente.apellidos}`.toLowerCase().includes(termino) ||
         paciente.dni.includes(termino);
+      const coincideEstado = estado === 'Todos' || paciente.estado === estado;
       const coincideSexo = sexo === 'Todos' || paciente.sexo === sexo;
       const coincideSangre = sangre === 'Todos' || paciente.tipoSangre === sangre;
 
-      return coincideBusqueda && coincideSexo && coincideSangre;
+      return coincideBusqueda && coincideEstado && coincideSexo && coincideSangre;
     });
   });
 
@@ -77,19 +98,60 @@ export class Listado {
     Array.from({ length: this.totalPaginas() }, (_, index) => index + 1),
   );
 
-  readonly resumen = {
-    total: 348,
-    nuevos: 18,
-    citasActivas: 42,
-  };
+  readonly resumen = computed(() => {
+    const lista = this.pacientes();
+    return {
+      total: lista.length,
+      nuevos: lista.filter((p) => p.estado === 'Nuevo').length,
+      citasActivas: lista.reduce((acc, p) => acc + (p.citasActivas || 0), 0),
+    };
+  });
 
   actualizarBusqueda(event: Event): void {
-    this.busqueda.set((event.target as HTMLInputElement).value);
+    const valor = (event.target as HTMLInputElement).value;
+    clearTimeout(this.debounceTimer);
+    this.debounceTimer = setTimeout(() => {
+      this.busqueda.set(valor);
+      this.paginaActual.set(1);
+    }, 250);
+  }
+
+  eliminarPaciente(paciente: Paciente, event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.pacienteAEliminar.set(paciente);
+  }
+
+  cancelarEliminacion(): void {
+    this.pacienteAEliminar.set(null);
+  }
+
+  confirmarEliminacion(): void {
+    const paciente = this.pacienteAEliminar();
+    if (!paciente) {
+      return;
+    }
+
+    const eliminado = this.pacienteService.eliminar(paciente.id);
+    if (eliminado) {
+      if (this.pacienteSeleccionado()?.id === paciente.id) {
+        this.cerrarDetalle();
+      }
+
+      this.pacienteAEliminar.set(null);
+      this.mensaje.set('Paciente eliminado del padrón clínico con éxito.');
+      window.setTimeout(() => this.mensaje.set(null), 3000);
+    }
+  }
+
+  cambiarEstado(event: Event): void {
+    this.filtroEstado.set((event.target as HTMLSelectElement).value as any);
     this.paginaActual.set(1);
   }
 
   cambiarSexo(event: Event): void {
-    this.filtroSexo.set((event.target as HTMLSelectElement).value);
+    this.filtroSexo.set((event.target as HTMLSelectElement).value as any);
     this.paginaActual.set(1);
   }
 
@@ -100,6 +162,7 @@ export class Listado {
 
   limpiarFiltros(): void {
     this.busqueda.set('');
+    this.filtroEstado.set('Todos');
     this.filtroSexo.set('Todos');
     this.filtroSangre.set('Todos');
     this.paginaActual.set(1);

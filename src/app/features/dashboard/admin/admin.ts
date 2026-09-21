@@ -30,13 +30,26 @@ interface Doctor {
 export class AdminComponent {
   private readonly authService = inject(AuthService);
 
-  private readonly infoSesion = this.authService.usuarioActual();
-
-  usuario = {
-    nombre: this.infoSesion?.nombreCompleto ?? 'Dr. Juan Pérez',
-    rol: this.infoSesion?.rolLabel ?? 'Administrador',
-    iniciales: this.infoSesion?.iniciales ?? 'JP'
-  };
+  get usuario() {
+    const info = this.authService.usuarioActual();
+    if (info) {
+      return {
+        nombre: info.nombreCompleto,
+        rol: info.rolLabel,
+        iniciales: info.iniciales,
+      };
+    }
+    const u = this.authService.obtenerUsuario();
+    const nombre = u ? `${u.nombre} ${u.apellidos}`.trim() : 'Dr. Juan Pérez';
+    const iniciales = u
+      ? `${u.nombre.charAt(0)}${u.apellidos.charAt(0)}`.toUpperCase()
+      : 'JP';
+    return {
+      nombre,
+      rol: 'Administrador',
+      iniciales,
+    };
+  }
 
   kpis = {
     citasHoy: 12,
@@ -94,5 +107,10 @@ export class AdminComponent {
 
   toggleSidebar() {
     this.sidebarAbierto = !this.sidebarAbierto;
+  }
+
+  mostrarProximamente(modulo: string): void {
+    console.log(`${modulo} estará disponible en un próximo sprint`);
+    alert(`${modulo} estará disponible en un próximo sprint.`);
   }
 }

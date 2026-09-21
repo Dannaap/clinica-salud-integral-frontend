@@ -350,6 +350,61 @@
   margin-top: $space-7;
 }
 
+.confirm-backdrop {
+  z-index: 60;
+}
+
+.confirm-modal {
+  position: relative;
+  width: min(100%, 460px);
+  padding: $space-7;
+  background: $white;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-lg;
+  text-align: center;
+
+  .confirm-icon {
+    display: grid;
+    width: 58px;
+    height: 58px;
+    margin: 0 auto $space-4;
+    place-items: center;
+    color: $danger;
+    background: rgba($danger, 0.1);
+    border-radius: 50%;
+
+    svg {
+      width: 28px;
+      height: 28px;
+    }
+  }
+
+  h2 {
+    margin: 0 0 $space-2;
+    color: $neutral-900;
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+  }
+
+  .confirm-message {
+    margin: 0 0 $space-6;
+    color: $neutral-700;
+    font-size: $font-size-sm;
+    line-height: 1.5;
+
+    strong {
+      color: $neutral-900;
+    }
+  }
+
+  .modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: $space-3;
+    margin-top: 0;
+  }
+}
+
 @media (max-width: 900px) {
   .filters-toolbar {
     flex-wrap: wrap;

@@ -1,56 +1,53 @@
 import { Routes } from '@angular/router';
-import { authGuard, rolGuard } from './core/guards/auth.guard';
+import { authGuard } from './core/guards/auth.guard';
+import { roleGuard } from './core/guards/role.guard';
+import { dashboardRedirectGuard } from './core/guards/dashboard-redirect.guard';
+import { guestGuard } from './core/guards/guest.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   {
     path: 'login',
+    canActivate: [guestGuard],
     loadComponent: () =>
       import('./features/auth/login/login').then((m) => m.Login),
   },
   {
-    path: 'pacientes',
-    canActivate: [authGuard],
-    loadChildren: () =>
-      import('./features/pacientes/pacientes.routes').then(
-        (m) => m.pacientesRoutes
-      ),
+    path: 'dashboard',
+    canActivate: [authGuard, dashboardRedirectGuard],
+    pathMatch: 'full',
+    children: [],
   },
-  // Rutas de Dashboard por rol
+  {
+    path: 'pacientes',
+    // Según H.U.2: Solo ADMIN y RECEPCION gestionan pacientes; MÉDICO no tiene acceso
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMIN', 'RECEPCION'] },
+    loadChildren: () =>
+      import('./features/pacientes/pacientes.routes').then((m) => m.pacientesRoutes),
+  },
   {
     path: 'dashboard/admin',
-    canActivate: [rolGuard(['ADMIN'])],
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMIN'] },
     loadComponent: () =>
       import('./features/dashboard/admin/admin').then((m) => m.AdminComponent),
   },
   {
-    path: 'dashboard/reception',
-    canActivate: [rolGuard(['RECEPCION'])],
+    path: 'dashboard/recepcion',
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['RECEPCION'] },
     loadComponent: () =>
       import('./features/dashboard/reception/reception').then((m) => m.ReceptionComponent),
   },
   {
-    path: 'dashboard/recepcion',
-    redirectTo: 'dashboard/reception',
-    pathMatch: 'full',
-  },
-  {
-    path: 'dashboard/medical',
-    canActivate: [rolGuard(['MEDICO'])],
+    path: 'dashboard/medico',
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['MEDICO'] },
     loadComponent: () =>
       import('./features/dashboard/medical/medical').then((m) => m.MedicalComponent),
   },
-  {
-    path: 'dashboard/medico',
-    redirectTo: 'dashboard/medical',
-    pathMatch: 'full',
-  },
-  {
-    path: 'dashboard',
-    redirectTo: 'dashboard/admin',
-    pathMatch: 'full',
-  },
-  // Rutas bajo el layout de administración
+  // Rutas bajo el layout de administración para el módulo de usuarios
   {
     path: '',
     canActivate: [authGuard],
@@ -61,18 +58,22 @@ export const routes: Routes = [
     children: [
       {
         path: 'usuarios',
-        canActivate: [rolGuard(['ADMIN'])],
+        canActivate: [roleGuard],
+        data: { roles: ['ADMIN'] },
         loadComponent: () =>
           import('./features/usuarios/listado/usuarios-listado').then(
             (m) => m.UsuariosListadoComponent
           ),
       },
-      { path: 'citas', redirectTo: 'dashboard/admin' },
-      { path: 'turnos', redirectTo: 'dashboard/admin' },
-      { path: 'atenciones', redirectTo: 'dashboard/medical' },
-      { path: 'reportes', redirectTo: 'dashboard/admin' },
-      { path: 'perfil', redirectTo: 'dashboard/admin' },
+      { path: 'citas', redirectTo: 'dashboard' },
+      { path: 'turnos', redirectTo: 'dashboard' },
+      { path: 'atenciones', redirectTo: 'dashboard' },
+      { path: 'reportes', redirectTo: 'dashboard' },
+      { path: 'perfil', redirectTo: 'dashboard' },
     ],
   },
+  // Alias legacy (por si alguien tiene la URL vieja en el navegador)
+  { path: 'dashboard/reception', redirectTo: 'dashboard/recepcion', pathMatch: 'full' },
+  { path: 'dashboard/medical', redirectTo: 'dashboard/medico', pathMatch: 'full' },
   { path: '**', redirectTo: 'login' },
 ];
