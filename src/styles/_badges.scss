@@ -1,6 +1,9 @@
 // ═══════════════════════════════════════════════════════════
 // BADGES Y ETIQUETAS DE ESTADO — Clínica Salud Integral S.A.C.
 // ═══════════════════════════════════════════════════════════
+
+@use 'variables' as *;
+
 // ─── BADGE BASE (tipo pill) ────────────────────────────────
 .badge {
   display: inline-flex;

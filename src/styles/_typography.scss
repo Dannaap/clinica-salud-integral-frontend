@@ -1,6 +1,10 @@
 // ═══════════════════════════════════════════════════════════
 // TIPOGRAFÍA — Clínica Salud Integral S.A.C.
 // ═══════════════════════════════════════════════════════════
+
+@use 'variables' as *;
+@use 'mixins' as *;
+
 body {
   font-family: $font-family;
   font-size: $font-size-base;

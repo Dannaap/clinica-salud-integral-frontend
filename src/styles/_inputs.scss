@@ -1,6 +1,10 @@
 // ═══════════════════════════════════════════════════════════
 // INPUTS Y FORMULARIOS — Clínica Salud Integral S.A.C.
 // ═══════════════════════════════════════════════════════════
+
+@use 'variables' as *;
+@use 'mixins' as *;
+
 // ─── GRUPO DE FORMULARIO ───────────────────────────────────
 .form-group {
   display: flex;
