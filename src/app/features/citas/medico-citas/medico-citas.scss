@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 $primary: #0b5ed7;
 $primary-dark: #084298;
 $primary-light: #e7f1ff;
@@ -48,7 +50,7 @@ $neutral-100: #f8f9fa;
 
   &.success {
     background: $success-light;
-    color: darken($success, 10%);
+    color: color.adjust($success, $lightness: -10%);
     border: 1px solid rgba($success, 0.3);
   }
 
