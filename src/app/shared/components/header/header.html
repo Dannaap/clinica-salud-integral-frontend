@@ -1,45 +1,35 @@
-<header class="top-header" role="banner">
-  <!-- Título y subtítulo de la vista -->
-  <div class="header-titles">
-    <h1 class="view-title">Usuarios</h1>
-    <span class="view-subtitle">Gestión de cuentas del personal</span>
+<header class="top-header">
+  <button class="btn-menu" (click)="menuToggle.emit()" type="button" aria-label="Abrir menú">
+    <span class="material-symbols-outlined">menu</span>
+  </button>
+  <div class="header-title">
+    <span class="header-heading">{{ titulo }}</span>
+    <span class="header-subtitle">{{ subtitulo }}</span>
   </div>
 
-  <!-- Buscador global -->
-  <div class="header-search">
-    <div class="search-input-wrapper">
-      <lucide-icon [img]="iconSearch" class="search-icon"></lucide-icon>
-      <input
-        type="search"
-        class="search-input"
-        placeholder="Buscar usuario por nombre o correo..."
-        [value]="usuarioService.busqueda()"
-        (input)="onSearchChange($event)"
-        aria-label="Buscar usuario por nombre o correo"
-      />
-    </div>
+  <div class="search-box">
+    <span class="material-symbols-outlined search-icon">search</span>
+    <input
+      type="search"
+      [placeholder]="placeholder"
+      [value]="usuarioService?.busqueda() || ''"
+      (input)="onSearchChange($event)"
+      aria-label="Buscar"
+    />
   </div>
 
-  <!-- Acciones: Notificaciones y Perfil -->
   <div class="header-actions">
-    <!-- Botón Notificaciones con badge -->
-    <button
-      type="button"
-      class="icon-button notification-button"
-      aria-label="Notificaciones"
-      title="3 notificaciones pendientes"
-    >
-      <lucide-icon [img]="iconBell"></lucide-icon>
-      <span class="notification-badge">3</span>
+    <button class="btn-notification" type="button" title="Notificaciones" aria-label="Notificaciones">
+      <span class="material-symbols-outlined">notifications</span>
+      <span class="notification-badge" *ngIf="notificaciones > 0">{{ notificaciones }}</span>
     </button>
-
-    <div class="divider" aria-hidden="true"></div>
-
-    <!-- Menú del usuario -->
-    <div class="user-menu-chip" role="button" tabindex="0" aria-label="Menú del Dr. Juan Pérez">
-      <div class="avatar-badge" aria-hidden="true">JP</div>
-      <span class="user-fullname">Dr. Juan Pérez</span>
-      <lucide-icon [img]="iconChevronDown" class="chevron-icon"></lucide-icon>
+    <div class="user-profile">
+      <div class="profile-avatar">{{ iniciales }}</div>
+      <div class="profile-info">
+        <span class="profile-name">{{ nombre }}</span>
+        <span class="profile-role" *ngIf="rol">{{ rol }}</span>
+      </div>
+      <span class="material-symbols-outlined">expand_more</span>
     </div>
   </div>
 </header>

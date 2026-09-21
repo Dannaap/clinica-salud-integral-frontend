@@ -1,0 +1,188 @@
+<app-sidebar
+  [nombre]="usuario.nombre"
+  [rol]="usuario.rol"
+  [iniciales]="usuario.iniciales"
+  [esAdmin]="false"
+  [esMedico]="false"
+  [abierto]="sidebarAbierto">
+</app-sidebar>
+
+<div class="sidebar-overlay" *ngIf="sidebarAbierto" (click)="sidebarAbierto = false"></div>
+
+<div class="main-wrapper">
+  <app-header
+    titulo="Inicio"
+    subtitulo="Panel de recepción"
+    placeholder="Buscar paciente por DNI o nombre..."
+    [notificaciones]="2"
+    [nombre]="usuario.nombre"
+    [rol]="usuario.rol"
+    [iniciales]="usuario.iniciales"
+    (menuToggle)="toggleSidebar()">
+  </app-header>
+
+  <main class="content">
+    <!-- Saludo -->
+    <section class="greeting-section">
+      <h1 class="greeting-title">Buenos días, Lucía <span class="wave">👋</span></h1>
+      <p class="greeting-subtitle">Hoy es lunes, 14 de septiembre de 2026 · 12 citas agendadas para hoy · 3 pacientes en sala de espera</p>
+    </section>
+
+    <!-- Banner de acción -->
+    <section class="banner-card">
+      <div class="banner-content">
+        <div class="banner-icon"><span class="material-symbols-outlined">add</span></div>
+        <div class="banner-text">
+          <h2>Agendar nueva cita</h2>
+          <p>Registra una cita en menos de 3 pasos</p>
+        </div>
+      </div>
+      <button class="btn-banner" type="button">
+        <span class="material-symbols-outlined">calendar_month</span>
+        <span>Nueva cita</span>
+      </button>
+    </section>
+
+    <!-- KPIs (3 columnas) -->
+    <section class="kpi-row">
+      <div class="kpi-item">
+        <div class="kpi-top">
+          <div class="kpi-text">
+            <span class="kpi-item-label">Citas de hoy</span>
+            <span class="kpi-item-value is-primary">{{ kpis.citasHoy }}</span>
+          </div>
+          <div class="kpi-item-icon is-primary"><span class="material-symbols-outlined">calendar_today</span></div>
+        </div>
+        <div class="kpi-item-footer">
+          <span>3 pendientes · 9 confirmadas</span>
+        </div>
+      </div>
+
+      <div class="kpi-item">
+        <div class="kpi-top">
+          <div class="kpi-text">
+            <span class="kpi-item-label">Pacientes en espera</span>
+            <span class="kpi-item-value is-warning">{{ kpis.pacientesEspera }}</span>
+          </div>
+          <div class="kpi-item-icon is-warning"><span class="material-symbols-outlined">hourglass_top</span></div>
+        </div>
+        <div class="kpi-item-footer">
+          <span>Tiempo promedio: 8 min</span>
+        </div>
+      </div>
+
+      <div class="kpi-item">
+        <div class="kpi-top">
+          <div class="kpi-text">
+            <span class="kpi-item-label">Citas por confirmar</span>
+            <span class="kpi-item-value is-success">{{ kpis.porConfirmar }}</span>
+          </div>
+          <div class="kpi-item-icon is-success"><span class="material-symbols-outlined">check_circle</span></div>
+        </div>
+        <div class="kpi-item-footer">
+          <span>Llamar antes de las 11:00</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tabla + panel lateral -->
+    <section class="main-grid">
+      <div class="card table-card">
+        <div class="card-header">
+          <h3 class="card-title">Citas de hoy</h3>
+          <a href="#" class="link-primary">Ver todas →</a>
+        </div>
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Hora</th>
+                <th>Paciente</th>
+                <th>Médico</th>
+                <th>Especialidad</th>
+                <th>Estado</th>
+                <th class="text-center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let cita of citas">
+                <td class="time-cell">{{ cita.hora }}</td>
+                <td class="patient-cell">{{ cita.paciente }}</td>
+                <td>{{ cita.medico }}</td>
+                <td>{{ cita.especialidad }}</td>
+                <td><span class="badge" [ngClass]="getEstadoClass(cita.estado)">{{ cita.estado }}</span></td>
+                <td class="text-center">
+                  <div class="action-buttons">
+                    <button class="btn-icon" title="Ver" type="button"><span class="material-symbols-outlined">visibility</span></button>
+                    <button class="btn-icon" title="Editar" type="button"><span class="material-symbols-outlined">edit</span></button>
+                    <button class="btn-icon btn-icon-danger" title="Cancelar" type="button"><span class="material-symbols-outlined">close</span></button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-footer">
+          <a href="#" class="link-primary">Ver agenda completa →</a>
+        </div>
+      </div>
+
+      <div class="side-panel">
+        <!-- Acciones rápidas -->
+        <div class="card quick-card">
+          <h3 class="card-title">Acciones rápidas</h3>
+          <div class="quick-grid">
+            <button class="quick-btn" type="button">
+              <div class="quick-icon"><span class="material-symbols-outlined">person_search</span></div>
+              <span>Buscar paciente</span>
+            </button>
+            <button class="quick-btn" type="button">
+              <div class="quick-icon"><span class="material-symbols-outlined">calendar_month</span></div>
+              <span>Agendar cita</span>
+            </button>
+            <button class="quick-btn" type="button">
+              <div class="quick-icon"><span class="material-symbols-outlined">update</span></div>
+              <span>Reprogramar</span>
+            </button>
+            <button class="quick-btn" type="button">
+              <div class="quick-icon"><span class="material-symbols-outlined">event_busy</span></div>
+              <span>Cancelar cita</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Pacientes en espera -->
+        <div class="card waiting-card">
+          <h3 class="card-title">Pacientes en sala de espera</h3>
+          <div class="waiting-list">
+            <div class="waiting-item" *ngFor="let p of pacientesEspera">
+              <div class="waiting-avatar">{{ p.iniciales }}</div>
+              <div class="waiting-info">
+                <span class="waiting-name">{{ p.nombre }}</span>
+                <span class="waiting-detail">{{ p.medico }} · {{ p.hora }}</span>
+              </div>
+              <span class="badge" [ngClass]="getEstadoClass(p.estado)">{{ p.estado }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Médicos disponibles -->
+    <section class="card team-card">
+      <div class="card-header">
+        <h3 class="card-title">Médicos disponibles hoy</h3>
+        <a href="#" class="link-primary">Ver todos →</a>
+      </div>
+      <div class="doctor-grid">
+        <div class="doctor-card" *ngFor="let m of medicos">
+          <img [src]="m.foto" [alt]="m.nombre" class="doctor-photo">
+          <h4 class="doctor-name">{{ m.nombre }}</h4>
+          <span class="doctor-specialty">{{ m.especialidad }}</span>
+          <span class="badge badge-disponible">{{ m.horario }}</span>
+          <button class="btn-agendar" type="button">Agendar</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>

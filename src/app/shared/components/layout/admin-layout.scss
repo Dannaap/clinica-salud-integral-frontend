@@ -6,24 +6,36 @@
   background-color: #f8fafc;
 }
 
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 45;
+}
+
 .layout-main {
   flex: 1;
-  margin-left: 240px;
+  margin-left: 260px;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   min-width: 0;
-  transition: margin-left $transition-normal;
+  transition: margin-left 0.3s ease;
 }
 
 .layout-content {
   flex: 1;
+  margin-top: 64px;
   padding: 24px 32px 48px;
   background-color: #f8fafc;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 992px) {
   .layout-main {
-    margin-left: 72px;
+    margin-left: 0;
+  }
+
+  .layout-content {
+    padding: 16px 12px 32px;
   }
 }

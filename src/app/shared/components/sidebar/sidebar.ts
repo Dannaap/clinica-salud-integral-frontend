@@ -1,54 +1,36 @@
-import { Component, inject } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import {
-  LucideAngularModule,
-  House,
-  Users,
-  Calendar,
-  Clock,
-  ClipboardList,
-  ChartColumn,
-  Settings,
-  User,
-  LogOut,
-  Plus,
-} from 'lucide-angular';
+import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
-
-interface NavItem {
-  label: string;
-  route: string;
-  icon: any;
-}
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, LucideAngularModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './sidebar.html',
-  styleUrl: './sidebar.scss',
+  styleUrl: './sidebar.scss'
 })
 export class SidebarComponent {
-  private authService = inject(AuthService);
-  private router = inject(Router);
+  private authService = inject(AuthService, { optional: true });
+  private router = inject(Router, { optional: true });
 
-  readonly iconPlus = Plus;
-  readonly iconLogOut = LogOut;
+  @Input() nombre: string = 'Dr. Juan Pérez';
+  @Input() rol: string = 'Administrador';
+  @Input() iniciales: string = 'JP';
+  @Input() esAdmin: boolean = true;
+  @Input() esMedico: boolean = false;
+  @Input() abierto: boolean = false;
 
-  readonly navItems: NavItem[] = [
-    { label: 'Inicio', route: '/dashboard', icon: House },
-    { label: 'Pacientes', route: '/pacientes', icon: Users },
-    { label: 'Citas', route: '/citas', icon: Calendar },
-    { label: 'Turnos médicos', route: '/turnos', icon: Clock },
-    { label: 'Atenciones', route: '/atenciones', icon: ClipboardList },
-    { label: 'Reportes', route: '/reportes', icon: ChartColumn },
-    { label: 'Usuarios', route: '/usuarios', icon: Settings },
-    { label: 'Perfil', route: '/perfil', icon: User },
-  ];
+  logout(): void {
+    if (this.authService) {
+      this.authService.logout();
+    }
+    if (this.router) {
+      this.router.navigate(['/login']);
+    }
+  }
 
   cerrarSesion(): void {
-    this.authService.logout();
-    this.router.navigate(['/login']);
+    this.logout();
   }
 }

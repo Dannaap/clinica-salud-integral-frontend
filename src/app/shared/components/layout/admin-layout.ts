@@ -11,4 +11,10 @@ import { HeaderComponent } from '../header/header';
   templateUrl: './admin-layout.html',
   styleUrl: './admin-layout.scss',
 })
-export class AdminLayoutComponent {}
+export class AdminLayoutComponent {
+  sidebarAbierto = false;
+
+  toggleSidebar(): void {
+    this.sidebarAbierto = !this.sidebarAbierto;
+  }
+}

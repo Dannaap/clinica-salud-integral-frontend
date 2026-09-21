@@ -1,50 +1,57 @@
-<aside class="sidebar-container" aria-label="Navegación principal">
-  <!-- Cabecera Institucional -->
+<aside class="sidebar" [class.abierto]="abierto" aria-label="Navegación principal">
   <div class="sidebar-header">
-    <div class="logo-box">
-      <lucide-icon [img]="iconPlus" class="logo-icon"></lucide-icon>
-    </div>
-    <div class="logo-details">
-      <h2 class="brand-name">Clínica Salud Integral</h2>
-      <span class="brand-tag">S.A.C. • ADMIN</span>
+    <span class="material-symbols-outlined logo-icon">local_hospital</span>
+    <div class="brand-text">
+      <span class="brand-name">Clínica Salud Integral</span>
+      <span class="brand-sub">S.A.C. • {{ rol }}</span>
     </div>
   </div>
 
-  <!-- Menú de Navegación -->
   <nav class="sidebar-nav">
-    <ul class="nav-list">
-      @for (item of navItems; track item.route) {
-        <li class="nav-item">
-          <a
-            [routerLink]="item.route"
-            routerLinkActive="is-active"
-            class="nav-link"
-          >
-            <lucide-icon [img]="item.icon" class="link-icon"></lucide-icon>
-            <span class="link-text">{{ item.label }}</span>
-          </a>
-        </li>
-      }
-    </ul>
+    <a routerLink="/dashboard" routerLinkActive="active" class="nav-item">
+      <span class="material-symbols-outlined">home</span>
+      <span>Inicio</span>
+    </a>
+    <a routerLink="/pacientes" routerLinkActive="active" class="nav-item">
+      <span class="material-symbols-outlined">group</span>
+      <span>Pacientes</span>
+    </a>
+    <a routerLink="/citas" routerLinkActive="active" class="nav-item">
+      <span class="material-symbols-outlined">calendar_month</span>
+      <span>Citas</span>
+    </a>
+    <a routerLink="/turnos" routerLinkActive="active" class="nav-item" *ngIf="esAdmin">
+      <span class="material-symbols-outlined">stethoscope</span>
+      <span>Turnos médicos</span>
+    </a>
+    <a routerLink="/atenciones" routerLinkActive="active" class="nav-item" *ngIf="esAdmin || esMedico">
+      <span class="material-symbols-outlined">assignment</span>
+      <span>Atenciones</span>
+    </a>
+    <a routerLink="/reportes" routerLinkActive="active" class="nav-item">
+      <span class="material-symbols-outlined">bar_chart</span>
+      <span>Reportes</span>
+    </a>
+    <a routerLink="/usuarios" routerLinkActive="active" class="nav-item" *ngIf="esAdmin">
+      <span class="material-symbols-outlined">manage_accounts</span>
+      <span>Usuarios</span>
+    </a>
+    <a routerLink="/perfil" routerLinkActive="active" class="nav-item">
+      <span class="material-symbols-outlined">account_circle</span>
+      <span>Perfil</span>
+    </a>
   </nav>
 
-  <!-- Perfil en el pie del Sidebar -->
   <div class="sidebar-footer">
-    <div class="user-chip">
-      <div class="user-avatar" aria-hidden="true">JP</div>
-      <div class="user-details">
-        <strong class="user-name">Dr. Juan Pérez</strong>
-        <span class="user-role">Administrador</span>
+    <div class="user-card">
+      <div class="user-avatar">{{ iniciales }}</div>
+      <div class="user-info">
+        <span class="user-name">{{ nombre }}</span>
+        <span class="user-role">{{ rol }}</span>
       </div>
-      <button
-        type="button"
-        class="logout-btn"
-        (click)="cerrarSesion()"
-        title="Cerrar sesión"
-        aria-label="Cerrar sesión"
-      >
-        <lucide-icon [img]="iconLogOut"></lucide-icon>
-      </button>
     </div>
+    <button class="btn-logout" (click)="logout()" title="Cerrar sesión" aria-label="Cerrar sesión">
+      <span class="material-symbols-outlined">logout</span>
+    </button>
   </div>
 </aside>

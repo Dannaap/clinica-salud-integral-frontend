@@ -1,10 +1,16 @@
 <div class="layout-wrapper">
   <!-- Barra lateral fija -->
-  <app-sidebar></app-sidebar>
+  <app-sidebar [abierto]="sidebarAbierto"></app-sidebar>
+  <div class="sidebar-overlay" *ngIf="sidebarAbierto" (click)="sidebarAbierto = false"></div>
 
   <!-- Contenedor principal a la derecha -->
   <div class="layout-main">
-    <app-header></app-header>
+    <app-header
+      titulo="Usuarios"
+      subtitulo="Gestión de cuentas del personal"
+      placeholder="Buscar usuario por nombre o correo..."
+      (menuToggle)="toggleSidebar()"
+    ></app-header>
     <main class="layout-content">
       <router-outlet></router-outlet>
     </main>

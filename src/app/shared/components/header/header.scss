@@ -1,176 +1,210 @@
-@use '../../../../styles/variables' as *;
+$primary: #0b5ed7;
+$primary-dark: #084298;
+$danger: #dc3545;
+$neutral-900: #1a1d21;
+$neutral-700: #495057;
+$neutral-400: #ced4da;
+$neutral-100: #f8f9fa;
 
 .top-header {
+  position: fixed;
+  top: 0;
+  left: 260px;
+  right: 0;
   height: 64px;
-  background-color: $white;
-  border-bottom: 1px solid #e9ecef;
-  padding: 0 32px;
+  background: white;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  font-family: $font-family;
-}
+  padding: 0 2rem;
+  z-index: 40;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 
-// ─── TÍTULOS ────────────────────────────────────────────────
-.header-titles {
-  display: flex;
-  flex-direction: column;
-  min-width: 200px;
-
-  .view-title {
-    font-size: 18px;
-    font-weight: 700;
-    color: #111827;
-    margin: 0;
-    line-height: 1.2;
-  }
-
-  .view-subtitle {
-    font-size: 12px;
-    color: #6b7280;
-    font-weight: 400;
-  }
-}
-
-// ─── BUSCADOR ───────────────────────────────────────────────
-.header-search {
-  flex: 1;
-  max-width: 440px;
-
-  .search-input-wrapper {
-    position: relative;
-    display: flex;
+  .btn-menu {
+    display: none;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: $neutral-700;
+    cursor: pointer;
     align-items: center;
-    width: 100%;
+    justify-content: center;
+
+    &:hover {
+      background: $neutral-100;
+    }
+  }
+
+  .header-title {
+    display: flex;
+    flex-direction: column;
+
+    .header-heading {
+      font-size: 18px;
+      font-weight: 600;
+      color: $neutral-900;
+      line-height: 1.2;
+    }
+
+    .header-subtitle {
+      font-size: 13px;
+      color: $neutral-700;
+    }
+  }
+
+  .search-box {
+    position: relative;
+    width: 400px;
 
     .search-icon {
       position: absolute;
-      left: 14px;
-      width: 16px;
-      height: 16px;
-      color: #9ca3af;
-      pointer-events: none;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: $neutral-400;
+      font-size: 20px;
     }
 
-    .search-input {
+    input {
       width: 100%;
-      height: 38px;
-      padding: 0 16px 0 40px;
-      font-size: 13px;
-      font-family: $font-family;
-      color: #1f2937;
-      background-color: $white;
-      border: 1px solid #e5e7eb;
-      border-radius: 20px;
-      transition: all 150ms ease;
+      height: 40px;
+      padding: 0 1rem 0 2.5rem;
+      border: 1px solid $neutral-400;
+      border-radius: 8px;
+      font-size: 14px;
+      color: $neutral-900;
+      background: white;
 
       &::placeholder {
-        color: #9ca3af;
+        color: $neutral-400;
       }
 
       &:focus {
         outline: none;
-        border-color: #0b5ed7;
-        box-shadow: 0 0 0 3px rgba(11, 94, 215, 0.12);
+        border-color: $primary;
+        box-shadow: 0 0 0 3px rgba($primary, 0.2);
+      }
+    }
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    .btn-notification {
+      position: relative;
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: $neutral-700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+
+      &:hover {
+        background: $neutral-100;
+      }
+
+      .notification-badge {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        min-width: 18px;
+        height: 18px;
+        padding: 0 4px;
+        background: $danger;
+        color: white;
+        border-radius: 9999px;
+        font-size: 11px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding-left: 1rem;
+      border-left: 1px solid $neutral-400;
+      cursor: pointer;
+
+      .profile-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: $primary;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .profile-info {
+        display: flex;
+        flex-direction: column;
+
+        .profile-name {
+          font-size: 14px;
+          font-weight: 500;
+          color: $neutral-900;
+        }
+
+        .profile-role {
+          font-size: 11px;
+          color: $neutral-700;
+        }
       }
     }
   }
 }
 
-// ─── ACCIONES Y PERFIL ──────────────────────────────────────
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 16px;
+@media (max-width: 992px) {
+  .top-header {
+    left: 0;
+    padding: 0 1rem;
+    gap: 0.75rem;
 
-  .icon-button {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    background: transparent;
-    border: none;
-    color: #4b5563;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: all 150ms ease;
-
-    &:hover {
-      background-color: #f3f4f6;
-      color: #0b5ed7;
-    }
-
-    lucide-icon {
-      width: 18px;
-      height: 18px;
-    }
-
-    .notification-badge {
-      position: absolute;
-      top: 2px;
-      right: 2px;
+    .btn-menu {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 16px;
-      height: 16px;
-      font-size: 10px;
-      font-weight: 700;
-      color: $white;
-      background-color: #ef4444;
-      border-radius: 50%;
-      border: 2px solid $white;
+    }
+
+    .search-box {
+      display: none;
+    }
+
+    .header-title {
+      .header-heading {
+        font-size: 16px;
+      }
     }
   }
+}
 
-  .divider {
-    width: 1px;
-    height: 24px;
-    background-color: #e5e7eb;
-  }
-
-  .user-menu-chip {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 4px 8px;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: background-color 150ms ease;
-
-    &:hover {
-      background-color: #f3f4f6;
+// --- MÓVIL (≤ 576px) ---
+@media (max-width: 576px) {
+  .top-header {
+    .header-title .header-subtitle {
+      display: none;
     }
 
-    .avatar-badge {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background-color: #0b5ed7;
-      color: $white;
-      font-size: 12px;
-      font-weight: 700;
+    .user-profile .profile-info {
+      display: none;
     }
 
-    .user-fullname {
-      font-size: 13px;
-      font-weight: 600;
-      color: #1f2937;
-    }
-
-    .chevron-icon {
-      width: 14px;
-      height: 14px;
-      color: #6b7280;
+    .header-actions {
+      gap: 0.5rem;
     }
   }
 }

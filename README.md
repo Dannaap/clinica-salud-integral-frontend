@@ -60,71 +60,63 @@ clinica-salud-integral-frontend/
 ├── src/
 │   ├── app/
 │   │   ├── core/
-│   │   │   ├── guards/
-│   │   │   │   ├── auth.guard.ts
-│   │   │   │   └── role.guard.ts
-│   │   │   ├── interceptors/
-│   │   │   │   └── jwt.interceptor.ts
+│   │   │   ├── guards/              
+│   │   │   ├── interceptors/        
 │   │   │   ├── services/
-│   │   │   │   ├── auth.service.ts
-│   │   │   │   ├── paciente.service.ts
-│   │   │   │   └── usuario.service.ts
+│   │   │   │   ├── auth.service.ts  
+│   │   │   │   ├── paciente.service.ts  
+│   │   │   │   └── usuario.service.ts   
 │   │   │   └── models/
-│   │   │       ├── usuario.model.ts
-│   │   │       ├── paciente.model.ts
-│   │   │       └── cita.model.ts
+│   │   │       ├── usuario.model.ts 
+│   │   │       ├── paciente.model.ts 
+│   │   │       └── cita.model.ts     
+│   │   │
 │   │   ├── shared/
-│   │   │   ├── components/
-│   │   │   │   ├── sidebar/
-│   │   │   │   ├── header/
-│   │   │   │   └── modal/
+│   │   │   ├── components/          
 │   │   │   └── pipes/
+│   │   │
 │   │   ├── features/
-│   │   │   ├── auth/
-│   │   │   │   ├── login/
-│   │   │   │   └── auth.routes.ts
-│   │   │   ├── dashboard/
-│   │   │   │   ├── admin/
-│   │   │   │   ├── recepcion/
-│   │   │   │   ├── medico/
-│   │   │   │   └── dashboard.routes.ts
-│   │   │   ├── pacientes/
-│   │   │   │   ├── registro/
-│   │   │   │   ├── listado/
-│   │   │   │   └── pacientes.routes.ts
-│   │   │   └── usuarios/
-│   │   │       ├── listado/
-│   │   │       ├── formulario/
-│   │   │       └── usuarios.routes.ts
-│   │   ├── app.routes.ts
-│   │   ├── app.component.ts
-│   │   ├── app.component.html
-│   │   ├── app.component.scss
-│   │   └── app.config.ts
-│   ├── assets/
-│   │   ├── images/
-│   │   └── icons/
-│   ├── environments/
+│   │   │   ├── auth/login/          
+│   │   │   ├── dashboard/           
+│   │   │   ├── pacientes/           
+│   │   │   └── usuarios/            
+│   │   │
+│   │   ├── app.config.ts            
+│   │   ├── app.html                 
+│   │   ├── app.routes.ts            
+│   │   ├── app.scss                 
+│   │   └── app.ts                   
+│   │
+│   ├── environments/              
 │   │   ├── environment.ts
 │   │   └── environment.prod.ts
+│   │
 │   ├── styles/
-│   │   ├── _variables.scss
-│   │   ├── _mixins.scss
-│   │   ├── _buttons.scss
-│   │   ├── _inputs.scss
-│   │   ├── _cards.scss
-│   │   ├── _tables.scss
-│   │   ├── _badges.scss
-│   │   └── styles.scss
-│   ├── index.html
-│   └── main.ts
-├── angular.json
-├── package.json
-├── tsconfig.json
-├── tsconfig.app.json
-├── tailwind.config.js (opcional)
-├── .gitignore
-└── README.md
+│   │   ├── _variables.scss          
+│   │   ├── _mixins.scss             
+│   │   ├── _typography.scss         
+│   │   ├── _buttons.scss            
+│   │   ├── _inputs.scss             
+│   │   ├── _cards.scss              
+│   │   ├── _badges.scss             
+│   │   ├── _tables.scss             
+│   │   └── _layout.scss             
+│   │
+│   ├── index.html                   
+│   ├── main.ts                      
+│   └── styles.scss                  
+│
+├── public/                          
+│   ├── favicon.ico
+│   └── logo.png
+│
+├── angular.json                     
+├── package.json                     
+├── tsconfig.json                    
+├── tsconfig.app.json                
+├── tsconfig.spec.json               
+├── .gitignore                       
+└── README.md                        
 ```
 ---
 

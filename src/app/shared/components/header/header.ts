@@ -1,30 +1,32 @@
-import { Component, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import {
-  LucideAngularModule,
-  Search,
-  Bell,
-  ChevronDown,
-} from 'lucide-angular';
 import { UsuarioService } from '../../../core/services/usuario.service';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule],
+  imports: [CommonModule],
   templateUrl: './header.html',
-  styleUrl: './header.scss',
+  styleUrl: './header.scss'
 })
 export class HeaderComponent {
-  readonly usuarioService = inject(UsuarioService);
+  readonly usuarioService = inject(UsuarioService, { optional: true });
 
-  readonly iconSearch = Search;
-  readonly iconBell = Bell;
-  readonly iconChevronDown = ChevronDown;
+  @Input() titulo: string = 'Inicio';
+  @Input() subtitulo: string = 'Resumen general del día';
+  @Input() placeholder: string = 'Buscar paciente por DNI, nombre o cita...';
+  @Input() notificaciones: number = 3;
+  @Input() nombre: string = 'Dr. Juan Pérez';
+  @Input() rol: string = '';
+  @Input() iniciales: string = 'JP';
+  @Output() menuToggle = new EventEmitter<void>();
+  @Output() searchChange = new EventEmitter<string>();
 
   onSearchChange(event: Event): void {
     const input = event.target as HTMLInputElement;
-    this.usuarioService.setBusqueda(input.value);
+    this.searchChange.emit(input.value);
+    if (this.usuarioService) {
+      this.usuarioService.setBusqueda(input.value);
+    }
   }
 }

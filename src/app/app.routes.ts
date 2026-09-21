@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
   {
     path: 'login',
     loadComponent: () =>
@@ -13,6 +14,38 @@ export const routes: Routes = [
         (m) => m.pacientesRoutes
       ),
   },
+  // Rutas de Dashboard por rol
+  {
+    path: 'dashboard/admin',
+    loadComponent: () =>
+      import('./features/dashboard/admin/admin').then((m) => m.AdminComponent),
+  },
+  {
+    path: 'dashboard/reception',
+    loadComponent: () =>
+      import('./features/dashboard/reception/reception').then((m) => m.ReceptionComponent),
+  },
+  {
+    path: 'dashboard/recepcion',
+    redirectTo: 'dashboard/reception',
+    pathMatch: 'full',
+  },
+  {
+    path: 'dashboard/medical',
+    loadComponent: () =>
+      import('./features/dashboard/medical/medical').then((m) => m.MedicalComponent),
+  },
+  {
+    path: 'dashboard/medico',
+    redirectTo: 'dashboard/medical',
+    pathMatch: 'full',
+  },
+  {
+    path: 'dashboard',
+    redirectTo: 'dashboard/admin',
+    pathMatch: 'full',
+  },
+  // Rutas bajo el layout de administración
   {
     path: '',
     loadComponent: () =>
@@ -20,7 +53,6 @@ export const routes: Routes = [
         (m) => m.AdminLayoutComponent
       ),
     children: [
-      { path: '', redirectTo: 'usuarios', pathMatch: 'full' },
       {
         path: 'usuarios',
         loadComponent: () =>
@@ -28,13 +60,12 @@ export const routes: Routes = [
             (m) => m.UsuariosListadoComponent
           ),
       },
-      { path: 'dashboard', redirectTo: 'usuarios' },
-      { path: 'citas', redirectTo: 'usuarios' },
-      { path: 'turnos', redirectTo: 'usuarios' },
-      { path: 'atenciones', redirectTo: 'usuarios' },
-      { path: 'reportes', redirectTo: 'usuarios' },
-      { path: 'perfil', redirectTo: 'usuarios' },
+      { path: 'citas', redirectTo: 'dashboard/admin' },
+      { path: 'turnos', redirectTo: 'dashboard/admin' },
+      { path: 'atenciones', redirectTo: 'dashboard/medical' },
+      { path: 'reportes', redirectTo: 'dashboard/admin' },
+      { path: 'perfil', redirectTo: 'dashboard/admin' },
     ],
   },
-  { path: '**', redirectTo: 'usuarios' },
+  { path: '**', redirectTo: 'login' },
 ];
