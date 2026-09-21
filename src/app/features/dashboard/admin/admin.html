@@ -109,10 +109,10 @@
             <span class="material-symbols-outlined text-primary">event_available</span>
             <h2 class="card-title">Próximas citas de hoy</h2>
           </div>
-          <a href="#" class="link-primary">
+          <button type="button" class="link-primary" (click)="mostrarProximamente('Listado completo de citas')">
             <span>Ver todas</span>
             <span class="material-symbols-outlined">arrow_forward</span>
-          </a>
+          </button>
         </div>
 
         <div class="table-wrapper">
@@ -140,10 +140,10 @@
                 </td>
                 <td class="text-center">
                   <div class="action-buttons">
-                    <button class="btn-icon" title="Ver detalles" type="button">
+                    <button class="btn-icon" title="Ver detalles" type="button" (click)="mostrarProximamente('Detalles de cita')">
                       <span class="material-symbols-outlined">visibility</span>
                     </button>
-                    <button class="btn-icon" title="Editar cita" type="button">
+                    <button class="btn-icon" title="Editar cita" type="button" (click)="mostrarProximamente('Editar cita')">
                       <span class="material-symbols-outlined">edit</span>
                     </button>
                   </div>
@@ -161,28 +161,28 @@
         </div>
 
         <div class="quick-actions-grid">
-          <button class="quick-action-btn" type="button">
+          <button class="quick-action-btn" type="button" [routerLink]="['/pacientes/registro']">
             <div class="quick-action-icon">
               <span class="material-symbols-outlined">person_add</span>
             </div>
             <span class="quick-action-label">Registrar paciente</span>
           </button>
 
-          <button class="quick-action-btn" type="button">
+          <button class="quick-action-btn" type="button" (click)="mostrarProximamente('Agendar cita')">
             <div class="quick-action-icon">
               <span class="material-symbols-outlined">add_task</span>
             </div>
             <span class="quick-action-label">Agendar cita</span>
           </button>
 
-          <button class="quick-action-btn" type="button">
+          <button class="quick-action-btn" type="button" (click)="mostrarProximamente('Gestionar turnos')">
             <div class="quick-action-icon">
               <span class="material-symbols-outlined">calendar_month</span>
             </div>
             <span class="quick-action-label">Gestionar turnos</span>
           </button>
 
-          <button class="quick-action-btn" type="button">
+          <button class="quick-action-btn" type="button" (click)="mostrarProximamente('Ver reportes')">
             <div class="quick-action-icon">
               <span class="material-symbols-outlined">query_stats</span>
             </div>
@@ -208,10 +208,10 @@
           <span class="material-symbols-outlined text-primary">medical_services</span>
           <h2 class="card-title">Nuestro equipo médico</h2>
         </div>
-        <a href="#" class="link-primary">
+        <button type="button" class="link-primary" (click)="mostrarProximamente('Directorio médico completo')">
           <span>Ver todos</span>
           <span class="material-symbols-outlined">arrow_forward</span>
-        </a>
+        </button>
       </div>
 
       <div class="doctor-grid">
@@ -222,7 +222,7 @@
           </div>
           <h3 class="doctor-name">{{ doctor.nombre }}</h3>
           <span class="doctor-specialty">{{ doctor.especialidad }}</span>
-          <button class="btn-doctor" type="button">Ver agenda</button>
+          <button class="btn-doctor" type="button" (click)="mostrarProximamente('Agenda de ' + doctor.nombre)">Ver agenda</button>
         </div>
       </div>
     </section>

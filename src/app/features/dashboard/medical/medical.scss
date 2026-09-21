@@ -469,6 +469,10 @@ $neutral-100: #F8F9FA;
   font-family: 'Poppins', sans-serif;
   font-size: 13px; font-weight: 600;
   color: $primary; text-decoration: none;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
   &:hover { text-decoration: underline; }
 }
 

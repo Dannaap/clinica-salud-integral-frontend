@@ -100,4 +100,9 @@ export class AdminComponent {
   toggleSidebar() {
     this.sidebarAbierto = !this.sidebarAbierto;
   }
+
+  mostrarProximamente(modulo: string): void {
+    console.log(`${modulo} estará disponible en un próximo sprint`);
+    alert(`${modulo} estará disponible en un próximo sprint.`);
+  }
 }

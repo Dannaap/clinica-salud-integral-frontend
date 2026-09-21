@@ -83,4 +83,9 @@ export class MedicalComponent {
     };
     return map[estado] || '';
   }
+
+  mostrarProximamente(modulo: string): void {
+    console.log(`${modulo} estará disponible en un próximo sprint`);
+    alert(`${modulo} estará disponible en un próximo sprint.`);
+  }
 }

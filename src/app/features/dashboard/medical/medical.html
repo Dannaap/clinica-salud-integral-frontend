@@ -60,7 +60,7 @@
           </p>
         </div>
       </div>
-      <button class="btn-hero" type="button">
+      <button class="btn-hero" type="button" (click)="mostrarProximamente('Iniciar consulta con María López')">
         <span class="material-symbols-outlined">play_circle</span>
         <span>Iniciar consulta</span>
       </button>
@@ -121,10 +121,10 @@
             <h3 class="card-title">Mi agenda de hoy</h3>
             <span class="date-badge">14 Sep</span>
           </div>
-          <a href="#" class="link-primary">
+          <button type="button" class="link-primary" (click)="mostrarProximamente('Agenda semanal')">
             <span>Ver semana</span>
             <span class="material-symbols-outlined">arrow_forward</span>
-          </a>
+          </button>
         </div>
 
         <div class="table-wrapper">
@@ -156,13 +156,13 @@
                 </td>
                 <td class="text-right">
                   <div class="action-buttons right">
-                    <button class="btn-icon" title="Ver historial" type="button">
+                    <button class="btn-icon" title="Ver historial" type="button" (click)="mostrarProximamente('Historial de ' + cita.paciente)">
                       <span class="material-symbols-outlined">visibility</span>
                     </button>
-                    <button class="btn-icon btn-icon-success" *ngIf="cita.estado === 'Atendida'" title="Ver receta" type="button">
+                    <button class="btn-icon btn-icon-success" *ngIf="cita.estado === 'Atendida'" title="Ver receta" type="button" (click)="mostrarProximamente('Receta médica de ' + cita.paciente)">
                       <span class="material-symbols-outlined">description</span>
                     </button>
-                    <button class="btn-icon btn-icon-primary" *ngIf="cita.estado !== 'Atendida'" title="Iniciar consulta" type="button">
+                    <button class="btn-icon btn-icon-primary" *ngIf="cita.estado !== 'Atendida'" title="Iniciar consulta" type="button" (click)="mostrarProximamente('Iniciar consulta de ' + cita.paciente)">
                       <span class="material-symbols-outlined">play_arrow</span>
                     </button>
                   </div>
@@ -178,19 +178,19 @@
         <div class="card quick-card">
           <h3 class="card-title">Acciones rápidas</h3>
           <div class="quick-grid">
-            <button class="quick-btn" type="button">
+            <button class="quick-btn" type="button" (click)="mostrarProximamente('Iniciar consulta')">
               <div class="quick-icon"><span class="material-symbols-outlined">stethoscope</span></div>
               <span>Iniciar consulta</span>
             </button>
-            <button class="quick-btn" type="button">
+            <button class="quick-btn" type="button" [routerLink]="['/pacientes/listado']">
               <div class="quick-icon"><span class="material-symbols-outlined">person_search</span></div>
               <span>Buscar paciente</span>
             </button>
-            <button class="quick-btn" type="button">
+            <button class="quick-btn" type="button" (click)="mostrarProximamente('Ver historial clínico')">
               <div class="quick-icon"><span class="material-symbols-outlined">history_edu</span></div>
               <span>Ver historial</span>
             </button>
-            <button class="quick-btn" type="button">
+            <button class="quick-btn" type="button" (click)="mostrarProximamente('Emitir receta médica')">
               <div class="quick-icon"><span class="material-symbols-outlined">prescriptions</span></div>
               <span>Emitir receta</span>
             </button>
@@ -224,17 +224,17 @@
           <span class="indicator-bar indicator-success"></span>
           <h3 class="card-title">Mis pacientes recientes</h3>
         </div>
-        <a href="#" class="link-primary">
+        <button type="button" class="link-primary" (click)="mostrarProximamente('Listado de pacientes recientes')">
           <span>Ver todos</span>
           <span class="material-symbols-outlined">arrow_forward</span>
-        </a>
+        </button>
       </div>
       <div class="recent-grid">
         <div class="recent-item" *ngFor="let p of pacientesRecientes">
           <div class="recent-avatar">{{ p.iniciales }}</div>
           <h4 class="recent-name">{{ p.nombre }}</h4>
           <span class="recent-last">Última atención: {{ p.ultima }}</span>
-          <button class="btn-historia" type="button">Ver historia</button>
+          <button class="btn-historia" type="button" (click)="mostrarProximamente('Historia clínica de ' + p.nombre)">Ver historia</button>
         </div>
       </div>
     </section>

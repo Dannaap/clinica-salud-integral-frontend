@@ -37,7 +37,7 @@
           <p>Registra una cita en menos de 3 pasos</p>
         </div>
       </div>
-      <button class="btn-banner" type="button">
+      <button class="btn-banner" type="button" (click)="mostrarProximamente('Agendar nueva cita')">
         <span class="material-symbols-outlined">calendar_month</span>
         <span>Nueva cita</span>
       </button>
@@ -90,7 +90,7 @@
       <div class="card table-card">
         <div class="card-header">
           <h3 class="card-title">Citas de hoy</h3>
-          <a href="#" class="link-primary">Ver todas →</a>
+          <button type="button" class="link-primary" (click)="mostrarProximamente('Listado completo de citas')">Ver todas →</button>
         </div>
         <div class="table-wrapper">
           <table class="data-table">
@@ -113,9 +113,9 @@
                 <td><span class="badge" [ngClass]="getEstadoClass(cita.estado)">{{ cita.estado }}</span></td>
                 <td class="text-center">
                   <div class="action-buttons">
-                    <button class="btn-icon" title="Ver" type="button"><span class="material-symbols-outlined">visibility</span></button>
-                    <button class="btn-icon" title="Editar" type="button"><span class="material-symbols-outlined">edit</span></button>
-                    <button class="btn-icon btn-icon-danger" title="Cancelar" type="button"><span class="material-symbols-outlined">close</span></button>
+                    <button class="btn-icon" title="Ver" type="button" (click)="mostrarProximamente('Ver detalle de cita')"><span class="material-symbols-outlined">visibility</span></button>
+                    <button class="btn-icon" title="Editar" type="button" (click)="mostrarProximamente('Editar cita')"><span class="material-symbols-outlined">edit</span></button>
+                    <button class="btn-icon btn-icon-danger" title="Cancelar" type="button" (click)="mostrarProximamente('Cancelar cita')"><span class="material-symbols-outlined">close</span></button>
                   </div>
                 </td>
               </tr>
@@ -123,7 +123,7 @@
           </table>
         </div>
         <div class="table-footer">
-          <a href="#" class="link-primary">Ver agenda completa →</a>
+          <button type="button" class="link-primary" (click)="mostrarProximamente('Agenda completa')">Ver agenda completa →</button>
         </div>
       </div>
 
@@ -132,19 +132,19 @@
         <div class="card quick-card">
           <h3 class="card-title">Acciones rápidas</h3>
           <div class="quick-grid">
-            <button class="quick-btn" type="button">
+            <button class="quick-btn" type="button" [routerLink]="['/pacientes/listado']">
               <div class="quick-icon"><span class="material-symbols-outlined">person_search</span></div>
               <span>Buscar paciente</span>
             </button>
-            <button class="quick-btn" type="button">
+            <button class="quick-btn" type="button" (click)="mostrarProximamente('Agendar cita')">
               <div class="quick-icon"><span class="material-symbols-outlined">calendar_month</span></div>
               <span>Agendar cita</span>
             </button>
-            <button class="quick-btn" type="button">
+            <button class="quick-btn" type="button" (click)="mostrarProximamente('Reprogramar cita')">
               <div class="quick-icon"><span class="material-symbols-outlined">update</span></div>
               <span>Reprogramar</span>
             </button>
-            <button class="quick-btn" type="button">
+            <button class="quick-btn" type="button" (click)="mostrarProximamente('Cancelar cita')">
               <div class="quick-icon"><span class="material-symbols-outlined">event_busy</span></div>
               <span>Cancelar cita</span>
             </button>
@@ -172,7 +172,7 @@
     <section class="card team-card">
       <div class="card-header">
         <h3 class="card-title">Médicos disponibles hoy</h3>
-        <a href="#" class="link-primary">Ver todos →</a>
+        <button type="button" class="link-primary" (click)="mostrarProximamente('Directorio médico completo')">Ver todos →</button>
       </div>
       <div class="doctor-grid">
         <div class="doctor-card" *ngFor="let m of medicos">
@@ -180,7 +180,7 @@
           <h4 class="doctor-name">{{ m.nombre }}</h4>
           <span class="doctor-specialty">{{ m.especialidad }}</span>
           <span class="badge badge-disponible">{{ m.horario }}</span>
-          <button class="btn-agendar" type="button">Agendar</button>
+          <button class="btn-agendar" type="button" (click)="mostrarProximamente('Agendar con ' + m.nombre)">Agendar</button>
         </div>
       </div>
     </section>
