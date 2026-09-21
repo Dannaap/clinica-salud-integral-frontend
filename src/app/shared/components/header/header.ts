@@ -30,4 +30,8 @@ export class HeaderComponent {
       queryParams: { dni: valor }
     });
   }
+
+  mostrarNotificaciones(): void {
+    alert('El módulo de notificaciones estará disponible en un próximo sprint.');
+  }
 }

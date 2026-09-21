@@ -13,17 +13,9 @@
   </div>
 
   <div class="header-actions">
-    <button class="btn-notification" title="Notificaciones" type="button">
+    <button class="btn-notification" title="Notificaciones" type="button" (click)="mostrarNotificaciones()">
       <span class="material-symbols-outlined">notifications</span>
       <span class="notification-badge">{{ notificaciones }}</span>
     </button>
-    <div class="user-profile">
-      <div class="profile-avatar">{{ iniciales }}</div>
-      <div class="profile-info">
-        <span class="profile-name">{{ nombre }}</span>
-        <span class="profile-role" *ngIf="rol">{{ rol }}</span>
-      </div>
-      <span class="material-symbols-outlined">expand_more</span>
-    </div>
   </div>
 </header>
