@@ -128,7 +128,13 @@ export class Registro {
       return;
     }
 
-    if (this.dniEstado() === 'duplicado') {
+    const dniValor = (this.dni.value ?? '').trim();
+    const pacienteExistente = this.pacienteService.buscarPorDni(dniValor);
+    const pacienteEditando = this.pacienteEditando();
+
+    if (pacienteExistente && pacienteExistente.id !== pacienteEditando?.id) {
+      this.dniEstado.set('duplicado');
+      this.pacienteEncontrado.set(pacienteExistente);
       this.error.set('Ya existe un paciente registrado con este DNI.');
       return;
     }
@@ -137,17 +143,16 @@ export class Registro {
     this.error.set(null);
 
     const datos = this.formulario.getRawValue() as PacienteFormValue;
-    const paciente = this.pacienteEditando();
 
-    if (paciente) {
-      this.pacienteService.actualizar(paciente.id, datos);
+    if (pacienteEditando) {
+      this.pacienteService.actualizar(pacienteEditando.id, datos);
     } else {
       this.pacienteService.crear(datos);
     }
 
     this.guardando.set(false);
     this.mensaje.set(
-      paciente ? 'Los datos del paciente fueron actualizados.' : 'Paciente registrado correctamente.',
+      pacienteEditando ? 'Los datos del paciente fueron actualizados.' : 'Paciente registrado correctamente.',
     );
   }
 
