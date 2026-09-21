@@ -53,6 +53,9 @@ export class MedicoCitasComponent {
 
   // Modales
   citaSeleccionada = signal<CitaConDetalle | null>(null);
+  get cita(): CitaConDetalle | null {
+    return this.citaSeleccionada();
+  }
   modalDetalleAbierto = signal<boolean>(false);
   modalAccionAbierto = signal<boolean>(false);
   accionTipo = signal<'atender' | 'cancelar' | 'reprogramar'>('atender');

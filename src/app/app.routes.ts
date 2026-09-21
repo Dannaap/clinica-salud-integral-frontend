@@ -47,6 +47,15 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/dashboard/medical/medical').then((m) => m.MedicalComponent),
   },
+  {
+    path: 'citas',
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['MEDICO', 'ADMIN'] },
+    loadComponent: () =>
+      import('./features/citas/medico-citas/medico-citas').then(
+        (m) => m.MedicoCitasComponent
+      ),
+  },
   // Rutas bajo el layout de administración para el módulo de usuarios
   {
     path: '',
@@ -65,7 +74,6 @@ export const routes: Routes = [
             (m) => m.UsuariosListadoComponent
           ),
       },
-      { path: 'citas', redirectTo: 'dashboard' },
       { path: 'turnos', redirectTo: 'dashboard' },
       { path: 'atenciones', redirectTo: 'dashboard' },
       { path: 'reportes', redirectTo: 'dashboard' },

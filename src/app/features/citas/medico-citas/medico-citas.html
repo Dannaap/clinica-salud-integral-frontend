@@ -24,10 +24,12 @@
 
   <main class="content">
     <!-- Feedback Toast -->
-    <div class="feedback-banner" *ngIf="mensajeFeedback(); as fb" [ngClass]="fb.tipo">
-      <span class="material-symbols-outlined">{{ fb.tipo === 'success' ? 'check_circle' : 'error' }}</span>
-      <span>{{ fb.texto }}</span>
-    </div>
+    @if (mensajeFeedback(); as fb) {
+      <div class="feedback-banner" [ngClass]="fb.tipo">
+        <span class="material-symbols-outlined">{{ fb.tipo === 'success' ? 'check_circle' : 'error' }}</span>
+        <span>{{ fb.texto }}</span>
+      </div>
+    }
 
     <!-- Header / Banner de sección -->
     <section class="page-title-row">
@@ -292,7 +294,7 @@
 </div>
 
 <!-- MODAL: Detalle de Cita -->
-<div class="modal-backdrop" *ngIf="modalDetalleAbierto() && citaSeleccionada(); as cita" (click)="cerrarModales()">
+<div class="modal-backdrop" *ngIf="modalDetalleAbierto() && cita" (click)="cerrarModales()">
   <div class="modal-card" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <div class="modal-title-box">
@@ -368,7 +370,7 @@
 </div>
 
 <!-- MODAL: Acción (Atender / Reprogramar / Cancelar) -->
-<div class="modal-backdrop" *ngIf="modalAccionAbierto() && citaSeleccionada(); as cita" (click)="cerrarModales()">
+<div class="modal-backdrop" *ngIf="modalAccionAbierto() && cita" (click)="cerrarModales()">
   <div class="modal-card modal-sm" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <div class="modal-title-box">

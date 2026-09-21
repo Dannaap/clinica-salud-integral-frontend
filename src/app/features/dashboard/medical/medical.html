@@ -60,10 +60,10 @@
           </p>
         </div>
       </div>
-      <button class="btn-hero" type="button" (click)="mostrarProximamente('Iniciar consulta con María López')">
+      <a class="btn-hero" routerLink="/citas">
         <span class="material-symbols-outlined">play_circle</span>
         <span>Iniciar consulta</span>
-      </button>
+      </a>
     </section>
 
     <!-- KPIs -->
@@ -127,10 +127,10 @@
             <h2 class="card-title">Mi agenda de hoy</h2>
             <span class="date-badge">14 Sep</span>
           </div>
-          <button type="button" class="link-primary" (click)="mostrarProximamente('Agenda semanal')">
+          <a class="link-primary" routerLink="/citas">
             <span>Ver semana</span>
             <span class="material-symbols-outlined">arrow_forward</span>
-          </button>
+          </a>
         </div>
 
         <div class="table-wrapper">
@@ -189,10 +189,10 @@
             </div>
           </div>
           <div class="quick-grid">
-            <button class="quick-btn" type="button" (click)="mostrarProximamente('Iniciar consulta')">
+            <a class="quick-btn" routerLink="/citas">
               <div class="quick-icon"><span class="material-symbols-outlined">stethoscope</span></div>
               <span class="quick-label">Iniciar consulta</span>
-            </button>
+            </a>
             <button class="quick-btn" type="button" (click)="mostrarProximamente('Buscar paciente en expediente')">
               <div class="quick-icon"><span class="material-symbols-outlined">person_search</span></div>
               <span class="quick-label">Buscar paciente</span>

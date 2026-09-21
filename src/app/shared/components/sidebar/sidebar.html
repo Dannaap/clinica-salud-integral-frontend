@@ -16,10 +16,15 @@
       <span class="material-symbols-outlined">group</span>
       <span>Pacientes</span>
     </a>
+    <a routerLink="/citas" routerLinkActive="active" class="nav-item" *ngIf="esMedico || esAdmin">
+      <span class="material-symbols-outlined">calendar_month</span>
+      <span>Citas</span>
+    </a>
     <button
       type="button"
       class="nav-item nav-item-disabled"
       (click)="mostrarProximamente('Citas')"
+      *ngIf="!esMedico && !esAdmin"
     >
       <span class="material-symbols-outlined">calendar_month</span>
       <span>Citas</span>
