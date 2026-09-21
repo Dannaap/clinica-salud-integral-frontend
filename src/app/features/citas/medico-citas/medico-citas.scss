@@ -845,7 +845,7 @@ $neutral-100: #f8f9fa;
     background: $danger;
     color: white;
     &:hover {
-      background: darken($danger, 8%);
+      background: color.adjust($danger, $lightness: -8%);
     }
   }
 }
