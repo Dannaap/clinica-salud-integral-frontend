@@ -748,7 +748,7 @@ $neutral-100: #f8f9fa;
         line-height: 1.4;
 
         &.modal-warning-desc {
-          color: darken($danger, 10%);
+          color: color.adjust($danger, $lightness: -10%);
           background: $danger-light;
           padding: 0.75rem 1rem;
           border-radius: 8px;
