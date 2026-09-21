@@ -29,10 +29,10 @@
     </nav>
 
     <div class="sidebar-profile">
-      <div class="profile-avatar" aria-hidden="true">LF</div>
+      <div class="profile-avatar" aria-hidden="true">{{ usuario.iniciales }}</div>
       <div class="profile-info">
-        <span class="profile-name">Lucía Fernández</span>
-        <span class="profile-role">Recepción</span>
+        <span class="profile-name">{{ usuario.nombre }}</span>
+        <span class="profile-role">{{ usuario.rol }}</span>
       </div>
       <button class="profile-logout" type="button" aria-label="Cerrar sesión" (click)="logout()">
         <lucide-icon [img]="iconLogout" aria-hidden="true"></lucide-icon>
@@ -53,8 +53,8 @@
           <span class="badge-count">2</span>
         </button>
         <div class="user-menu" aria-label="Usuario actual">
-          <span class="user-avatar" aria-hidden="true">LF</span>
-          <span class="user-name">Lucía Fernández</span>
+          <span class="user-avatar" aria-hidden="true">{{ usuario.iniciales }}</span>
+          <span class="user-name">{{ usuario.nombre }}</span>
           <span class="user-arrow" aria-hidden="true">⌄</span>
         </div>
       </div>

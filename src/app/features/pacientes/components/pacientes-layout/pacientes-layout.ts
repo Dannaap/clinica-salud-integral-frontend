@@ -33,6 +33,16 @@ export class PacientesLayout {
   readonly iconBell = Bell;
   readonly iconLogout = LogOut;
 
+  get usuario() {
+    const u = this.authService.obtenerUsuario();
+    const nombre = u ? `${u.nombre} ${u.apellidos}`.trim() : 'Personal de Clínica';
+    const rol = u?.rol === 'ADMIN' ? 'Administrador' : (u?.rol === 'RECEPCION' ? 'Recepción' : (u?.rol === 'MEDICO' ? 'Médico' : 'Personal'));
+    const iniciales = u
+      ? `${u.nombre.charAt(0)}${u.apellidos.charAt(0)}`.toUpperCase()
+      : 'PC';
+    return { nombre, rol, iniciales };
+  }
+
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);
