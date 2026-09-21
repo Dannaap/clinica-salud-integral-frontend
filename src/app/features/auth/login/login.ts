@@ -116,6 +116,10 @@ export class Login {
     this.mostrarPassword.update((v) => !v);
   }
 
+  olvidePassword(): void {
+    alert('La recuperación de contraseña estará disponible en un próximo sprint.');
+  }
+
   onBlurPassword(): void {
     setTimeout(() => {
       const checks = this.passwordChecks();
