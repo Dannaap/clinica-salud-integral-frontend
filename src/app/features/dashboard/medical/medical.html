@@ -28,9 +28,9 @@
         <h1 class="greeting-title">Buenos días, {{ usuario.nombre }} <span class="wave">👋</span></h1>
         <p class="greeting-subtitle">
           <span>Hoy es lunes, 14 de septiembre de 2026</span>
-          <span class="dot-sep"></span>
+          <span class="separator">•</span>
           <span class="highlight">Tienes 8 citas programadas</span>
-          <span class="dot-sep"></span>
+          <span class="separator">•</span>
           <span class="next-consult"><span class="pulse-dot"></span> Próxima consulta en 15 minutos</span>
         </p>
       </div>
@@ -74,12 +74,14 @@
             <span class="kpi-item-label">Consultas hoy</span>
             <span class="kpi-item-value is-primary">{{ kpis.consultasHoy }}</span>
           </div>
-          <div class="kpi-item-icon is-primary"><span class="material-symbols-outlined">calendar_today</span></div>
+          <div class="kpi-item-icon is-primary">
+            <span class="material-symbols-outlined">calendar_today</span>
+          </div>
         </div>
-        <div class="kpi-footer-band">
+        <div class="kpi-item-footer">
           <span class="strong">3 atendidas</span>
-          <span class="dot-sep"></span>
-          <span class="is-primary-text">5 pendientes</span>
+          <span class="dot"></span>
+          <span>5 pendientes</span>
         </div>
       </div>
 
@@ -87,13 +89,15 @@
         <div class="kpi-top">
           <div class="kpi-text">
             <span class="kpi-item-label">Pacientes en espera</span>
-            <span class="kpi-item-value is-tertiary">{{ kpis.enEspera }}</span>
+            <span class="kpi-item-value is-warning">{{ kpis.enEspera }}</span>
           </div>
-          <div class="kpi-item-icon is-tertiary"><span class="material-symbols-outlined">hourglass_top</span></div>
+          <div class="kpi-item-icon is-warning">
+            <span class="material-symbols-outlined">hourglass_top</span>
+          </div>
         </div>
-        <div class="kpi-footer-band">
-          <span class="material-symbols-outlined band-icon">schedule</span>
-          <span>Tiempo promedio: <strong>6 min</strong></span>
+        <div class="kpi-item-footer">
+          <span class="material-symbols-outlined">schedule</span>
+          <span>Tiempo promedio: <span class="strong">6 min</span></span>
         </div>
       </div>
 
@@ -103,11 +107,13 @@
             <span class="kpi-item-label">Atenciones del mes</span>
             <span class="kpi-item-value is-success">{{ kpis.atencionesMes }}</span>
           </div>
-          <div class="kpi-item-icon is-success"><span class="material-symbols-outlined">assignment_turned_in</span></div>
+          <div class="kpi-item-icon is-success">
+            <span class="material-symbols-outlined">assignment_turned_in</span>
+          </div>
         </div>
-        <div class="kpi-footer-band">
-          <span>Meta mensual: <strong>60</strong></span>
-          <span class="progress-badge">78% alcanzado</span>
+        <div class="kpi-item-footer is-success">
+          <span class="material-symbols-outlined">trending_up</span>
+          <span>78% de la meta mensual (60)</span>
         </div>
       </div>
     </section>
@@ -117,8 +123,8 @@
       <div class="card agenda-card">
         <div class="card-header">
           <div class="card-title-wrapper">
-            <span class="indicator-bar"></span>
-            <h3 class="card-title">Mi agenda de hoy</h3>
+            <span class="material-symbols-outlined text-primary">event_available</span>
+            <h2 class="card-title">Mi agenda de hoy</h2>
             <span class="date-badge">14 Sep</span>
           </div>
           <button type="button" class="link-primary" (click)="mostrarProximamente('Agenda semanal')">
@@ -135,7 +141,7 @@
                 <th>Paciente</th>
                 <th>Motivo</th>
                 <th class="text-center">Estado</th>
-                <th class="text-right">Acciones</th>
+                <th class="text-center">Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -154,8 +160,8 @@
                     {{ cita.estado }}
                   </span>
                 </td>
-                <td class="text-right">
-                  <div class="action-buttons right">
+                <td class="text-center">
+                  <div class="action-buttons">
                     <button class="btn-icon" title="Ver historial" type="button" (click)="mostrarProximamente('Historial de ' + cita.paciente)">
                       <span class="material-symbols-outlined">visibility</span>
                     </button>
@@ -176,23 +182,28 @@
       <div class="side-panel">
         <!-- Acciones rápidas -->
         <div class="card quick-card">
-          <h3 class="card-title">Acciones rápidas</h3>
+          <div class="card-header">
+            <div class="card-title-wrapper">
+              <span class="material-symbols-outlined text-primary">bolt</span>
+              <h2 class="card-title">Acciones rápidas</h2>
+            </div>
+          </div>
           <div class="quick-grid">
             <button class="quick-btn" type="button" (click)="mostrarProximamente('Iniciar consulta')">
               <div class="quick-icon"><span class="material-symbols-outlined">stethoscope</span></div>
-              <span>Iniciar consulta</span>
+              <span class="quick-label">Iniciar consulta</span>
             </button>
-            <button class="quick-btn" type="button" [routerLink]="['/pacientes/listado']">
+            <button class="quick-btn" type="button" (click)="mostrarProximamente('Buscar paciente en expediente')">
               <div class="quick-icon"><span class="material-symbols-outlined">person_search</span></div>
-              <span>Buscar paciente</span>
+              <span class="quick-label">Buscar paciente</span>
             </button>
             <button class="quick-btn" type="button" (click)="mostrarProximamente('Ver historial clínico')">
               <div class="quick-icon"><span class="material-symbols-outlined">history_edu</span></div>
-              <span>Ver historial</span>
+              <span class="quick-label">Ver historial</span>
             </button>
             <button class="quick-btn" type="button" (click)="mostrarProximamente('Emitir receta médica')">
               <div class="quick-icon"><span class="material-symbols-outlined">prescriptions</span></div>
-              <span>Emitir receta</span>
+              <span class="quick-label">Emitir receta</span>
             </button>
           </div>
         </div>
@@ -200,8 +211,11 @@
         <!-- Pacientes en espera -->
         <div class="card waiting-card">
           <div class="card-header">
-            <h3 class="card-title">Pacientes en espera</h3>
-            <span class="count-badge">{{ pacientesEspera.length }} en sala</span>
+            <div class="card-title-wrapper">
+              <span class="material-symbols-outlined text-primary">hourglass_top</span>
+              <h2 class="card-title">Sala de espera</h2>
+            </div>
+            <span class="badge badge-en-espera">{{ pacientesEspera.length }} en sala</span>
           </div>
           <div class="waiting-list">
             <div class="waiting-item" *ngFor="let p of pacientesEspera">
@@ -221,8 +235,8 @@
     <section class="card recent-card">
       <div class="card-header">
         <div class="card-title-wrapper">
-          <span class="indicator-bar indicator-success"></span>
-          <h3 class="card-title">Mis pacientes recientes</h3>
+          <span class="material-symbols-outlined text-primary">history</span>
+          <h2 class="card-title">Mis pacientes recientes</h2>
         </div>
         <button type="button" class="link-primary" (click)="mostrarProximamente('Listado de pacientes recientes')">
           <span>Ver todos</span>
@@ -232,9 +246,9 @@
       <div class="recent-grid">
         <div class="recent-item" *ngFor="let p of pacientesRecientes">
           <div class="recent-avatar">{{ p.iniciales }}</div>
-          <h4 class="recent-name">{{ p.nombre }}</h4>
+          <h3 class="recent-name">{{ p.nombre }}</h3>
           <span class="recent-last">Última atención: {{ p.ultima }}</span>
-          <button class="btn-historia" type="button" (click)="mostrarProximamente('Historia clínica de ' + p.nombre)">Ver historia</button>
+          <button class="btn-doctor" type="button" (click)="mostrarProximamente('Historia clínica de ' + p.nombre)">Ver historia</button>
         </div>
       </div>
     </section>

@@ -12,7 +12,7 @@
       <span class="material-symbols-outlined">home</span>
       <span>Inicio</span>
     </a>
-    <a routerLink="/pacientes" routerLinkActive="active" class="nav-item">
+    <a routerLink="/pacientes" routerLinkActive="active" class="nav-item" *ngIf="!esMedico">
       <span class="material-symbols-outlined">group</span>
       <span>Pacientes</span>
     </a>
