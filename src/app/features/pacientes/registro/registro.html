@@ -1,4 +1,5 @@
-<app-pacientes-layout [pageTitle]="editando ? 'Editar paciente' : 'Registrar paciente'" pageSubtitle="Registro y búsqueda de pacientes">
+<app-pacientes-layout [pageTitle]="editando ? 'Editar paciente' : 'Registrar paciente'"
+  pageSubtitle="Registro y búsqueda de pacientes">
   <div class="registration-page">
     <div class="breadcrumb" aria-label="Migas de pan">
       <a class="breadcrumb-item" routerLink="/pacientes/listado">Pacientes</a>
@@ -10,7 +11,8 @@
       <div class="page-header-title">
         <h2 class="page-title">{{ editando ? 'Editar paciente' : 'Registrar nuevo paciente' }}</h2>
         <p class="page-description">
-          {{ editando ? 'Actualiza los datos personales y de contacto del paciente.' : 'Ingresa los datos personales y de contacto para generar la historia clínica digital.' }}
+          {{ editando ? 'Actualiza los datos personales y de contacto del paciente.' : 'Ingresa los datos personales y
+          de contacto para generar la historia clínica digital.' }}
         </p>
       </div>
       <a class="btn btn-outline" routerLink="/pacientes/listado">
@@ -20,17 +22,17 @@
     </header>
 
     @if (mensaje(); as aviso) {
-      <div class="feedback-message feedback-success" role="status">
-        <lucide-icon [img]="iconCheck" aria-hidden="true"></lucide-icon>
-        <span>{{ aviso }}</span>
-      </div>
+    <div class="feedback-message feedback-success" role="status">
+      <lucide-icon [img]="iconCheck" aria-hidden="true"></lucide-icon>
+      <span>{{ aviso }}</span>
+    </div>
     }
 
     @if (error(); as errorMensaje) {
-      <div class="feedback-message feedback-error" role="alert">
-        <lucide-icon [img]="iconX" aria-hidden="true"></lucide-icon>
-        <span>{{ errorMensaje }}</span>
-      </div>
+    <div class="feedback-message feedback-error" role="alert">
+      <lucide-icon [img]="iconX" aria-hidden="true"></lucide-icon>
+      <span>{{ errorMensaje }}</span>
+    </div>
     }
 
     <section class="card dni-card">
@@ -46,25 +48,17 @@
         <div class="dni-input-group">
           <label class="form-label" for="dni">DNI <span class="required">*</span></label>
           <div class="input-icon-wrapper has-icon-right">
-            <input
-              id="dni"
-              class="form-control"
-              type="text"
-              inputmode="numeric"
-              maxlength="8"
-              placeholder="Ingresa 8 dígitos"
-              [formControl]="dni"
+            <input id="dni" class="form-control" type="text" inputmode="numeric" maxlength="8"
+              placeholder="Ingresa 8 dígitos" [formControl]="dni"
               [class.is-invalid]="tieneError('dni') || dniEstado() === 'duplicado'"
-              [class.is-valid]="dniEstado() === 'disponible'"
-              (input)="limpiarResultadoDni()"
-            />
+              [class.is-valid]="dniEstado() === 'disponible'" (input)="limpiarResultadoDni()" />
             <span class="input-icon-right" aria-hidden="true"><lucide-icon [img]="iconUser"></lucide-icon></span>
           </div>
           @if (tieneError('dni')) {
-            <span class="form-error">
-              @if (dni.errors?.['required']) { El DNI es obligatorio. }
-              @if (dni.errors?.['dniFormato']) { El DNI debe tener exactamente 8 dígitos numéricos. }
-            </span>
+          <span class="form-error">
+            @if (dni.errors?.['required']) { El DNI es obligatorio. }
+            @if (dni.errors?.['dniFormato']) { El DNI debe tener exactamente 8 dígitos numéricos. }
+          </span>
           }
         </div>
         <button class="btn btn-secondary dni-button" type="button" (click)="buscarDni()">
@@ -74,20 +68,21 @@
       </div>
 
       @if (dniEstado() === 'disponible') {
-        <div class="validation-state state-available" role="status">
-          <lucide-icon [img]="iconCheck" aria-hidden="true"></lucide-icon>
-          DNI disponible. Puedes continuar con el registro.
-        </div>
+      <div class="validation-state state-available" role="status">
+        <lucide-icon [img]="iconCheck" aria-hidden="true"></lucide-icon>
+        DNI disponible. Puedes continuar con el registro.
+      </div>
       }
 
       @if (dniEstado() === 'duplicado' && pacienteEncontrado(); as paciente) {
-        <div class="validation-state state-duplicate" role="alert">
-          <div>
-            <strong>Ya existe un paciente con este DNI</strong>
-            <span>{{ paciente.nombres }} {{ paciente.apellidos }} · DNI {{ paciente.dni }}</span>
-          </div>
-          <a class="btn btn-outline btn-sm" [routerLink]="['/pacientes/listado']" [queryParams]="{ dni: paciente.dni }">Ver expediente</a>
+      <div class="validation-state state-duplicate" role="alert">
+        <div>
+          <strong>Ya existe un paciente con este DNI</strong>
+          <span>{{ paciente.nombres }} {{ paciente.apellidos }} · DNI {{ paciente.dni }}</span>
         </div>
+        <a class="btn btn-outline btn-sm" [routerLink]="['/pacientes/listado']"
+          [queryParams]="{ dni: paciente.dni }">Ver expediente</a>
+      </div>
       }
     </section>
 
@@ -103,38 +98,43 @@
       <div class="form-grid">
         <div class="form-group">
           <label class="form-label" for="nombres">Nombres <span class="required">*</span></label>
-          <input id="nombres" class="form-control" type="text" formControlName="nombres" placeholder="Ej. Renato Andrés" [class.is-invalid]="tieneError('nombres')" />
+          <input id="nombres" class="form-control" type="text" formControlName="nombres" placeholder="Ej. Renato Andrés"
+            [class.is-invalid]="tieneError('nombres')" />
           @if (tieneError('nombres')) {
-            <span class="form-error">
-              @if (formulario.controls.nombres.errors?.['required']) { Ingresa los nombres del paciente. }
-              @if (formulario.controls.nombres.errors?.['minlength']) { Debe tener al menos 2 caracteres. }
-              @if (formulario.controls.nombres.errors?.['soloLetras']) { Solo se permiten letras y espacios. }
-            </span>
+          <span class="form-error">
+            @if (formulario.controls.nombres.errors?.['required']) { Ingresa los nombres del paciente. }
+            @if (formulario.controls.nombres.errors?.['minlength']) { Debe tener al menos 2 caracteres. }
+            @if (formulario.controls.nombres.errors?.['soloLetras']) { Solo se permiten letras y espacios. }
+          </span>
           }
         </div>
 
         <div class="form-group">
           <label class="form-label" for="apellidos">Apellidos <span class="required">*</span></label>
-          <input id="apellidos" class="form-control" type="text" formControlName="apellidos" placeholder="Ej. Vargas Silva" [class.is-invalid]="tieneError('apellidos')" />
+          <input id="apellidos" class="form-control" type="text" formControlName="apellidos"
+            placeholder="Ej. Vargas Silva" [class.is-invalid]="tieneError('apellidos')" />
           @if (tieneError('apellidos')) {
-            <span class="form-error">
-              @if (formulario.controls.apellidos.errors?.['required']) { Ingresa los apellidos del paciente. }
-              @if (formulario.controls.apellidos.errors?.['minlength']) { Debe tener al menos 2 caracteres. }
-              @if (formulario.controls.apellidos.errors?.['soloLetras']) { Solo se permiten letras y espacios. }
-            </span>
+          <span class="form-error">
+            @if (formulario.controls.apellidos.errors?.['required']) { Ingresa los apellidos del paciente. }
+            @if (formulario.controls.apellidos.errors?.['minlength']) { Debe tener al menos 2 caracteres. }
+            @if (formulario.controls.apellidos.errors?.['soloLetras']) { Solo se permiten letras y espacios. }
+          </span>
           }
         </div>
 
         <div class="form-group">
           <label class="form-label" for="fechaNacimiento">Fecha de nacimiento <span class="required">*</span></label>
-          <input id="fechaNacimiento" class="form-control" type="date" formControlName="fechaNacimiento" max="{{ hoy }}" [class.is-invalid]="tieneError('fechaNacimiento')" />
+          <input id="fechaNacimiento" class="form-control" type="date" formControlName="fechaNacimiento" max="{{ hoy }}"
+            [class.is-invalid]="tieneError('fechaNacimiento')" />
           @if (edad() !== null) { <span class="form-hint">Edad: {{ edad() }} años</span> }
           @if (tieneError('fechaNacimiento')) {
-            <span class="form-error">
-              @if (formulario.controls.fechaNacimiento.errors?.['required']) { Selecciona la fecha de nacimiento. }
-              @if (formulario.controls.fechaNacimiento.errors?.['fechaFutura']) { La fecha de nacimiento no puede ser futura. }
-              @if (formulario.controls.fechaNacimiento.errors?.['fechaAntigua'] || formulario.controls.fechaNacimiento.errors?.['fechaInvalida']) { Ingresa una fecha de nacimiento válida. }
-            </span>
+          <span class="form-error">
+            @if (formulario.controls.fechaNacimiento.errors?.['required']) { Selecciona la fecha de nacimiento. }
+            @if (formulario.controls.fechaNacimiento.errors?.['fechaFutura']) { La fecha de nacimiento no puede ser
+            futura. }
+            @if (formulario.controls.fechaNacimiento.errors?.['fechaAntigua'] ||
+            formulario.controls.fechaNacimiento.errors?.['fechaInvalida']) { Ingresa una fecha de nacimiento válida. }
+          </span>
           }
         </div>
 
@@ -150,20 +150,23 @@
 
         <div class="form-group">
           <label class="form-label" for="telefono">Teléfono <span class="required">*</span></label>
-          <input id="telefono" class="form-control" type="tel" formControlName="telefono" placeholder="+51 987 654 321" [class.is-invalid]="tieneError('telefono')" />
+          <input id="telefono" class="form-control" type="tel" formControlName="telefono" placeholder="+51 987 654 321"
+            [class.is-invalid]="tieneError('telefono')" />
           @if (tieneError('telefono')) {
-            <span class="form-error">
-              @if (formulario.controls.telefono.errors?.['required']) { El teléfono es obligatorio. }
-              @if (formulario.controls.telefono.errors?.['telefonoInvalido']) { Ingresa un número de celular válido de 9 dígitos que inicie con 9. }
-            </span>
+          <span class="form-error">
+            @if (formulario.controls.telefono.errors?.['required']) { El teléfono es obligatorio. }
+            @if (formulario.controls.telefono.errors?.['telefonoInvalido']) { Ingresa un número de celular válido de 9
+            dígitos que inicie con 9. }
+          </span>
           }
         </div>
 
         <div class="form-group">
           <label class="form-label" for="correo">Correo electrónico</label>
-          <input id="correo" class="form-control" type="email" formControlName="correo" placeholder="paciente@email.com" [class.is-invalid]="tieneError('correo')" />
+          <input id="correo" class="form-control" type="email" formControlName="correo" placeholder="paciente@email.com"
+            [class.is-invalid]="tieneError('correo')" />
           @if (tieneError('correo')) {
-            <span class="form-error">Ingresa un correo electrónico válido (ej. paciente@email.com).</span>
+          <span class="form-error">Ingresa un correo electrónico válido (ej. paciente@email.com).</span>
           }
         </div>
 
@@ -171,21 +174,32 @@
           <label class="form-label" for="tipoSangre">Tipo de sangre</label>
           <select id="tipoSangre" class="form-control" formControlName="tipoSangre">
             <option value="">Seleccionar tipo sanguíneo...</option>
-            <option>O+</option><option>O-</option><option>A+</option><option>A-</option>
-            <option>B+</option><option>B-</option><option>AB+</option><option>AB-</option>
+            <option>O+</option>
+            <option>O-</option>
+            <option>A+</option>
+            <option>A-</option>
+            <option>B+</option>
+            <option>B-</option>
+            <option>AB+</option>
+            <option>AB-</option>
           </select>
         </div>
 
         <div class="form-group form-full">
           <label class="form-label" for="direccion">Dirección de residencia</label>
-          <input id="direccion" class="form-control" type="text" formControlName="direccion" placeholder="Av. Guardia Civil 450, San Borja, Lima" [class.is-invalid]="tieneError('direccion')" />
-          @if (tieneError('direccion')) { <span class="form-error">La dirección no puede superar los 200 caracteres.</span> }
+          <input id="direccion" class="form-control" type="text" formControlName="direccion"
+            placeholder="Av. Guardia Civil 450, San Borja, Lima" [class.is-invalid]="tieneError('direccion')" />
+          @if (tieneError('direccion')) { <span class="form-error">La dirección no puede superar los 200
+            caracteres.</span> }
         </div>
 
         <div class="form-group form-full">
           <label class="form-label" for="alergias">Alergias conocidas o antecedentes médicos relevantes</label>
-          <textarea id="alergias" class="form-control" rows="4" formControlName="alergias" placeholder="Describe alergias, antecedentes o escribe 'Ninguna registrada'" [class.is-invalid]="tieneError('alergias')"></textarea>
-          @if (tieneError('alergias')) { <span class="form-error">Este campo no puede superar los 500 caracteres.</span> }
+          <textarea id="alergias" class="form-control" rows="4" formControlName="alergias"
+            placeholder="Describe alergias, antecedentes o escribe 'Ninguna registrada'"
+            [class.is-invalid]="tieneError('alergias')"></textarea>
+          @if (tieneError('alergias')) { <span class="form-error">Este campo no puede superar los 500 caracteres.</span>
+          }
         </div>
       </div>
 
@@ -198,7 +212,8 @@
         <button class="btn btn-outline" type="button" (click)="cancelar()">Cancelar</button>
         <button class="btn btn-primary" type="submit" [disabled]="guardando() || redirigiendo()">
           <lucide-icon [img]="iconCheck" aria-hidden="true"></lucide-icon>
-          {{ guardando() ? 'Guardando...' : (redirigiendo() ? 'Redirigiendo...' : (editando ? 'Guardar cambios' : 'Guardar paciente')) }}
+          {{ guardando() ? 'Guardando...' : (redirigiendo() ? 'Redirigiendo...' : (editando ? 'Guardar cambios' :
+          'Guardar paciente')) }}
         </button>
       </div>
     </form>
