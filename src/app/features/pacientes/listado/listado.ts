@@ -56,6 +56,7 @@ export class Listado {
   readonly paginaActual = signal(1);
   readonly tamanoPagina = 8;
   readonly pacienteSeleccionado = signal<Paciente | null>(null);
+  readonly pacienteAEliminar = signal<Paciente | null>(null);
   readonly mensaje = signal<string | null>(null);
 
   constructor() {
@@ -119,12 +120,16 @@ export class Listado {
     if (event) {
       event.stopPropagation();
     }
+    this.pacienteAEliminar.set(paciente);
+  }
 
-    const confirmado = window.confirm(
-      `¿Estás seguro de eliminar el expediente del paciente ${paciente.nombres} ${paciente.apellidos} (DNI:${paciente.dni})?`,
-    );
+  cancelarEliminacion(): void {
+    this.pacienteAEliminar.set(null);
+  }
 
-    if (!confirmado) {
+  confirmarEliminacion(): void {
+    const paciente = this.pacienteAEliminar();
+    if (!paciente) {
       return;
     }
 
@@ -134,6 +139,7 @@ export class Listado {
         this.cerrarDetalle();
       }
 
+      this.pacienteAEliminar.set(null);
       this.mensaje.set('Paciente eliminado del padrón clínico con éxito.');
       window.setTimeout(() => this.mensaje.set(null), 3000);
     }

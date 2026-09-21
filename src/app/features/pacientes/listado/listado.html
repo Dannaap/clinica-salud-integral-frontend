@@ -216,3 +216,22 @@
     </section>
   </div>
 }
+
+@if (pacienteAEliminar(); as paciente) {
+  <div class="modal-backdrop confirm-backdrop" role="presentation" (click)="cancelarEliminacion()">
+    <section class="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="confirm-delete-title" (click)="$event.stopPropagation()">
+      <button class="modal-close" type="button" aria-label="Cerrar modal" (click)="cancelarEliminacion()">×</button>
+      <div class="confirm-icon">
+        <lucide-icon [img]="iconTrash" aria-hidden="true"></lucide-icon>
+      </div>
+      <h2 id="confirm-delete-title">¿Eliminar paciente?</h2>
+      <p class="confirm-message">
+        ¿Estás seguro de eliminar el expediente de <strong>{{ nombreCompleto(paciente) }}</strong> (DNI: {{ paciente.dni }})? Esta acción no se puede deshacer.
+      </p>
+      <div class="modal-actions">
+        <button class="btn btn-outline" type="button" (click)="cancelarEliminacion()">Cancelar</button>
+        <button class="btn btn-danger" type="button" (click)="confirmarEliminacion()">Sí, eliminar</button>
+      </div>
+    </section>
+  </div>
+}
