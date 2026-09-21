@@ -1,0 +1,57 @@
+<aside class="sidebar" [class.abierto]="abierto">
+  <div class="sidebar-header">
+    <span class="material-symbols-outlined logo-icon">local_hospital</span>
+    <div class="brand-text">
+      <span class="brand-name">Clínica Salud Integral</span>
+      <span class="brand-sub">S.A.C. • {{ rol }}</span>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a routerLink="/dashboard" routerLinkActive="active" class="nav-item">
+      <span class="material-symbols-outlined">home</span>
+      <span>Inicio</span>
+    </a>
+    <a routerLink="/pacientes" class="nav-item">
+      <span class="material-symbols-outlined">group</span>
+      <span>Pacientes</span>
+    </a>
+    <a routerLink="/citas" class="nav-item">
+      <span class="material-symbols-outlined">calendar_month</span>
+      <span>Citas</span>
+    </a>
+    <a routerLink="/turnos" class="nav-item" *ngIf="esAdmin">
+      <span class="material-symbols-outlined">stethoscope</span>
+      <span>Turnos médicos</span>
+    </a>
+    <a routerLink="/atenciones" class="nav-item" *ngIf="esAdmin || esMedico">
+      <span class="material-symbols-outlined">assignment</span>
+      <span>Atenciones</span>
+    </a>
+    <a routerLink="/reportes" class="nav-item">
+      <span class="material-symbols-outlined">bar_chart</span>
+      <span>Reportes</span>
+    </a>
+    <a routerLink="/usuarios" class="nav-item" *ngIf="esAdmin">
+      <span class="material-symbols-outlined">manage_accounts</span>
+      <span>Usuarios</span>
+    </a>
+    <a routerLink="/perfil" class="nav-item">
+      <span class="material-symbols-outlined">account_circle</span>
+      <span>Perfil</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="user-avatar">{{ iniciales }}</div>
+      <div class="user-info">
+        <span class="user-name">{{ nombre }}</span>
+        <span class="user-role">{{ rol }}</span>
+      </div>
+    </div>
+    <button class="btn-logout" (click)="logout()" title="Cerrar sesión">
+      <span class="material-symbols-outlined">logout</span>
+    </button>
+  </div>
+</aside>
