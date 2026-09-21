@@ -18,14 +18,17 @@ export const routes: Routes = [
       import('./features/dashboard/admin/admin').then((m) => m.AdminComponent),
   },
   {
-    path: 'dashboard/reception',
+    path: 'dashboard/recepcion',
     loadComponent: () =>
       import('./features/dashboard/reception/reception').then((m) => m.ReceptionComponent),
   },
   {
-    path: 'dashboard/medical',
+    path: 'dashboard/medico',
     loadComponent: () =>
       import('./features/dashboard/medical/medical').then((m) => m.MedicalComponent),
   },
+  // Alias legacy (por si alguien tiene la URL vieja en el navegador)
+  { path: 'dashboard/reception', redirectTo: 'dashboard/recepcion', pathMatch: 'full' },
+  { path: 'dashboard/medical', redirectTo: 'dashboard/medico', pathMatch: 'full' },
   { path: '**', redirectTo: 'login' },
 ];
