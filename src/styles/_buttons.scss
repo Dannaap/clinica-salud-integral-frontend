@@ -2,6 +2,7 @@
 // BOTONES — Clínica Salud Integral S.A.C.
 // ═══════════════════════════════════════════════════════════
 
+@use 'sass:color';
 @use 'variables' as *;
 @use 'mixins' as *;
 
@@ -63,7 +64,7 @@
   color: $white;
 
   &:hover:not(:disabled) {
-    background-color: darken($danger, 8%);
+    background-color: color.adjust($danger, $lightness: -8%);
     transform: translateY(-1px);
   }
 }
@@ -75,7 +76,7 @@
   color: $white;
 
   &:hover:not(:disabled) {
-    background-color: darken($secondary, 8%);
+    background-color: color.adjust($secondary, $lightness: -8%);
     transform: translateY(-1px);
   }
 }
