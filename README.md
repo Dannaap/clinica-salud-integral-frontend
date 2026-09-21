@@ -1,4 +1,4 @@
-# 🎨 Frontend — Clínica Salud Integral S.A.C. 
+# Frontend — Clínica Salud Integral S.A.C. 
 
 Aplicación web SPA construida con **Angular 20 + SASS** para la intranet de la **Clínica Salud Integral S.A.C.**
 
@@ -6,7 +6,7 @@ Interfaz de usuario para el personal de la clínica que consume la API REST del 
 
 ---
 
-## 🏥 ¿Qué es esta intranet?
+## ¿Qué es esta intranet?
 
 Este proyecto es la **capa de presentación (frontend)** de la intranet de la clínica, compuesta por dos repositorios:
 
@@ -19,17 +19,17 @@ Este proyecto es la **capa de presentación (frontend)** de la intranet de la cl
 
 ---
 
-## 🎯 Objetivo
+## Objetivo
 
 Proporcionar una interfaz ágil, intuitiva y responsive para que el personal de la clínica pueda gestionar citas, pacientes y atenciones médicas de forma centralizada, eliminando los siguientes problemas:
 
-- ⏱️ Elevados tiempos de espera en recepción.
-- 🔔 Alta tasa de inasistencias por falta de recordatorios.
-- 🗂️ Errores y duplicidad en historias clínicas.
+- Elevados tiempos de espera en recepción.
+- Alta tasa de inasistencias por falta de recordatorios.
+- Errores y duplicidad en historias clínicas.
 
 ---
 
-## 👥 Roles y vistas por rol
+## Roles y vistas por rol
 
 | Rol | Vistas principales |
 |---|---|
@@ -39,7 +39,7 @@ Proporcionar una interfaz ágil, intuitiva y responsive para que el personal de 
 
 ---
 
-## 🛠️ Stack tecnológico
+## Stack tecnológico
 
 | Capa | Tecnología |
 |---|---|
@@ -54,7 +54,7 @@ Proporcionar una interfaz ágil, intuitiva y responsive para que el personal de 
 
 ---
 
-## 📂 Estructura del proyecto
+## Estructura del proyecto
 ```
 clinica-salud-integral-frontend/
 ├── src/
@@ -120,7 +120,7 @@ clinica-salud-integral-frontend/
 ```
 ---
 
-## 🎨 Sistema de diseño (SASS)
+## Sistema de diseño (SASS)
 
 El sistema de diseño sigue los wireframes creados en Stitch para la Clínica Salud Integral S.A.C.
 
@@ -149,7 +149,7 @@ El sistema de diseño sigue los wireframes creados en Stitch para la Clínica Sa
 
 ---
 
-## 📅 Sprints y HU (según backlog priorizado)
+## Sprints y HU (según backlog priorizado)
 
 | Sprint | Duración | HU | Prioridad | Días |
 |---|---|---|---|---|
@@ -165,7 +165,7 @@ El sistema de diseño sigue los wireframes creados en Stitch para la Clínica Sa
 
 ---
 
-## 🚀 Plan de Lanzamientos (Release Plan)
+## Plan de Lanzamientos (Release Plan)
 
 | Release | Sprints incluidos | Contenido |
 |---|---|---|
@@ -175,7 +175,7 @@ El sistema de diseño sigue los wireframes creados en Stitch para la Clínica Sa
 
 ---
 
-## 🚀 Cómo levantar el frontend localmente
+## Cómo levantar el frontend localmente
 
 ### Requisitos previos
 
@@ -195,7 +195,7 @@ La aplicación corre en http://localhost:4200.
 
 ---
 
-## 🔐 Autenticación y Guards
+## Autenticación y Guards
 
 - Interceptor HTTP para agregar el token JWT en cada petición
 - AuthGuard para proteger rutas privadas
@@ -203,7 +203,7 @@ La aplicación corre en http://localhost:4200.
 
 ---
 
-## 📦 Módulos principales
+## Módulos principales
 
 | Módulo | Descripción |
 |---|---|
@@ -214,7 +214,7 @@ La aplicación corre en http://localhost:4200.
 
 ---
 
-## 🧪 Ejecutar tests
+## Ejecutar tests
 
 ng test
 
@@ -241,14 +241,14 @@ Vercel ofrece hosting gratuito para proyectos personales y académicos.
 
 ---
 
-## 🔗 Repositorios relacionados
+## Repositorios relacionados
 
 - **Backend:** clinica-salud-integral-backend
 - **Frontend (este repo):** clinica-salud-integral-frontend
 
 ---
 
-## 📄 Licencia
+## Licencia
 
 Proyecto académico — **Clínica Salud Integral S.A.C.**
 
