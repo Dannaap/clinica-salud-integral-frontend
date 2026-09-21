@@ -153,6 +153,55 @@
           </table>
         </div>
       </div>
+
+      <div class="card quick-access-card">
+        <div class="card-header">
+          <div class="card-title-wrapper">
+            <span class="material-symbols-outlined text-primary">bolt</span>
+            <h2 class="card-title">Accesos rápidos</h2>
+          </div>
+        </div>
+
+        <div class="quick-actions-grid">
+          <button class="quick-action-btn" type="button" [routerLink]="['/pacientes/registro']">
+            <div class="quick-action-icon">
+              <span class="material-symbols-outlined">person_add</span>
+            </div>
+            <span class="quick-action-label">Registrar paciente</span>
+          </button>
+
+          <button class="quick-action-btn" type="button" (click)="mostrarProximamente('Agendar cita')">
+            <div class="quick-action-icon">
+              <span class="material-symbols-outlined">add_task</span>
+            </div>
+            <span class="quick-action-label">Agendar cita</span>
+          </button>
+
+          <button class="quick-action-btn" type="button" (click)="mostrarProximamente('Gestionar turnos')">
+            <div class="quick-action-icon">
+              <span class="material-symbols-outlined">calendar_month</span>
+            </div>
+            <span class="quick-action-label">Gestionar turnos</span>
+          </button>
+
+          <button class="quick-action-btn" type="button" (click)="mostrarProximamente('Ver reportes')">
+            <div class="quick-action-icon">
+              <span class="material-symbols-outlined">query_stats</span>
+            </div>
+            <span class="quick-action-label">Ver reportes</span>
+          </button>
+        </div>
+
+        <div class="info-notice">
+          <span class="material-symbols-outlined text-primary">info</span>
+          <div class="notice-content">
+            <span class="notice-title">Módulo de triaje activo</span>
+            <span class="notice-text"
+              >Los turnos del turno tarde inician registro a las 13:30 hrs.</span
+            >
+          </div>
+        </div>
+      </div>
     </section>
 
     <section class="card team-card">

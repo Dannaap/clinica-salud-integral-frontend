@@ -184,7 +184,7 @@ $neutral-100: #f8f9fa;
 
 .main-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 2fr 1fr;
   gap: 1.5rem;
   align-items: start;
 }
