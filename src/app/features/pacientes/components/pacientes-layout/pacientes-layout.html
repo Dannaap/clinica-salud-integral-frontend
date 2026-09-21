@@ -1,67 +1,27 @@
-<div class="app-shell pacientes-shell">
-  <aside class="sidebar" aria-label="Navegación principal">
-    <div class="sidebar-logo">
-      <div class="logo-icon" aria-hidden="true">✚</div>
-      <span class="logo-text">Clínica Salud<br />Integral</span>
-    </div>
+<app-sidebar
+  [nombre]="usuario.nombre"
+  [rol]="usuario.rol"
+  [iniciales]="usuario.iniciales"
+  [esAdmin]="esAdmin"
+  [esMedico]="esMedico"
+  [abierto]="sidebarAbierto">
+</app-sidebar>
 
-    <nav class="sidebar-menu">
-      <a class="menu-item" routerLink="/pacientes/listado">
-        <lucide-icon [img]="iconHome" aria-hidden="true"></lucide-icon>
-        <span>Inicio</span>
-      </a>
-      <a class="menu-item is-active" routerLink="/pacientes/listado" routerLinkActive="is-active">
-        <lucide-icon [img]="iconUsers" aria-hidden="true"></lucide-icon>
-        <span>Pacientes</span>
-      </a>
-      <span class="menu-item is-disabled" aria-disabled="true">
-        <lucide-icon [img]="iconCalendar" aria-hidden="true"></lucide-icon>
-        <span>Citas</span>
-      </span>
-      <span class="menu-item is-disabled" aria-disabled="true">
-        <lucide-icon [img]="iconReports" aria-hidden="true"></lucide-icon>
-        <span>Reportes</span>
-      </span>
-      <span class="menu-item is-disabled" aria-disabled="true">
-        <lucide-icon [img]="iconProfile" aria-hidden="true"></lucide-icon>
-        <span>Perfil</span>
-      </span>
-    </nav>
+<div class="sidebar-overlay" *ngIf="sidebarAbierto" (click)="sidebarAbierto = false"></div>
 
-    <div class="sidebar-profile">
-      <div class="profile-avatar" aria-hidden="true">{{ usuario.iniciales }}</div>
-      <div class="profile-info">
-        <span class="profile-name">{{ usuario.nombre }}</span>
-        <span class="profile-role">{{ usuario.rol }}</span>
-      </div>
-      <button class="profile-logout" type="button" aria-label="Cerrar sesión" (click)="logout()">
-        <lucide-icon [img]="iconLogout" aria-hidden="true"></lucide-icon>
-      </button>
-    </div>
-  </aside>
+<div class="main-wrapper">
+  <app-header
+    [titulo]="pageTitle"
+    [subtitulo]="pageSubtitle"
+    placeholder="Buscar paciente por DNI, nombre..."
+    [notificaciones]="3"
+    [nombre]="usuario.nombre"
+    [rol]="usuario.rol"
+    [iniciales]="usuario.iniciales"
+    (menuToggle)="toggleSidebar()">
+  </app-header>
 
-  <main class="main-content">
-    <header class="header">
-      <div class="header-title">
-        <h1 class="title-main">{{ pageTitle }}</h1>
-        <p class="title-subtitle">{{ pageSubtitle }}</p>
-      </div>
-
-      <div class="header-actions">
-        <button class="notification-btn" type="button" aria-label="Notificaciones">
-          <lucide-icon [img]="iconBell" aria-hidden="true"></lucide-icon>
-          <span class="badge-count">2</span>
-        </button>
-        <div class="user-menu" aria-label="Usuario actual">
-          <span class="user-avatar" aria-hidden="true">{{ usuario.iniciales }}</span>
-          <span class="user-name">{{ usuario.nombre }}</span>
-          <span class="user-arrow" aria-hidden="true">⌄</span>
-        </div>
-      </div>
-    </header>
-
-    <section class="page-content">
-      <ng-content></ng-content>
-    </section>
+  <main class="content">
+    <ng-content></ng-content>
   </main>
 </div>

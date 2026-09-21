@@ -21,6 +21,10 @@ export class SidebarComponent {
   @Input() esMedico: boolean = false;
   @Input() abierto: boolean = false;
 
+  get rutaDashboard(): string {
+    return this.authService.obtenerRutaDashboard();
+  }
+
   mostrarProximamente(modulo: string): void {
     console.log(`${modulo} estará disponible en un próximo sprint`);
     alert(`${modulo} estará disponible en un próximo sprint.`);

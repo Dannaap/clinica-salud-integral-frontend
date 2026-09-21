@@ -8,11 +8,11 @@
   </div>
 
   <nav class="sidebar-nav">
-    <a routerLink="/dashboard" routerLinkActive="active" class="nav-item">
+    <a [routerLink]="rutaDashboard" routerLinkActive="active" class="nav-item">
       <span class="material-symbols-outlined">home</span>
       <span>Inicio</span>
     </a>
-    <a routerLink="/pacientes" class="nav-item">
+    <a routerLink="/pacientes" routerLinkActive="active" class="nav-item">
       <span class="material-symbols-outlined">group</span>
       <span>Pacientes</span>
     </a>
