@@ -9,6 +9,7 @@ import {
   Plus,
   Search,
   SlidersHorizontal,
+  Trash2,
   UserRound,
   X,
 } from 'lucide-angular';
@@ -30,6 +31,7 @@ export class Listado {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  private debounceTimer?: any;
 
   get rutaDashboard(): string {
     return this.authService.obtenerRutaDashboard();
@@ -40,6 +42,7 @@ export class Listado {
   readonly iconSliders = SlidersHorizontal;
   readonly iconEye = Eye;
   readonly iconEdit = FilePenLine;
+  readonly iconTrash = Trash2;
   readonly iconCalendarPlus = CalendarPlus;
   readonly iconUser = UserRound;
   readonly iconX = X;
@@ -104,8 +107,36 @@ export class Listado {
   });
 
   actualizarBusqueda(event: Event): void {
-    this.busqueda.set((event.target as HTMLInputElement).value);
-    this.paginaActual.set(1);
+    const valor = (event.target as HTMLInputElement).value;
+    clearTimeout(this.debounceTimer);
+    this.debounceTimer = setTimeout(() => {
+      this.busqueda.set(valor);
+      this.paginaActual.set(1);
+    }, 250);
+  }
+
+  eliminarPaciente(paciente: Paciente, event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+
+    const confirmado = window.confirm(
+      `¿Estás seguro de eliminar el expediente del paciente ${paciente.nombres} ${paciente.apellidos} (DNI:${paciente.dni})?`,
+    );
+
+    if (!confirmado) {
+      return;
+    }
+
+    const eliminado = this.pacienteService.eliminar(paciente.id);
+    if (eliminado) {
+      if (this.pacienteSeleccionado()?.id === paciente.id) {
+        this.cerrarDetalle();
+      }
+
+      this.mensaje.set('Paciente eliminado del padrón clínico con éxito.');
+      window.setTimeout(() => this.mensaje.set(null), 3000);
+    }
   }
 
   cambiarEstado(event: Event): void {

@@ -156,6 +156,14 @@
                     <button class="btn-action" type="button" aria-label="Editar paciente" title="Editar paciente" (click)="editarPaciente(paciente)">
                       <lucide-icon [img]="iconEdit" aria-hidden="true"></lucide-icon>
                     </button>
+                    <button
+                      class="btn-action btn-action-danger"
+                      type="button"
+                      aria-label="Eliminar paciente"
+                      title="Eliminar paciente"
+                      (click)="eliminarPaciente(paciente, $event)">
+                      <lucide-icon [img]="iconTrash" aria-hidden="true"></lucide-icon>
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -202,6 +210,7 @@
       </div>
       <div class="modal-actions">
         <button class="btn btn-outline" type="button" (click)="cerrarDetalle()">Cerrar</button>
+        <button class="btn btn-danger" type="button" (click)="eliminarPaciente(paciente)">Dar de baja</button>
         <button class="btn btn-primary" type="button" (click)="editarPaciente(paciente)">Editar paciente</button>
       </div>
     </section>
