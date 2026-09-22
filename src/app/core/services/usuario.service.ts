@@ -265,6 +265,11 @@ export class UsuarioService {
     });
   });
 
+  // Lista de médicos registrados, usada por otros módulos (p. ej. turnos)
+  obtenerMedicos(): Usuario[] {
+    return this._usuarios().filter((u) => u.rol === 'MEDICO');
+  }
+
   // Métodos de mutación de filtros
   setBusqueda(termino: string): void {
     this.busqueda.set(termino);
