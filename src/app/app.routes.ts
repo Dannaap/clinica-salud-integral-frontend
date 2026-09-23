@@ -74,7 +74,15 @@ export const routes: Routes = [
             (m) => m.UsuariosListadoComponent
           ),
       },
-      { path: 'turnos', redirectTo: 'dashboard' },
+      {
+        path: 'turnos',
+        canActivate: [roleGuard],
+        data: { roles: ['ADMIN'] },
+        loadComponent: () =>
+          import('./features/turnos/listado/turnos-listado').then(
+            (m) => m.TurnosListadoComponent
+          ),
+      },
       { path: 'atenciones', redirectTo: 'dashboard' },
       { path: 'reportes', redirectTo: 'dashboard' },
       { path: 'perfil', redirectTo: 'dashboard' },
