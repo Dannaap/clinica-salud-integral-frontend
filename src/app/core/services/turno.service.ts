@@ -16,6 +16,24 @@ export class TurnoService {
   readonly busqueda = signal<string>('');
   readonly filtroDia = signal<DiaSemana | 'TODOS'>('TODOS');
   readonly filtroEstado = signal<EstadoTurno | 'TODOS'>('TODOS');
+  readonly filtroEspecialidad = signal<string>('TODAS');
+  readonly filtroFranja = signal<FranjaTurno | 'TODAS'>('TODAS');
+
+  // Días de la semana en orden, para agrupar y ordenar turnos
+  readonly diasSemana: DiaSemana[] = [
+    'LUNES',
+    'MARTES',
+    'MIERCOLES',
+    'JUEVES',
+    'VIERNES',
+    'SABADO',
+    'DOMINGO',
+  ];
+
+  // Especialidades disponibles (para el filtro del administrador)
+  readonly especialidades = computed<string[]>(() =>
+    [...new Set(this._turnos().map((t) => t.especialidad))].sort((a, b) => a.localeCompare(b))
+  );
 
   // Estadísticas KPI computadas dinámicamente
   readonly stats = computed<ResumenTurnos>(() => {
@@ -36,19 +54,42 @@ export class TurnoService {
     const termino = this.busqueda().trim().toLowerCase();
     const dia = this.filtroDia();
     const estado = this.filtroEstado();
+    const especialidad = this.filtroEspecialidad();
+    const franja = this.filtroFranja();
 
-    return this._turnos().filter((turno) => {
-      const coincideTexto =
-        !termino ||
-        turno.medicoNombre.toLowerCase().includes(termino) ||
-        turno.especialidad.toLowerCase().includes(termino) ||
-        turno.consultorio.toLowerCase().includes(termino);
+    return this._turnos()
+      .filter((turno) => {
+        const coincideTexto =
+          !termino ||
+          turno.medicoNombre.toLowerCase().includes(termino) ||
+          turno.especialidad.toLowerCase().includes(termino) ||
+          turno.consultorio.toLowerCase().includes(termino);
 
-      const coincideDia = dia === 'TODOS' || turno.diaSemana === dia;
-      const coincideEstado = estado === 'TODOS' || turno.estado === estado;
+        const coincideDia = dia === 'TODOS' || turno.diaSemana === dia;
+        const coincideEstado = estado === 'TODOS' || turno.estado === estado;
+        const coincideEspecialidad =
+          especialidad === 'TODAS' || turno.especialidad === especialidad;
+        const coincideFranja = franja === 'TODAS' || this.obtenerFranja(turno.horaInicio) === franja;
 
-      return coincideTexto && coincideDia && coincideEstado;
-    });
+        return (
+          coincideTexto && coincideDia && coincideEstado && coincideEspecialidad && coincideFranja
+        );
+      })
+      .sort(
+        (a, b) =>
+          this.ordenDia(a.diaSemana) - this.ordenDia(b.diaSemana) ||
+          a.horaInicio.localeCompare(b.horaInicio) ||
+          a.medicoNombre.localeCompare(b.medicoNombre)
+      );
+  });
+
+  // Turnos filtrados agrupados por día (vista semanal del administrador)
+  readonly turnosPorDia = computed<Array<{ dia: DiaSemana; turnos: Turno[] }>>(() => {
+    const lista = this.turnosFiltrados();
+    return this.diasSemana.map((dia) => ({
+      dia,
+      turnos: lista.filter((t) => t.diaSemana === dia),
+    }));
   });
 
   // Todos los turnos de un médico específico (para la vista de horario semanal)
@@ -71,10 +112,20 @@ export class TurnoService {
     this.filtroEstado.set(estado);
   }
 
+  setFiltroEspecialidad(especialidad: string): void {
+    this.filtroEspecialidad.set(especialidad);
+  }
+
+  setFiltroFranja(franja: FranjaTurno | 'TODAS'): void {
+    this.filtroFranja.set(franja);
+  }
+
   limpiarFiltros(): void {
     this.busqueda.set('');
     this.filtroDia.set('TODOS');
     this.filtroEstado.set('TODOS');
+    this.filtroEspecialidad.set('TODAS');
+    this.filtroFranja.set('TODAS');
   }
 
   obtenerFranja(horaInicio: string): FranjaTurno {
@@ -85,16 +136,7 @@ export class TurnoService {
   }
 
   private ordenDia(dia: DiaSemana): number {
-    const orden: DiaSemana[] = [
-      'LUNES',
-      'MARTES',
-      'MIERCOLES',
-      'JUEVES',
-      'VIERNES',
-      'SABADO',
-      'DOMINGO',
-    ];
-    return orden.indexOf(dia);
+    return this.diasSemana.indexOf(dia);
   }
 
   // Genera turnos semanales de ejemplo para cada médico activo de la clínica
