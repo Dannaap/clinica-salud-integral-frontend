@@ -77,7 +77,14 @@ export const routes: Routes = [
       {
         path: 'turnos',
         canActivate: [roleGuard],
-        data: { roles: ['ADMIN'] },
+        data: {
+          roles: ['ADMIN'],
+          header: {
+            titulo: 'Turnos médicos',
+            subtitulo: 'Horarios de atención del personal médico',
+            placeholder: 'Buscar turno por médico, especialidad o consultorio...',
+          },
+        },
         loadComponent: () =>
           import('./features/turnos/listado/turnos-listado').then(
             (m) => m.TurnosListadoComponent

@@ -6,9 +6,9 @@
   <!-- Contenedor principal a la derecha -->
   <div class="layout-main">
     <app-header
-      titulo="Usuarios"
-      subtitulo="Gestión de cuentas del personal"
-      placeholder="Buscar usuario por nombre o correo..."
+      [titulo]="header().titulo"
+      [subtitulo]="header().subtitulo"
+      [placeholder]="header().placeholder"
       (menuToggle)="toggleSidebar()"
     ></app-header>
     <main class="layout-content">
