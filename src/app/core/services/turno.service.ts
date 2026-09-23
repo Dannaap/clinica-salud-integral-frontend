@@ -30,6 +30,24 @@ export class TurnoService {
     'DOMINGO',
   ];
 
+  // Fecha de referencia (hoy) para ubicar los turnos en la semana actual
+  readonly hoy = signal<Date>(new Date());
+
+  // Fecha exacta de cada día de la semana actual (lunes a domingo)
+  readonly fechasSemana = computed<Record<DiaSemana, Date>>(() => {
+    const hoy = this.hoy();
+    const lunes = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+    lunes.setDate(lunes.getDate() - ((lunes.getDay() + 6) % 7));
+
+    return this.diasSemana.reduce(
+      (fechas, dia, i) => {
+        fechas[dia] = new Date(lunes.getFullYear(), lunes.getMonth(), lunes.getDate() + i);
+        return fechas;
+      },
+      {} as Record<DiaSemana, Date>
+    );
+  });
+
   // Especialidades disponibles (para el filtro del administrador)
   readonly especialidades = computed<string[]>(() =>
     [...new Set(this._turnos().map((t) => t.especialidad))].sort((a, b) => a.localeCompare(b))
@@ -97,6 +115,15 @@ export class TurnoService {
     return this._turnos()
       .filter((t) => t.medicoId === medicoId)
       .sort((a, b) => this.ordenDia(a.diaSemana) - this.ordenDia(b.diaSemana));
+  }
+
+  // Fecha exacta en la semana actual del día indicado
+  obtenerFecha(dia: DiaSemana): Date {
+    return this.fechasSemana()[dia];
+  }
+
+  esHoy(dia: DiaSemana): boolean {
+    return this.obtenerFecha(dia).toDateString() === this.hoy().toDateString();
   }
 
   // Métodos de mutación de filtros

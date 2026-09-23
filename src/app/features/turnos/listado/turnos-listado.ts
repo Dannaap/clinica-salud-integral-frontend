@@ -17,16 +17,6 @@ import {
 import { TurnoService } from '../../../core/services/turno.service';
 import { DiaSemana, EstadoTurno, FranjaTurno, Turno } from '../../../core/models/turno.model';
 
-const ETIQUETAS_DIA: Record<DiaSemana, string> = {
-  LUNES: 'Lunes',
-  MARTES: 'Martes',
-  MIERCOLES: 'Miércoles',
-  JUEVES: 'Jueves',
-  VIERNES: 'Viernes',
-  SABADO: 'Sábado',
-  DOMINGO: 'Domingo',
-};
-
 @Component({
   selector: 'app-turnos-listado',
   standalone: true,
@@ -91,8 +81,16 @@ export class TurnosListadoComponent {
     this.turnoService.limpiarFiltros();
   }
 
-  etiquetaDia(dia: DiaSemana): string {
-    return ETIQUETAS_DIA[dia] ?? dia;
+  // Fecha exacta del día en la semana actual, formato dd/mm/aaaa
+  fechaDia(dia: DiaSemana): string {
+    const fecha = this.turnoService.obtenerFecha(dia);
+    const dd = String(fecha.getDate()).padStart(2, '0');
+    const mm = String(fecha.getMonth() + 1).padStart(2, '0');
+    return `${dd}/${mm}/${fecha.getFullYear()}`;
+  }
+
+  esHoy(dia: DiaSemana): boolean {
+    return this.turnoService.esHoy(dia);
   }
 
   verHorarioSemanal(turno: Turno): void {

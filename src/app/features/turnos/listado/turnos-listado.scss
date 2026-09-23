@@ -387,6 +387,20 @@
   min-height: 220px;
   overflow: hidden;
 
+  &.is-today {
+    border-color: #93c5fd;
+    box-shadow: 0 0 0 2px rgba(11, 94, 215, 0.12);
+
+    .week-day-header {
+      background-color: #eff6ff;
+      border-bottom-color: #bfdbfe;
+    }
+
+    .week-day-name {
+      color: #0b5ed7;
+    }
+  }
+
   .week-day-header {
     display: flex;
     align-items: center;
@@ -397,11 +411,13 @@
   }
 
   .week-day-name {
-    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
     font-weight: 700;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
     color: #475569;
+    font-variant-numeric: tabular-nums;
   }
 
   .week-day-count {
@@ -608,6 +624,23 @@
 .day-text {
   font-weight: 500;
   color: #1e293b;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+// Etiqueta "Hoy" junto a la fecha del día actual
+.today-tag {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 6px;
+  padding: 1px 8px;
+  border-radius: 9999px;
+  background-color: #0b5ed7;
+  color: #ffffff;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  vertical-align: middle;
 }
 
 .horario-text {

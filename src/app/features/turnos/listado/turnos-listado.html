@@ -82,16 +82,12 @@
           class="filter-select"
           [value]="turnoService.filtroDia()"
           (change)="onDiaChange($event)"
-          aria-label="Filtrar por día"
+          aria-label="Filtrar por fecha"
         >
-          <option value="TODOS">Día: Todos</option>
-          <option value="LUNES">Lunes</option>
-          <option value="MARTES">Martes</option>
-          <option value="MIERCOLES">Miércoles</option>
-          <option value="JUEVES">Jueves</option>
-          <option value="VIERNES">Viernes</option>
-          <option value="SABADO">Sábado</option>
-          <option value="DOMINGO">Domingo</option>
+          <option value="TODOS">Fecha: Todas</option>
+          @for (dia of turnoService.diasSemana; track dia) {
+            <option [value]="dia">{{ fechaDia(dia) }}{{ esHoy(dia) ? ' (hoy)' : '' }}</option>
+          }
         </select>
       </div>
 
@@ -181,11 +177,16 @@
 
   @if (vista() === 'SEMANA') {
   <!-- 6a. Tablero semanal con todos los turnos -->
-  <section class="week-board" aria-label="Turnos médicos por día de la semana">
+  <section class="week-board" aria-label="Turnos médicos de la semana por fecha">
     @for (grupo of turnoService.turnosPorDia(); track grupo.dia) {
-      <div class="week-day-column">
+      <div class="week-day-column" [class.is-today]="esHoy(grupo.dia)">
         <div class="week-day-header">
-          <span class="week-day-name">{{ etiquetaDia(grupo.dia) }}</span>
+          <span class="week-day-name">
+            {{ fechaDia(grupo.dia) }}
+            @if (esHoy(grupo.dia)) {
+              <span class="today-tag">Hoy</span>
+            }
+          </span>
           <span class="week-day-count">{{ grupo.turnos.length }}</span>
         </div>
 
@@ -218,7 +219,7 @@
         <thead>
           <tr>
             <th scope="col" class="th-medico">MÉDICO</th>
-            <th scope="col" class="th-dia">DÍA</th>
+            <th scope="col" class="th-dia">FECHA</th>
             <th scope="col" class="th-horario">HORARIO</th>
             <th scope="col" class="th-consultorio">CONSULTORIO</th>
             <th scope="col" class="th-estado">ESTADO</th>
@@ -243,7 +244,10 @@
 
               <!-- Día -->
               <td class="td-dia">
-                <span class="day-text">{{ etiquetaDia(turno.diaSemana) }}</span>
+                <span class="day-text">{{ fechaDia(turno.diaSemana) }}</span>
+                @if (esHoy(turno.diaSemana)) {
+                  <span class="today-tag">Hoy</span>
+                }
               </td>
 
               <!-- Horario -->
@@ -326,7 +330,7 @@
         <div class="horario-lista">
           @for (turno of turnosDelMedicoSeleccionado(); track turno.id) {
             <div class="horario-item">
-              <div class="horario-item-day">{{ etiquetaDia(turno.diaSemana) }}</div>
+              <div class="horario-item-day">{{ fechaDia(turno.diaSemana) }}</div>
               <div class="horario-item-time">{{ turno.horaInicio }} – {{ turno.horaFin }}</div>
               <div class="horario-item-office">
                 <span>{{ turno.consultorio }}</span>
