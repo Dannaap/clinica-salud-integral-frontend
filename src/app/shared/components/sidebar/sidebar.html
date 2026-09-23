@@ -29,15 +29,10 @@
       <span class="material-symbols-outlined">calendar_month</span>
       <span>Citas</span>
     </button>
-    <button
-      type="button"
-      class="nav-item nav-item-disabled"
-      (click)="mostrarProximamente('Turnos médicos')"
-      *ngIf="esAdmin"
-    >
+    <a routerLink="/turnos" routerLinkActive="active" class="nav-item" *ngIf="esAdmin">
       <span class="material-symbols-outlined">stethoscope</span>
       <span>Turnos médicos</span>
-    </button>
+    </a>
     <button
       type="button"
       class="nav-item nav-item-disabled"
