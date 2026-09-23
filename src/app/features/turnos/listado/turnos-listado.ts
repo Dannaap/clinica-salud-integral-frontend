@@ -13,7 +13,7 @@ import {
   Eye,
 } from 'lucide-angular';
 import { TurnoService } from '../../../core/services/turno.service';
-import { DiaSemana, EstadoTurno, Turno } from '../../../core/models/turno.model';
+import { DiaSemana, EstadoTurno, FranjaTurno, Turno } from '../../../core/models/turno.model';
 
 const ETIQUETAS_DIA: Record<DiaSemana, string> = {
   LUNES: 'Lunes',
@@ -68,6 +68,16 @@ export class TurnosListadoComponent {
   onEstadoChange(event: Event): void {
     const select = event.target as HTMLSelectElement;
     this.turnoService.setFiltroEstado(select.value as EstadoTurno | 'TODOS');
+  }
+
+  onEspecialidadChange(event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    this.turnoService.setFiltroEspecialidad(select.value);
+  }
+
+  onFranjaChange(event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    this.turnoService.setFiltroFranja(select.value as FranjaTurno | 'TODAS');
   }
 
   limpiarFiltros(): void {

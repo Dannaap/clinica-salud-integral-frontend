@@ -189,7 +189,7 @@
   border: 1px solid #e2e8f0;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
 
-  @media (max-width: 900px) {
+  @media (max-width: 1280px) {
     flex-wrap: wrap;
   }
 
@@ -236,6 +236,7 @@
   .filter-select-group {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 12px;
 
     @media (max-width: 600px) {

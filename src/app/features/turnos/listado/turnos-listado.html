@@ -98,6 +98,34 @@
       <div class="select-wrapper">
         <select
           class="filter-select"
+          [value]="turnoService.filtroEspecialidad()"
+          (change)="onEspecialidadChange($event)"
+          aria-label="Filtrar por especialidad"
+        >
+          <option value="TODAS">Especialidad: Todas</option>
+          @for (esp of turnoService.especialidades(); track esp) {
+            <option [value]="esp">{{ esp }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="select-wrapper">
+        <select
+          class="filter-select"
+          [value]="turnoService.filtroFranja()"
+          (change)="onFranjaChange($event)"
+          aria-label="Filtrar por franja horaria"
+        >
+          <option value="TODAS">Franja: Todas</option>
+          <option value="MAÑANA">Mañana</option>
+          <option value="TARDE">Tarde</option>
+          <option value="NOCHE">Noche</option>
+        </select>
+      </div>
+
+      <div class="select-wrapper">
+        <select
+          class="filter-select"
           [value]="turnoService.filtroEstado()"
           (change)="onEstadoChange($event)"
           aria-label="Filtrar por estado"
