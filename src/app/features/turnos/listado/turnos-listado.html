@@ -1,0 +1,280 @@
+<div class="turnos-page">
+
+  <!-- 1. Breadcrumbs -->
+  <nav class="breadcrumbs" aria-label="Migas de pan">
+    <a routerLink="/dashboard" class="breadcrumb-link">Inicio</a>
+    <span class="breadcrumb-separator">/</span>
+    <span class="breadcrumb-current">Turnos médicos</span>
+  </nav>
+
+  <!-- 2. Encabezado principal de la página -->
+  <div class="page-top-bar">
+    <div class="page-title-group">
+      <h1 class="page-main-title">Turnos médicos</h1>
+      <p class="page-description">Consulta los horarios semanales asignados a cada médico de la clínica</p>
+    </div>
+  </div>
+
+  <!-- 3. Tarjetas KPI de Resumen -->
+  <section class="kpi-grid" aria-label="Estadísticas de turnos">
+    <div class="kpi-card-item">
+      <div class="kpi-info">
+        <span class="kpi-title">TOTAL DE TURNOS</span>
+        <span class="kpi-number text-primary">{{ turnoService.stats().totalTurnos }}</span>
+        <span class="kpi-subtext">Bloques horarios registrados</span>
+      </div>
+      <div class="kpi-icon-wrapper bg-soft-indigo">
+        <lucide-icon [img]="iconCalendarClock" class="icon-indigo"></lucide-icon>
+      </div>
+    </div>
+
+    <div class="kpi-card-item">
+      <div class="kpi-info">
+        <span class="kpi-title">TURNOS ACTIVOS</span>
+        <span class="kpi-number text-green">{{ turnoService.stats().turnosActivos }}</span>
+        <span class="kpi-subtext">Vigentes esta semana</span>
+      </div>
+      <div class="kpi-icon-wrapper bg-soft-brown">
+        <lucide-icon [img]="iconCalendarCheck" class="icon-brown"></lucide-icon>
+      </div>
+    </div>
+
+    <div class="kpi-card-item">
+      <div class="kpi-info">
+        <span class="kpi-title">MÉDICOS CON TURNO</span>
+        <span class="kpi-number text-amber">{{ turnoService.stats().medicosConTurno }}</span>
+        <span class="kpi-subtext">Con horario asignado</span>
+      </div>
+      <div class="kpi-icon-wrapper bg-soft-orange">
+        <lucide-icon [img]="iconStethoscope" class="icon-orange"></lucide-icon>
+      </div>
+    </div>
+
+    <div class="kpi-card-item">
+      <div class="kpi-info">
+        <span class="kpi-title">CONSULTORIOS EN USO</span>
+        <span class="kpi-number text-dark-blue">{{ turnoService.stats().consultoriosEnUso }}</span>
+        <span class="kpi-subtext">Ambientes ocupados</span>
+      </div>
+      <div class="kpi-icon-wrapper bg-soft-purple">
+        <lucide-icon [img]="iconDoorOpen" class="icon-purple"></lucide-icon>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Barra de Filtros -->
+  <section class="filters-card" aria-label="Filtros de búsqueda">
+    <div class="filter-search-box">
+      <lucide-icon [img]="iconSearch" class="search-icon"></lucide-icon>
+      <input
+        type="search"
+        class="filter-search-input"
+        placeholder="Buscar por médico, especialidad o consultorio"
+        [value]="turnoService.busqueda()"
+        (input)="onSearchInput($event)"
+        aria-label="Buscar por médico, especialidad o consultorio"
+      />
+    </div>
+
+    <div class="filter-select-group">
+      <div class="select-wrapper">
+        <select
+          class="filter-select"
+          [value]="turnoService.filtroDia()"
+          (change)="onDiaChange($event)"
+          aria-label="Filtrar por día"
+        >
+          <option value="TODOS">Día: Todos</option>
+          <option value="LUNES">Lunes</option>
+          <option value="MARTES">Martes</option>
+          <option value="MIERCOLES">Miércoles</option>
+          <option value="JUEVES">Jueves</option>
+          <option value="VIERNES">Viernes</option>
+          <option value="SABADO">Sábado</option>
+          <option value="DOMINGO">Domingo</option>
+        </select>
+      </div>
+
+      <div class="select-wrapper">
+        <select
+          class="filter-select"
+          [value]="turnoService.filtroEstado()"
+          (change)="onEstadoChange($event)"
+          aria-label="Filtrar por estado"
+        >
+          <option value="TODOS">Estado: Todos</option>
+          <option value="ACTIVO">Estado: Activo</option>
+          <option value="INACTIVO">Estado: Inactivo</option>
+        </select>
+      </div>
+    </div>
+
+    <button
+      type="button"
+      class="btn-clear-filters"
+      (click)="limpiarFiltros()"
+      aria-label="Limpiar filtros"
+    >
+      <lucide-icon [img]="iconX" class="clear-icon"></lucide-icon>
+      <span>Limpiar filtros</span>
+    </button>
+  </section>
+
+  <!-- 5. Tabla de Turnos -->
+  <section class="table-card" aria-label="Listado de turnos médicos">
+    <div class="table-responsive">
+      <table class="turnos-table">
+        <thead>
+          <tr>
+            <th scope="col" class="th-medico">MÉDICO</th>
+            <th scope="col" class="th-dia">DÍA</th>
+            <th scope="col" class="th-horario">HORARIO</th>
+            <th scope="col" class="th-consultorio">CONSULTORIO</th>
+            <th scope="col" class="th-ocupacion">OCUPACIÓN</th>
+            <th scope="col" class="th-estado">ESTADO</th>
+            <th scope="col" class="th-acciones"><span class="sr-only">Acciones</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (turno of turnoService.turnosFiltrados(); track turno.id) {
+            <tr class="table-row">
+              <!-- Médico (Avatar + Nombre + Especialidad) -->
+              <td class="td-medico">
+                <div class="user-cell">
+                  <div class="user-avatar-circle" aria-hidden="true">
+                    {{ turno.iniciales }}
+                  </div>
+                  <div class="user-text-info">
+                    <span class="user-fullname">{{ turno.medicoNombre }}</span>
+                    <span class="user-role-detail">{{ turno.especialidad }}</span>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Día -->
+              <td class="td-dia">
+                <span class="day-text">{{ etiquetaDia(turno.diaSemana) }}</span>
+              </td>
+
+              <!-- Horario -->
+              <td class="td-horario">
+                <span class="horario-text">{{ turno.horaInicio }} – {{ turno.horaFin }}</span>
+              </td>
+
+              <!-- Consultorio -->
+              <td class="td-consultorio">
+                <span class="consultorio-text">{{ turno.consultorio }}</span>
+              </td>
+
+              <!-- Ocupación -->
+              <td class="td-ocupacion">
+                <div class="ocupacion-cell">
+                  <div class="ocupacion-bar">
+                    <div
+                      class="ocupacion-fill"
+                      [style.width.%]="porcentajeOcupacion(turno)"
+                      [class.is-full]="porcentajeOcupacion(turno) >= 90"
+                    ></div>
+                  </div>
+                  <span class="ocupacion-text">{{ turno.citasAgendadas }}/{{ turno.cupoMaximo }}</span>
+                </div>
+              </td>
+
+              <!-- Estado -->
+              <td class="td-estado">
+                @if (turno.estado === 'ACTIVO') {
+                  <span class="badge-status status-active">
+                    <span class="status-dot"></span>
+                    <span>Activo</span>
+                  </span>
+                } @else {
+                  <span class="badge-status status-inactive">
+                    <span class="status-dot"></span>
+                    <span>Inactivo</span>
+                  </span>
+                }
+              </td>
+
+              <!-- Botón Acción Ver horario semanal -->
+              <td class="td-acciones">
+                <button
+                  type="button"
+                  class="btn-view-action"
+                  (click)="verHorarioSemanal(turno)"
+                  title="Ver horario semanal del médico"
+                  aria-label="Ver horario semanal del médico"
+                >
+                  <lucide-icon [img]="iconEye"></lucide-icon>
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr class="table-row-empty">
+              <td colspan="7" class="td-empty">
+                <div class="empty-state-box">
+                  <p class="empty-text">No se encontraron turnos que coincidan con los filtros.</p>
+                  <button type="button" class="btn-empty-reset" (click)="limpiarFiltros()">
+                    Restablecer filtros
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+<!-- MODAL: Horario semanal del médico -->
+@if (modalHorarioAbierto() && turnosDelMedicoSeleccionado().length > 0) {
+  <div class="modal-backdrop" (click)="cerrarModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title-box">
+          <div class="user-avatar-circle modal-avatar" aria-hidden="true">
+            {{ turnosDelMedicoSeleccionado()[0].iniciales }}
+          </div>
+          <div>
+            <h3 class="modal-title">{{ turnosDelMedicoSeleccionado()[0].medicoNombre }}</h3>
+            <span class="modal-subtitle">{{ turnosDelMedicoSeleccionado()[0].especialidad }} • Horario semanal</span>
+          </div>
+        </div>
+        <button class="btn-close" (click)="cerrarModal()" type="button" aria-label="Cerrar">
+          <lucide-icon [img]="iconX"></lucide-icon>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="horario-lista">
+          @for (turno of turnosDelMedicoSeleccionado(); track turno.id) {
+            <div class="horario-item">
+              <div class="horario-item-day">{{ etiquetaDia(turno.diaSemana) }}</div>
+              <div class="horario-item-time">{{ turno.horaInicio }} – {{ turno.horaFin }}</div>
+              <div class="horario-item-office">
+                <span>{{ turno.consultorio }}</span>
+              </div>
+              <div class="horario-item-status">
+                @if (turno.estado === 'ACTIVO') {
+                  <span class="badge-status status-active">
+                    <span class="status-dot"></span>
+                    <span>Activo</span>
+                  </span>
+                } @else {
+                  <span class="badge-status status-inactive">
+                    <span class="status-dot"></span>
+                    <span>Inactivo</span>
+                  </span>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-outline" type="button" (click)="cerrarModal()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+}
