@@ -25,8 +25,6 @@ export interface Turno {
   horaInicio: string; // formato: '08:00'
   horaFin: string; // formato: '13:00'
   consultorio: string;
-  cupoMaximo: number;
-  citasAgendadas: number;
   estado: EstadoTurno;
 }
 

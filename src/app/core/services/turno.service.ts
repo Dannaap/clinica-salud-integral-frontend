@@ -147,11 +147,10 @@ export class TurnoService {
       dias: DiaSemana[];
       horaInicio: string;
       horaFin: string;
-      cupoMaximo: number;
     }> = [
-      { dias: ['LUNES', 'MIERCOLES', 'VIERNES'], horaInicio: '08:00', horaFin: '13:00', cupoMaximo: 10 },
-      { dias: ['MARTES', 'JUEVES'], horaInicio: '14:00', horaFin: '19:00', cupoMaximo: 8 },
-      { dias: ['SABADO'], horaInicio: '09:00', horaFin: '12:00', cupoMaximo: 6 },
+      { dias: ['LUNES', 'MIERCOLES', 'VIERNES'], horaInicio: '08:00', horaFin: '13:00' },
+      { dias: ['MARTES', 'JUEVES'], horaInicio: '14:00', horaFin: '19:00' },
+      { dias: ['SABADO'], horaInicio: '09:00', horaFin: '12:00' },
     ];
 
     let idCounter = 1;
@@ -162,7 +161,7 @@ export class TurnoService {
       const consultorio = `Consultorio ${(index % 6) + 1}`;
       const estado: EstadoTurno = medico.activo === false ? 'INACTIVO' : 'ACTIVO';
 
-      patron.dias.forEach((dia, i) => {
+      patron.dias.forEach((dia) => {
         turnos.push({
           id: idCounter++,
           medicoId: medico.id,
@@ -173,8 +172,6 @@ export class TurnoService {
           horaInicio: patron.horaInicio,
           horaFin: patron.horaFin,
           consultorio,
-          cupoMaximo: patron.cupoMaximo,
-          citasAgendadas: Math.min(patron.cupoMaximo, ((index + i) * 2) % (patron.cupoMaximo + 1)),
           estado,
         });
       });

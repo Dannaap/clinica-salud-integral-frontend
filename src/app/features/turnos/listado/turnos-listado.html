@@ -201,12 +201,7 @@
               <span class="shift-time">{{ turno.horaInicio }} – {{ turno.horaFin }}</span>
               <span class="shift-doctor">{{ turno.medicoNombre }}</span>
               <span class="shift-specialty">{{ turno.especialidad }}</span>
-              <div class="shift-footer">
-                <span class="shift-office">{{ turno.consultorio }}</span>
-                <span class="shift-occupancy" [class.is-full]="porcentajeOcupacion(turno) >= 90">
-                  {{ turno.citasAgendadas }}/{{ turno.cupoMaximo }}
-                </span>
-              </div>
+              <span class="shift-office">{{ turno.consultorio }}</span>
             </button>
           } @empty {
             <p class="week-day-empty">Sin turnos</p>
@@ -226,7 +221,6 @@
             <th scope="col" class="th-dia">DÍA</th>
             <th scope="col" class="th-horario">HORARIO</th>
             <th scope="col" class="th-consultorio">CONSULTORIO</th>
-            <th scope="col" class="th-ocupacion">OCUPACIÓN</th>
             <th scope="col" class="th-estado">ESTADO</th>
             <th scope="col" class="th-acciones"><span class="sr-only">Acciones</span></th>
           </tr>
@@ -262,20 +256,6 @@
                 <span class="consultorio-text">{{ turno.consultorio }}</span>
               </td>
 
-              <!-- Ocupación -->
-              <td class="td-ocupacion">
-                <div class="ocupacion-cell">
-                  <div class="ocupacion-bar">
-                    <div
-                      class="ocupacion-fill"
-                      [style.width.%]="porcentajeOcupacion(turno)"
-                      [class.is-full]="porcentajeOcupacion(turno) >= 90"
-                    ></div>
-                  </div>
-                  <span class="ocupacion-text">{{ turno.citasAgendadas }}/{{ turno.cupoMaximo }}</span>
-                </div>
-              </td>
-
               <!-- Estado -->
               <td class="td-estado">
                 @if (turno.estado === 'ACTIVO') {
@@ -306,7 +286,7 @@
             </tr>
           } @empty {
             <tr class="table-row-empty">
-              <td colspan="7" class="td-empty">
+              <td colspan="6" class="td-empty">
                 <div class="empty-state-box">
                   <p class="empty-text">No se encontraron turnos que coincidan con los filtros.</p>
                   <button type="button" class="btn-empty-reset" (click)="limpiarFiltros()">

@@ -95,11 +95,6 @@ export class TurnosListadoComponent {
     return ETIQUETAS_DIA[dia] ?? dia;
   }
 
-  porcentajeOcupacion(turno: Turno): number {
-    if (turno.cupoMaximo <= 0) return 0;
-    return Math.round((turno.citasAgendadas / turno.cupoMaximo) * 100);
-  }
-
   verHorarioSemanal(turno: Turno): void {
     this.medicoSeleccionadoId.set(turno.medicoId);
     this.modalHorarioAbierto.set(true);
