@@ -309,7 +309,210 @@
   }
 }
 
-// ─── 5. TABLA DE TURNOS ─────────────────────────────────────
+// ─── 5. BARRA DE VISTA (contador + Lista / Semana) ──────────
+.view-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  .results-count {
+    font-size: 13px;
+    color: #64748b;
+
+    strong {
+      color: #0f172a;
+      font-weight: 600;
+    }
+  }
+}
+
+.view-toggle {
+  display: inline-flex;
+  padding: 3px;
+  background-color: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+
+  .view-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 32px;
+    padding: 0 14px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: $font-family;
+    cursor: pointer;
+    transition: all 150ms ease;
+
+    lucide-icon {
+      width: 15px;
+      height: 15px;
+    }
+
+    &:hover {
+      color: #0b5ed7;
+    }
+
+    &.active {
+      background-color: $white;
+      color: #0b5ed7;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+  }
+}
+
+// ─── 6a. TABLERO SEMANAL ────────────────────────────────────
+.week-board {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(170px, 1fr));
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.week-day-column {
+  display: flex;
+  flex-direction: column;
+  background-color: $white;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  min-height: 220px;
+  overflow: hidden;
+
+  .week-day-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    background-color: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .week-day-name {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #475569;
+  }
+
+  .week-day-count {
+    min-width: 22px;
+    height: 22px;
+    padding: 0 7px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    background-color: #dbeafe;
+    color: #1d4ed8;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .week-day-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .week-day-empty {
+    margin: 16px 0;
+    text-align: center;
+    font-size: 12.5px;
+    color: #94a3b8;
+  }
+}
+
+.shift-card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  padding: 10px 12px;
+  text-align: left;
+  font-family: $font-family;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-left: 3px solid #0b5ed7;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 150ms ease;
+
+  &:hover {
+    border-color: #bfdbfe;
+    border-left-color: #0b5ed7;
+    background-color: #f8fbff;
+    box-shadow: 0 2px 6px rgba(11, 94, 215, 0.08);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(11, 94, 215, 0.15);
+  }
+
+  &.is-inactive {
+    border-left-color: #ef4444;
+    opacity: 0.7;
+  }
+
+  .shift-time {
+    font-size: 12px;
+    font-weight: 600;
+    color: #0b5ed7;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .shift-doctor {
+    font-size: 13px;
+    font-weight: 600;
+    color: #0f172a;
+  }
+
+  .shift-specialty {
+    font-size: 12px;
+    color: #64748b;
+  }
+
+  .shift-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    margin-top: 6px;
+  }
+
+  .shift-office {
+    font-size: 11.5px;
+    color: #475569;
+  }
+
+  .shift-occupancy {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 1px 8px;
+    border-radius: 9999px;
+    background-color: #eff6ff;
+    color: #1d4ed8;
+    font-variant-numeric: tabular-nums;
+
+    &.is-full {
+      background-color: #fffbeb;
+      color: #b45309;
+    }
+  }
+}
+
+// ─── 6b. TABLA DE TURNOS ─────────────────────────────────────
 .table-card {
   background-color: $white;
   border-radius: 14px;

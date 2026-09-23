@@ -11,6 +11,8 @@ import {
   Search,
   X,
   Eye,
+  List,
+  CalendarDays,
 } from 'lucide-angular';
 import { TurnoService } from '../../../core/services/turno.service';
 import { DiaSemana, EstadoTurno, FranjaTurno, Turno } from '../../../core/models/turno.model';
@@ -43,6 +45,11 @@ export class TurnosListadoComponent {
   readonly iconSearch = Search;
   readonly iconX = X;
   readonly iconEye = Eye;
+  readonly iconList = List;
+  readonly iconCalendarDays = CalendarDays;
+
+  // Vista activa: tabla de turnos o tablero semanal
+  vista = signal<'LISTA' | 'SEMANA'>('LISTA');
 
   // Modal de horario semanal de un médico
   medicoSeleccionadoId = signal<number | null>(null);

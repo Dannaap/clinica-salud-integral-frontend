@@ -11,7 +11,7 @@
   <div class="page-top-bar">
     <div class="page-title-group">
       <h1 class="page-main-title">Turnos médicos</h1>
-      <p class="page-description">Consulta los horarios semanales asignados a cada médico de la clínica</p>
+      <p class="page-description">Supervisa todos los turnos programados del personal médico de la clínica</p>
     </div>
   </div>
 
@@ -148,7 +148,75 @@
     </button>
   </section>
 
-  <!-- 5. Tabla de Turnos -->
+  <!-- 5. Barra de vista: contador + selector Lista / Semana -->
+  <div class="view-toolbar">
+    <span class="results-count">
+      Mostrando <strong>{{ turnoService.turnosFiltrados().length }}</strong>
+      de {{ turnoService.stats().totalTurnos }} turnos
+    </span>
+
+    <div class="view-toggle" role="group" aria-label="Tipo de vista">
+      <button
+        type="button"
+        class="view-toggle-btn"
+        [class.active]="vista() === 'LISTA'"
+        [attr.aria-pressed]="vista() === 'LISTA'"
+        (click)="vista.set('LISTA')"
+      >
+        <lucide-icon [img]="iconList"></lucide-icon>
+        <span>Lista</span>
+      </button>
+      <button
+        type="button"
+        class="view-toggle-btn"
+        [class.active]="vista() === 'SEMANA'"
+        [attr.aria-pressed]="vista() === 'SEMANA'"
+        (click)="vista.set('SEMANA')"
+      >
+        <lucide-icon [img]="iconCalendarDays"></lucide-icon>
+        <span>Semana</span>
+      </button>
+    </div>
+  </div>
+
+  @if (vista() === 'SEMANA') {
+  <!-- 6a. Tablero semanal con todos los turnos -->
+  <section class="week-board" aria-label="Turnos médicos por día de la semana">
+    @for (grupo of turnoService.turnosPorDia(); track grupo.dia) {
+      <div class="week-day-column">
+        <div class="week-day-header">
+          <span class="week-day-name">{{ etiquetaDia(grupo.dia) }}</span>
+          <span class="week-day-count">{{ grupo.turnos.length }}</span>
+        </div>
+
+        <div class="week-day-body">
+          @for (turno of grupo.turnos; track turno.id) {
+            <button
+              type="button"
+              class="shift-card"
+              [class.is-inactive]="turno.estado === 'INACTIVO'"
+              (click)="verHorarioSemanal(turno)"
+              [attr.aria-label]="'Ver horario semanal de ' + turno.medicoNombre"
+            >
+              <span class="shift-time">{{ turno.horaInicio }} – {{ turno.horaFin }}</span>
+              <span class="shift-doctor">{{ turno.medicoNombre }}</span>
+              <span class="shift-specialty">{{ turno.especialidad }}</span>
+              <div class="shift-footer">
+                <span class="shift-office">{{ turno.consultorio }}</span>
+                <span class="shift-occupancy" [class.is-full]="porcentajeOcupacion(turno) >= 90">
+                  {{ turno.citasAgendadas }}/{{ turno.cupoMaximo }}
+                </span>
+              </div>
+            </button>
+          } @empty {
+            <p class="week-day-empty">Sin turnos</p>
+          }
+        </div>
+      </div>
+    }
+  </section>
+  } @else {
+  <!-- 6b. Tabla de Turnos -->
   <section class="table-card" aria-label="Listado de turnos médicos">
     <div class="table-responsive">
       <table class="turnos-table">
@@ -252,6 +320,7 @@
       </table>
     </div>
   </section>
+  }
 </div>
 
 <!-- MODAL: Horario semanal del médico -->
