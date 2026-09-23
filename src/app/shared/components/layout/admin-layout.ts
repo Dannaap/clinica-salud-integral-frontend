@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, startWith } from 'rxjs';
 import { SidebarComponent } from '../sidebar/sidebar';
@@ -28,7 +28,6 @@ const HEADER_POR_DEFECTO: HeaderConfig = {
 })
 export class AdminLayoutComponent {
   private readonly router = inject(Router);
-  private readonly route = inject(ActivatedRoute);
 
   sidebarAbierto = false;
 
@@ -46,12 +45,15 @@ export class AdminLayoutComponent {
     this.sidebarAbierto = !this.sidebarAbierto;
   }
 
+  // Lee `data.header` de la ruta más profunda del estado actual del router.
+  // Se usa el snapshot del router (no el ActivatedRoute) porque durante la
+  // construcción del layout el snapshot del ActivatedRoute aún no existe.
   private obtenerHeaderDeRuta(): HeaderConfig {
-    let actual = this.route;
+    let actual = this.router.routerState.snapshot.root;
     while (actual.firstChild) {
       actual = actual.firstChild;
     }
-    const config = actual.snapshot.data['header'] as Partial<HeaderConfig> | undefined;
+    const config = actual.data?.['header'] as Partial<HeaderConfig> | undefined;
     return { ...HEADER_POR_DEFECTO, ...config };
   }
 }
