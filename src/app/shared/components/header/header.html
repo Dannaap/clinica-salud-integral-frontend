@@ -13,7 +13,7 @@
       #inputBusqueda
       type="search"
       [placeholder]="placeholder"
-      [value]="usuarioService?.busqueda() || ''"
+      [value]="valorBusqueda"
       (input)="onSearchChange($event)"
       (keyup.enter)="buscar(inputBusqueda.value)"
       aria-label="Buscar"
