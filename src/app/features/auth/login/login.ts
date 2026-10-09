@@ -1,9 +1,11 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
+  AbstractControl,
   FormBuilder,
   FormGroup,
   ReactiveFormsModule,
+  ValidationErrors,
   Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -24,6 +26,28 @@ import {
 
 import { AuthService } from '../../../core/services/auth.service';
 import { LoginRequest } from '../../../core/models/usuario.model';
+
+function passwordComplexityValidator(control: AbstractControl): ValidationErrors | null {
+  const pwd = control.value ?? '';
+  if (!pwd) {
+    return null;
+  }
+  const minLength = pwd.length >= 8;
+  const hasUppercase = /[A-Z]/.test(pwd);
+  const hasLowercase = /[a-z]/.test(pwd);
+  const hasNumber = /[0-9]/.test(pwd);
+  const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pwd);
+
+  const errors: ValidationErrors = {};
+  if (!minLength) {
+    errors['minlength'] = { requiredLength: 8, actualLength: pwd.length };
+  }
+  if (!hasUppercase || !hasLowercase || !hasNumber || !hasSpecial) {
+    errors['complexity'] = true;
+  }
+
+  return Object.keys(errors).length > 0 ? errors : null;
+}
 
 @Component({
   selector: 'app-login',
@@ -60,7 +84,7 @@ export class Login {
 
   formLogin: FormGroup = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(8)]],
+    password: ['', [Validators.required, passwordComplexityValidator]],
     recordarme: [false],
   });
 
@@ -90,6 +114,10 @@ export class Login {
 
   togglePassword(): void {
     this.mostrarPassword.update((v) => !v);
+  }
+
+  olvidePassword(): void {
+    alert('La recuperación de contraseña estará disponible en un próximo sprint.');
   }
 
   onBlurPassword(): void {
@@ -123,10 +151,9 @@ export class Login {
     };
 
     this.authService.login(credenciales).subscribe({
-      next: (response) => {
-        console.log('Login exitoso:', response);
+      next: () => {
         this.cargando.set(false);
-        this.redirigirPorRol(response.usuario.rol);
+        this.router.navigate([this.authService.obtenerRutaDashboard()]);
       },
       error: (error) => {
         console.error('Error de login:', error);
@@ -136,21 +163,5 @@ export class Login {
         );
       },
     });
-  }
-
-  private redirigirPorRol(rol: string): void {
-    switch (rol) {
-      case 'ADMIN':
-        this.router.navigate(['/dashboard/admin']);
-        break;
-      case 'RECEPCION':
-        this.router.navigate(['/dashboard/recepcion']);
-        break;
-      case 'MEDICO':
-        this.router.navigate(['/dashboard/medico']);
-        break;
-      default:
-        this.router.navigate(['/']);
-    }
   }
 }

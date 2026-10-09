@@ -1,77 +1,41 @@
-@use '../../../../../styles/variables' as *;
-
 :host {
   display: block;
 }
 
-.pacientes-shell {
-  min-height: 100vh;
+.main-wrapper {
+  margin-left: 260px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
-.logo-icon {
-  font-size: 24px;
-  font-weight: $font-weight-bold;
+.content {
+  margin-top: 64px;
+  padding: 2rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
-.menu-item.is-disabled {
-  cursor: not-allowed;
-  opacity: 0.62;
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 45;
 }
 
-.badge-count {
-  position: absolute;
-  top: 2px;
-  right: 2px;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 4px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: $danger;
-  color: $white;
-  font-size: 10px;
-  font-weight: $font-weight-semibold;
-}
-
-@media (max-width: 760px) {
-  .sidebar {
-    width: $sidebar-width-collapsed;
-
-    .sidebar-logo .logo-text,
-    .sidebar-menu .menu-item span,
-    .sidebar-profile .profile-info,
-    .sidebar-profile .profile-logout {
-      display: none;
-    }
-
-    .sidebar-logo {
-      justify-content: center;
-      padding: 0 0 $space-5;
-    }
-
-    .sidebar-menu .menu-item {
-      justify-content: center;
-      padding: 0;
-    }
-
-    .sidebar-profile {
-      justify-content: center;
-      margin-inline: $space-2;
-    }
+@media (max-width: 992px) {
+  .main-wrapper {
+    margin-left: 0;
   }
 
-  .main-content {
-    margin-left: $sidebar-width-collapsed;
+  .content {
+    padding: 1.5rem 1rem;
   }
+}
 
-  .header {
-    padding: 0 $space-4;
-  }
-
-  .user-name,
-  .user-arrow {
-    display: none;
+@media (max-width: 576px) {
+  .content {
+    padding: 1rem 0.75rem;
   }
 }

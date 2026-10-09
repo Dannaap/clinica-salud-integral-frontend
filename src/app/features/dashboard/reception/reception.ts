@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { SidebarComponent } from '../../../shared/components/sidebar/sidebar';
 import { HeaderComponent } from '../../../shared/components/header/header';
+import { AuthService } from '../../../core/services/auth.service';
 
 interface Cita {
   hora: string;
@@ -35,7 +36,28 @@ interface Medico {
   styleUrl: './reception.scss'
 })
 export class ReceptionComponent {
-  usuario = { nombre: 'Lucía Fernández', rol: 'Recepción', iniciales: 'LF' };
+  private readonly authService = inject(AuthService);
+
+  get usuario() {
+    const info = this.authService.usuarioActual();
+    if (info) {
+      return {
+        nombre: info.nombreCompleto,
+        rol: info.rolLabel,
+        iniciales: info.iniciales,
+      };
+    }
+    const u = this.authService.obtenerUsuario();
+    const nombre = u ? `${u.nombre} ${u.apellidos}`.trim() : 'Lucía Fernández';
+    const iniciales = u
+      ? `${u.nombre.charAt(0)}${u.apellidos.charAt(0)}`.toUpperCase()
+      : 'LF';
+    return {
+      nombre,
+      rol: 'Recepción',
+      iniciales,
+    };
+  }
 
   kpis = { citasHoy: 12, pacientesEspera: 3, porConfirmar: 4 };
 
@@ -74,5 +96,10 @@ export class ReceptionComponent {
       'En espera': 'badge-en-espera'
     };
     return map[estado] || '';
+  }
+
+  mostrarProximamente(modulo: string): void {
+    console.log(`${modulo} estará disponible en un próximo sprint`);
+    alert(`${modulo} estará disponible en un próximo sprint.`);
   }
 }

@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { SidebarComponent } from '../../../shared/components/sidebar/sidebar';
 import { HeaderComponent } from '../../../shared/components/header/header';
+import { AuthService } from '../../../core/services/auth.service';
 
 interface Cita {
   hora: string;
@@ -27,11 +28,28 @@ interface Doctor {
   styleUrl: './admin.scss'
 })
 export class AdminComponent {
-  usuario = {
-    nombre: 'Dr. Juan Pérez',
-    rol: 'Administrador',
-    iniciales: 'JP'
-  };
+  private readonly authService = inject(AuthService);
+
+  get usuario() {
+    const info = this.authService.usuarioActual();
+    if (info) {
+      return {
+        nombre: info.nombreCompleto,
+        rol: info.rolLabel,
+        iniciales: info.iniciales,
+      };
+    }
+    const u = this.authService.obtenerUsuario();
+    const nombre = u ? `${u.nombre} ${u.apellidos}`.trim() : 'Dr. Juan Pérez';
+    const iniciales = u
+      ? `${u.nombre.charAt(0)}${u.apellidos.charAt(0)}`.toUpperCase()
+      : 'JP';
+    return {
+      nombre,
+      rol: 'Administrador',
+      iniciales,
+    };
+  }
 
   kpis = {
     citasHoy: 12,
@@ -89,5 +107,10 @@ export class AdminComponent {
 
   toggleSidebar() {
     this.sidebarAbierto = !this.sidebarAbierto;
+  }
+
+  mostrarProximamente(modulo: string): void {
+    console.log(`${modulo} estará disponible en un próximo sprint`);
+    alert(`${modulo} estará disponible en un próximo sprint.`);
   }
 }

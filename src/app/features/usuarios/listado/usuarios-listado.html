@@ -1,0 +1,238 @@
+<div class="usuarios-page">
+
+  <!-- 1. Breadcrumbs -->
+  <nav class="breadcrumbs" aria-label="Migas de pan">
+    <a routerLink="/dashboard" class="breadcrumb-link">Inicio</a>
+    <span class="breadcrumb-separator">/</span>
+    <span class="breadcrumb-current">Usuarios</span>
+  </nav>
+
+  <!-- 2. Encabezado principal de la página -->
+  <div class="page-top-bar">
+    <div class="page-title-group">
+      <h1 class="page-main-title">Gestión de usuarios</h1>
+      <p class="page-description">Crea, edita y administra las cuentas del personal de la clínica</p>
+    </div>
+    <div class="page-top-actions">
+      <button type="button" class="btn-new-user" aria-label="Nuevo usuario">
+        <lucide-icon [img]="iconPlus" class="btn-icon"></lucide-icon>
+        <span>NUEVO usuario</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 3. Tarjetas KPI de Resumen -->
+  <section class="kpi-grid" aria-label="Estadísticas de usuarios">
+    <!-- Card 1: Total Usuarios -->
+    <div class="kpi-card-item">
+      <div class="kpi-info">
+        <span class="kpi-title">TOTAL USUARIOS</span>
+        <span class="kpi-number text-primary">{{ usuarioService.stats().totalUsuarios }}</span>
+        <span class="kpi-subtext">Activos en el sistema</span>
+      </div>
+      <div class="kpi-icon-wrapper bg-soft-indigo">
+        <lucide-icon [img]="iconUsers" class="icon-indigo"></lucide-icon>
+      </div>
+    </div>
+
+    <!-- Card 2: Administradores -->
+    <div class="kpi-card-item">
+      <div class="kpi-info">
+        <span class="kpi-title">ADMINISTRADORES</span>
+        <span class="kpi-number text-dark-blue">{{ usuarioService.stats().administradores }}</span>
+        <span class="kpi-subtext">Con acceso total</span>
+      </div>
+      <div class="kpi-icon-wrapper bg-soft-purple">
+        <lucide-icon [img]="iconSettings" class="icon-purple"></lucide-icon>
+      </div>
+    </div>
+
+    <!-- Card 3: Recepción -->
+    <div class="kpi-card-item">
+      <div class="kpi-info">
+        <span class="kpi-title">RECEPCIÓN</span>
+        <span class="kpi-number text-green">{{ usuarioService.stats().recepcion }}</span>
+        <span class="kpi-subtext">Gestionan citas</span>
+      </div>
+      <div class="kpi-icon-wrapper bg-soft-brown">
+        <lucide-icon [img]="iconBriefcase" class="icon-brown"></lucide-icon>
+      </div>
+    </div>
+
+    <!-- Card 4: Médicos -->
+    <div class="kpi-card-item">
+      <div class="kpi-info">
+        <span class="kpi-title">MÉDICOS</span>
+        <span class="kpi-number text-amber">{{ usuarioService.stats().medicos }}</span>
+        <span class="kpi-subtext">{{ usuarioService.stats().especialidades }} especialidades</span>
+      </div>
+      <div class="kpi-icon-wrapper bg-soft-orange">
+        <lucide-icon [img]="iconStethoscope" class="icon-orange"></lucide-icon>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Barra de Filtros -->
+  <section class="filters-card" aria-label="Filtros de búsqueda">
+    <div class="filter-search-box">
+      <lucide-icon [img]="iconSearch" class="search-icon"></lucide-icon>
+      <input
+        type="search"
+        class="filter-search-input"
+        placeholder="Buscar por nombre o correo"
+        [value]="usuarioService.busqueda()"
+        (input)="onSearchInput($event)"
+        aria-label="Buscar por nombre o correo"
+      />
+    </div>
+
+    <div class="filter-select-group">
+      <div class="select-wrapper">
+        <select
+          class="filter-select"
+          [value]="usuarioService.filtroRol()"
+          (change)="onRolChange($event)"
+          aria-label="Filtrar por rol"
+        >
+          <option value="TODOS">Rol: Todos</option>
+          <option value="ADMIN">Rol: Administrador</option>
+          <option value="RECEPCION">Rol: Recepción</option>
+          <option value="MEDICO">Rol: Médico</option>
+        </select>
+      </div>
+
+      <div class="select-wrapper">
+        <select
+          class="filter-select"
+          [value]="usuarioService.filtroEstado()"
+          (change)="onEstadoChange($event)"
+          aria-label="Filtrar por estado"
+        >
+          <option value="TODOS">Estado: Todos</option>
+          <option value="ACTIVO">Estado: Activo</option>
+          <option value="INACTIVO">Estado: Inactivo</option>
+        </select>
+      </div>
+    </div>
+
+    <button
+      type="button"
+      class="btn-clear-filters"
+      (click)="limpiarFiltros()"
+      aria-label="Limpiar filtros"
+    >
+      <lucide-icon [img]="iconX" class="clear-icon"></lucide-icon>
+      <span>Limpiar filtros</span>
+    </button>
+  </section>
+
+  <!-- 5. Tabla de Usuarios -->
+  <section class="table-card" aria-label="Listado de personal">
+    <div class="table-responsive">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th scope="col" class="th-usuario">USUARIO</th>
+            <th scope="col" class="th-correo">CORREO</th>
+            <th scope="col" class="th-rol">ROL</th>
+            <th scope="col" class="th-acceso">ÚLTIMO ACCESO</th>
+            <th scope="col" class="th-estado">ESTADO</th>
+            <th scope="col" class="th-acciones"><span class="sr-only">Acciones</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (usuario of usuarioService.usuariosFiltrados(); track usuario.id) {
+            <tr class="table-row">
+              <!-- Usuario (Avatar + Nombre + Cargo/Especialidad) -->
+              <td class="td-usuario">
+                <div class="user-cell">
+                  <div class="user-avatar-circle" aria-hidden="true">
+                    {{ usuario.iniciales || 'U' }}
+                  </div>
+                  <div class="user-text-info">
+                    <span class="user-fullname">{{ usuario.nombre }} {{ usuario.apellidos }}</span>
+                    <span class="user-role-detail">
+                      {{ usuario.cargo || usuario.especialidad || 'Personal' }}
+                    </span>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Correo -->
+              <td class="td-correo">
+                <span class="email-text">{{ usuario.email }}</span>
+              </td>
+
+              <!-- Rol con badges semánticos -->
+              <td class="td-rol">
+                @switch (usuario.rol) {
+                  @case ('ADMIN') {
+                    <span class="badge-role badge-role-admin">Administrador</span>
+                  }
+                  @case ('RECEPCION') {
+                    <span class="badge-role badge-role-recepcion">Recepción</span>
+                  }
+                  @case ('MEDICO') {
+                    <span class="badge-role badge-role-medico">Médico</span>
+                  }
+                  @default {
+                    <span class="badge-role">{{ usuario.rol }}</span>
+                  }
+                }
+              </td>
+
+              <!-- Último Acceso (Fecha y Hora) -->
+              <td class="td-acceso">
+                @let dateTime = obtenerFechaYHora(usuario.ultimoAcceso);
+                <div class="access-datetime">
+                  <span class="access-date">{{ dateTime.fecha }}</span>
+                  <span class="access-time">{{ dateTime.hora }}</span>
+                </div>
+              </td>
+
+              <!-- Estado -->
+              <td class="td-estado">
+                @if (usuario.activo) {
+                  <span class="badge-status status-active">
+                    <span class="status-dot"></span>
+                    <span>Activo</span>
+                  </span>
+                } @else {
+                  <span class="badge-status status-inactive">
+                    <span class="status-dot"></span>
+                    <span>Inactivo</span>
+                  </span>
+                }
+              </td>
+
+              <!-- Botón Acción Ver Detalle -->
+              <td class="td-acciones">
+                <button
+                  type="button"
+                  class="btn-view-action"
+                  (click)="verDetalleUsuario(usuario)"
+                  title="Ver detalle del usuario"
+                  aria-label="Ver detalle del usuario"
+                >
+                  <lucide-icon [img]="iconEye"></lucide-icon>
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr class="table-row-empty">
+              <td colspan="6" class="td-empty">
+                <div class="empty-state-box">
+                  <p class="empty-text">No se encontraron usuarios que coincidan con los filtros.</p>
+                  <button type="button" class="btn-empty-reset" (click)="limpiarFiltros()">
+                    Restablecer filtros
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</div>

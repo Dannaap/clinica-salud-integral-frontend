@@ -1,6 +1,10 @@
 // ═══════════════════════════════════════════════════════════
 // TABLAS — Clínica Salud Integral S.A.C.
 // ═══════════════════════════════════════════════════════════
+
+@use 'variables' as *;
+@use 'mixins' as *;
+
 // ─── WRAPPER DE TABLA (para scroll horizontal) ─────────────
 .table-wrapper {
   width: 100%;

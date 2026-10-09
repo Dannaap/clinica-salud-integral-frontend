@@ -1,10 +1,10 @@
-$primary: #0B5ED7;
+$primary: #0b5ed7;
 $primary-dark: #084298;
-$danger: #DC3545;
-$neutral-900: #1A1D21;
+$danger: #dc3545;
+$neutral-900: #1a1d21;
 $neutral-700: #495057;
-$neutral-400: #CED4DA;
-$neutral-100: #F8F9FA;
+$neutral-400: #ced4da;
+$neutral-100: #f8f9fa;
 
 .top-header {
   position: fixed;
@@ -129,59 +129,21 @@ $neutral-100: #F8F9FA;
         justify-content: center;
       }
     }
-
-    .user-profile {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding-left: 1rem;
-      border-left: 1px solid $neutral-400;
-      cursor: pointer;
-
-      .profile-avatar {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        background: $primary;
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 12px;
-        font-weight: 700;
-      }
-
-      .profile-info {
-        display: flex;
-        flex-direction: column;
-
-        .profile-name {
-          font-size: 14px;
-          font-weight: 500;
-          color: $neutral-900;
-        }
-
-        .profile-role {
-          font-size: 11px;
-          color: $neutral-700;
-        }
-      }
-    }
   }
 }
 
 @media (max-width: 992px) {
   .top-header {
-    left: 0;                     
+    left: 0;
     padding: 0 1rem;
     gap: 0.75rem;
 
     .btn-menu {
-      display: flex;             
+      display: flex;
     }
 
     .search-box {
-      display: none;             
+      display: none;
     }
 
     .header-title {
@@ -196,12 +158,9 @@ $neutral-100: #F8F9FA;
 @media (max-width: 576px) {
   .top-header {
     .header-title .header-subtitle {
-      display: none;             
+      display: none;
     }
 
-    .user-profile .profile-info {
-      display: none;             
-    }
 
     .header-actions {
       gap: 0.5rem;

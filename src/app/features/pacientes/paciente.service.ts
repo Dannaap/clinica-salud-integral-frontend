@@ -162,4 +162,16 @@ export class PacienteService {
 
     return actualizado;
   }
+
+  eliminar(id: number): boolean {
+    const existe = this.pacientesState().some((paciente) => paciente.id === id);
+    if (!existe) {
+      return false;
+    }
+
+    this.pacientesState.update((pacientes) =>
+      pacientes.filter((paciente) => paciente.id !== id),
+    );
+    return true;
+  }
 }

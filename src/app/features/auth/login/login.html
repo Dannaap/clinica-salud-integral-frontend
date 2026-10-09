@@ -166,7 +166,7 @@
             <input type="checkbox" formControlName="recordarme" />
             <span>Recordarme</span>
           </label>
-          <a href="#" class="form-link">¿Olvidaste tu contraseña?</a>
+          <button type="button" class="form-link" (click)="olvidePassword()">¿Olvidaste tu contraseña?</button>
         </div>
 
         @if (errorMensaje()) {

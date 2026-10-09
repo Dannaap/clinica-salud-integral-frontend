@@ -1,9 +1,22 @@
 // ═══════════════════════════════════════════════════════════
 // LAYOUT — Clínica Salud Integral S.A.C.
 // ═══════════════════════════════════════════════════════════
+
+@use 'variables' as *;
+@use 'mixins' as *;
+
 // ─── RESET ─────────────────────────────────────────────────
 * {
   box-sizing: border-box;
+}
+
+// lucide-icon es un elemento inline por defecto; sin esto su svg
+// interno queda con el offset de baseline y se ve descentrado
+// dentro de círculos/botones aunque el contenedor use flex.
+lucide-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 html, body {

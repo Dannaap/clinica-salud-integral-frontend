@@ -19,6 +19,38 @@ function soloNumeros(control: AbstractControl): ValidationErrors | null {
   return /^\d{8}$/.test(control.value ?? '') ? null : { dniFormato: true };
 }
 
+function soloLetras(control: AbstractControl): ValidationErrors | null {
+  const val = control.value?.trim();
+  if (!val) return null;
+  return /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s'-]+$/.test(val) ? null : { soloLetras: true };
+}
+
+function fechaNacimientoValida(control: AbstractControl): ValidationErrors | null {
+  if (!control.value) return null;
+  const fecha = new Date(`${control.value}T00:00:00`);
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+  if (isNaN(fecha.getTime())) return { fechaInvalida: true };
+  if (fecha > hoy) return { fechaFutura: true };
+  const anioMinimo = hoy.getFullYear() - 130;
+  if (fecha.getFullYear() < anioMinimo) return { fechaAntigua: true };
+  return null;
+}
+
+function telefonoValido(control: AbstractControl): ValidationErrors | null {
+  const val = control.value?.trim();
+  if (!val) return null;
+  const limpio = val.replace(/[\s+-]/g, '');
+  const sinPais = limpio.startsWith('51') && limpio.length === 11 ? limpio.substring(2) : limpio;
+  return /^9\d{8}$/.test(sinPais) ? null : { telefonoInvalido: true };
+}
+
+function correoOpcional(control: AbstractControl): ValidationErrors | null {
+  const val = control.value?.trim();
+  if (!val) return null;
+  return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(val) ? null : { emailInvalido: true };
+}
+
 @Component({
   selector: 'app-registro',
   imports: [CommonModule, ReactiveFormsModule, RouterLink, LucideAngularModule, PacientesLayout],
@@ -41,21 +73,23 @@ export class Registro {
   readonly dniEstado = signal<'neutral' | 'disponible' | 'duplicado'>('neutral');
   readonly pacienteEncontrado = signal<Paciente | null>(null);
   readonly guardando = signal(false);
+  readonly redirigiendo = signal(false);
   readonly mensaje = signal<string | null>(null);
   readonly error = signal<string | null>(null);
   readonly pacienteEditando = signal<Paciente | null>(null);
+  readonly hoy = new Date().toISOString().split('T')[0];
 
   readonly formulario = this.fb.group({
     dni: ['', [Validators.required, soloNumeros]],
-    nombres: ['', [Validators.required, Validators.minLength(2)]],
-    apellidos: ['', [Validators.required, Validators.minLength(2)]],
-    fechaNacimiento: ['', Validators.required],
+    nombres: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50), soloLetras]],
+    apellidos: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50), soloLetras]],
+    fechaNacimiento: ['', [Validators.required, fechaNacimientoValida]],
     sexo: ['', Validators.required],
-    telefono: ['', [Validators.required, Validators.pattern(/^\+?\d[\d\s-]{8,}$/)]],
-    correo: ['', Validators.email],
+    telefono: ['', [Validators.required, telefonoValido]],
+    correo: ['', [correoOpcional]],
     tipoSangre: [''],
-    direccion: [''],
-    alergias: [''],
+    direccion: ['', [Validators.maxLength(200)]],
+    alergias: ['', [Validators.maxLength(500)]],
   });
 
   constructor() {
@@ -117,6 +151,17 @@ export class Registro {
     if (!this.editando) {
       this.dniEstado.set('neutral');
       this.pacienteEncontrado.set(null);
+      return;
+    }
+
+    const dniActual = (this.dni.value ?? '').trim();
+    const pacienteOriginal = this.pacienteEditando();
+    if (pacienteOriginal && dniActual !== pacienteOriginal.dni) {
+      this.dniEstado.set('neutral');
+      this.pacienteEncontrado.set(null);
+    } else if (pacienteOriginal && dniActual === pacienteOriginal.dni) {
+      this.dniEstado.set('disponible');
+      this.pacienteEncontrado.set(null);
     }
   }
 
@@ -127,7 +172,13 @@ export class Registro {
       return;
     }
 
-    if (this.dniEstado() === 'duplicado') {
+    const dniValor = (this.dni.value ?? '').trim();
+    const pacienteExistente = this.pacienteService.buscarPorDni(dniValor);
+    const pacienteEditando = this.pacienteEditando();
+
+    if (pacienteExistente && pacienteExistente.id !== pacienteEditando?.id) {
+      this.dniEstado.set('duplicado');
+      this.pacienteEncontrado.set(pacienteExistente);
       this.error.set('Ya existe un paciente registrado con este DNI.');
       return;
     }
@@ -136,18 +187,22 @@ export class Registro {
     this.error.set(null);
 
     const datos = this.formulario.getRawValue() as PacienteFormValue;
-    const paciente = this.pacienteEditando();
 
-    if (paciente) {
-      this.pacienteService.actualizar(paciente.id, datos);
+    if (pacienteEditando) {
+      this.pacienteService.actualizar(pacienteEditando.id, datos);
     } else {
       this.pacienteService.crear(datos);
     }
 
     this.guardando.set(false);
+    this.redirigiendo.set(true);
     this.mensaje.set(
-      paciente ? 'Los datos del paciente fueron actualizados.' : 'Paciente registrado correctamente.',
+      pacienteEditando ? 'Los datos del paciente fueron actualizados.' : 'Paciente registrado correctamente.',
     );
+
+    setTimeout(() => {
+      this.router.navigate(['/pacientes/listado']);
+    }, 1200);
   }
 
   cancelar(): void {

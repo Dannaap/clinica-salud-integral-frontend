@@ -7,7 +7,20 @@ export interface Usuario {
   email: string;
   rol: Rol;
   activo: boolean;
+  cargo?: string;
+  especialidad?: string;
+  ultimoAcceso?: string;
+  iniciales?: string;
 }
+
+export interface UsuarioStats {
+  totalUsuarios: number;
+  administradores: number;
+  recepcion: number;
+  medicos: number;
+  especialidades: number;
+}
+
 
 export interface LoginRequest {
   email: string;

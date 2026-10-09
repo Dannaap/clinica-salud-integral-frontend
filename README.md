@@ -46,8 +46,8 @@ Proporcionar una interfaz ágil, intuitiva y responsive para que el personal de 
 | Framework | Angular 20 |
 | Lenguaje | TypeScript |
 | Estilos | SASS (SCSS) |
-| Estado | RxJS |
-| Rutas | Angular Router + Guards |
+| Estado | Angular Signals (Reactividad nativa) + RxJS |
+| Rutas | Angular Router + Functional Guards |
 | Formularios | Reactive Forms |
 | Tests | Jasmine + Karma |
 | Deploy | Vercel |
@@ -60,25 +60,36 @@ clinica-salud-integral-frontend/
 ├── src/
 │   ├── app/
 │   │   ├── core/
-│   │   │   ├── guards/              
+│   │   │   ├── guards/
+│   │   │   │   ├── auth.guard.ts
+│   │   │   │   ├── role.guard.ts
+│   │   │   │   ├── guest.guard.ts
+│   │   │   │   └── dashboard-redirect.guard.ts
 │   │   │   ├── interceptors/        
 │   │   │   ├── services/
-│   │   │   │   ├── auth.service.ts  
-│   │   │   │   ├── paciente.service.ts  
-│   │   │   │   └── usuario.service.ts   
+│   │   │   │   └── auth.service.ts  
 │   │   │   └── models/
-│   │   │       ├── usuario.model.ts 
-│   │   │       ├── paciente.model.ts 
-│   │   │       └── cita.model.ts     
+│   │   │       └── usuario.model.ts 
 │   │   │
 │   │   ├── shared/
-│   │   │   ├── components/          
+│   │   │   ├── components/
+│   │   │   │   ├── header/
+│   │   │   │   └── sidebar/
 │   │   │   └── pipes/
 │   │   │
 │   │   ├── features/
 │   │   │   ├── auth/login/          
-│   │   │   ├── dashboard/           
-│   │   │   ├── pacientes/           
+│   │   │   ├── dashboard/
+│   │   │   │   ├── admin/
+│   │   │   │   ├── reception/
+│   │   │   │   └── medical/
+│   │   │   ├── pacientes/
+│   │   │   │   ├── components/
+│   │   │   │   ├── listado/
+│   │   │   │   ├── registro/
+│   │   │   │   ├── paciente.service.ts
+│   │   │   │   ├── paciente.model.ts
+│   │   │   │   └── pacientes.routes.ts
 │   │   │   └── usuarios/            
 │   │   │
 │   │   ├── app.config.ts            
@@ -185,11 +196,15 @@ El sistema de diseño sigue los wireframes creados en Stitch para la Clínica Sa
 
 ### Instalar dependencias
 
+```bash
 npm install
+```
 
 ### Ejecutar en desarrollo
 
+```bash
 ng serve
+```
 
 La aplicación corre en http://localhost:4200.
 
@@ -197,9 +212,11 @@ La aplicación corre en http://localhost:4200.
 
 ## Autenticación y Guards
 
-- Interceptor HTTP para agregar el token JWT en cada petición
-- AuthGuard para proteger rutas privadas
-- RoleGuard para filtrar vistas según el rol (Admin, Recepción, Médico)
+- **Interceptor HTTP** para agregar el token JWT en cada petición
+- **AuthGuard** para proteger rutas privadas
+- **RoleGuard** para filtrar vistas según el rol (Admin, Recepción, Médico)
+- **GuestGuard** para redirigir al dashboard correspondiente a usuarios ya autenticados que intentan ingresar a `/login`
+- **DashboardRedirectGuard** para dirigir la ruta `/dashboard` a la vista especializada de cada rol
 
 ---
 
@@ -207,16 +224,18 @@ La aplicación corre en http://localhost:4200.
 
 | Módulo | Descripción |
 |---|---|
-| Auth | Login con JWT y almacenamiento seguro del token |
-| Dashboard | Vistas diferenciadas por rol |
-| Pacientes | Registro, listado y búsqueda por DNI |
+| Auth | Login con JWT, checklist de requisitos de contraseña y almacenamiento seguro de sesión |
+| Dashboard | Vistas diferenciadas y homologadas por rol (Admin, Recepción, Médico) |
+| Pacientes | CRUD completo (H.U.2): Registro con validaciones robustas, edición, baja/eliminación inmutable con confirmación, búsqueda reactiva con debounce de 250ms y filtros avanzados (estado, sexo, tipo de sangre) |
 | Usuarios | CRUD de usuarios (solo Admin) |
 
 ---
 
 ## Ejecutar tests
 
-ng test
+```bash
+ng test --watch=false
+```
 
 ---
 

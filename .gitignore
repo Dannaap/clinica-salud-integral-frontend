@@ -147,3 +147,19 @@ vite.config.ts.timestamp-*
 
 # Archivos temporales
 tall
+*.tmp
+*.temp
+
+# IDEs and Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
