@@ -144,3 +144,6 @@ vite.config.ts.timestamp-*
 
 # Angular cache
 /.angular/
+
+# Archivos temporales
+tall
