@@ -1,28 +1,17 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
-
-interface CitaAgenda {
-  hora: string;
-  paciente: string;
-  hc: string;
-  motivo: string;
-  estado: 'En consulta' | 'Pendiente' | 'Atendida';
-}
-
-interface PacienteEspera {
-  iniciales: string;
-  nombre: string;
-  motivo: string;
-  hora: string;
-}
-
-interface PacienteReciente {
-  iniciales: string;
-  nombre: string;
-  ultima: string;
-}
+import { CitaService } from '../../../core/services/cita.service';
+import { ETIQUETAS_ESTADO_CITA, EstadoCita } from '../../../core/models/cita.model';
+import {
+  aFechaHoraIso,
+  fechaLargaDeHoy,
+  formatearFecha,
+  hoyIso,
+  iniciales,
+  saludoDelDia,
+} from '../../../core/utils/fechas';
 
 @Component({
   selector: 'app-medical',
@@ -31,58 +20,100 @@ interface PacienteReciente {
   templateUrl: './medical.html',
   styleUrl: './medical.scss'
 })
-export class MedicalComponent {
+export class MedicalComponent implements OnInit {
   private readonly authService = inject(AuthService);
+  private readonly citaService = inject(CitaService);
+
+  readonly saludo = saludoDelDia();
+  readonly fechaHoy = fechaLargaDeHoy();
+  readonly fechaCorta = formatearFecha(hoyIso());
+  private readonly hoy = hoyIso();
+
+  readonly cargando = this.citaService.cargando;
 
   get usuario() {
     const info = this.authService.usuarioActual();
-    if (info) {
-      return {
-        nombre: info.nombreCompleto,
-        especialidad: info.especialidad ?? 'Médico general',
-        iniciales: info.iniciales,
-      };
-    }
-    const u = this.authService.obtenerUsuario();
-    const nombre = u ? `Dr. ${u.nombre} ${u.apellidos}`.trim() : 'Dr. Axel Rojas';
-    const iniciales = u
-      ? `${u.nombre.charAt(0)}${u.apellidos.charAt(0)}`.toUpperCase()
-      : 'AR';
     return {
-      nombre,
-      especialidad: 'Cardiólogo',
-      iniciales,
+      nombre: info?.nombreCompleto ?? '',
+      especialidad: info?.especialidad ?? 'Médico general',
+      iniciales: info?.iniciales ?? '',
     };
   }
 
-  kpis = { consultasHoy: 8, enEspera: 2, atencionesMes: 47 };
+  // GET /citas ya devuelve solo las citas del médico en sesión
+  readonly agenda = computed(() => this.citaService.obtenerCitasDelDia(this.hoy));
+  readonly resumenHoy = computed(() => this.citaService.resumir(this.agenda()));
 
-  agenda: CitaAgenda[] = [
-    { hora: '09:00', paciente: 'María López', hc: '#39281', motivo: 'Dolor torácico agudo', estado: 'En consulta' },
-    { hora: '09:30', paciente: 'Carlos Ruiz', hc: '#40102', motivo: 'Control post-cateterismo', estado: 'Pendiente' },
-    { hora: '10:00', paciente: 'Ana Torres', hc: '#29810', motivo: 'Arritmia y palpitaciones', estado: 'Pendiente' },
-    { hora: '10:30', paciente: 'Luis Mendoza', hc: '#19402', motivo: 'Chequeo cardiovascular', estado: 'Atendida' },
-    { hora: '11:00', paciente: 'Sofía Ramírez', hc: '#51092', motivo: 'Ecocardiograma de control', estado: 'Atendida' },
-    { hora: '11:30', paciente: 'Diego Castro', hc: '#38421', motivo: 'Seguimiento de hipertensión', estado: 'Pendiente' }
-  ];
+  // Cita reservada más próxima (de hoy en adelante)
+  readonly proximaConsulta = computed(() => {
+    const ahora = aFechaHoraIso(new Date());
+    const cita = this.citaService
+      .citas()
+      .find((c) => c.estado === 'RESERVADA' && c.inicio >= ahora);
 
-  pacientesEspera: PacienteEspera[] = [
-    { iniciales: 'CR', nombre: 'Carlos Ruiz', motivo: 'Control post-cateterismo', hora: '09:30' },
-    { iniciales: 'AT', nombre: 'Ana Torres', motivo: 'Arritmia y palpitaciones', hora: '10:00' }
-  ];
+    return cita
+      ? {
+          paciente: cita.pacienteNombre,
+          dni: `••${cita.pacienteDni.slice(-4)}`,
+          especialidad: cita.especialidad,
+          hora: cita.hora,
+          fecha: cita.fecha === this.hoy ? 'Hoy' : formatearFecha(cita.fecha),
+        }
+      : null;
+  });
 
-  pacientesRecientes: PacienteReciente[] = [
-    { iniciales: 'ML', nombre: 'María López', ultima: '12/09/2026' },
-    { iniciales: 'CR', nombre: 'Carlos Ruiz', ultima: '05/09/2026' },
-    { iniciales: 'AT', nombre: 'Ana Torres', ultima: '28/08/2026' },
-    { iniciales: 'LM', nombre: 'Luis Mendoza', ultima: '20/08/2026' }
-  ];
+  readonly pacientesEspera = computed(() =>
+    this.agenda()
+      .filter((cita) => cita.estado === 'RESERVADA')
+      .map((cita) => ({
+        iniciales: iniciales(cita.pacienteNombre),
+        nombre: cita.pacienteNombre,
+        motivo: cita.motivo || 'Consulta médica programada',
+        hora: cita.hora,
+      }))
+  );
 
-  getEstadoClass(estado: string): string {
-    const map: { [key: string]: string } = {
-      'En consulta': 'badge-en-consulta',
-      'Pendiente': 'badge-pendiente',
-      'Atendida': 'badge-atendida'
+  readonly kpis = computed(() => {
+    const mesActual = this.hoy.slice(0, 7);
+    return {
+      consultasHoy: this.resumenHoy().total,
+      enEspera: this.pacientesEspera().length,
+      atencionesMes: this.citaService
+        .citas()
+        .filter((c) => c.estado === 'ATENDIDA' && c.fecha.startsWith(mesActual)).length,
+    };
+  });
+
+  // Últimos pacientes atendidos (uno por paciente, del más reciente al más antiguo)
+  readonly pacientesRecientes = computed(() => {
+    const vistos = new Set<number>();
+    return this.citaService
+      .citas()
+      .filter((c) => c.estado === 'ATENDIDA')
+      .sort((a, b) => b.inicio.localeCompare(a.inicio))
+      .filter((c) => !vistos.has(c.pacienteId) && vistos.add(c.pacienteId))
+      .slice(0, 4)
+      .map((c) => ({
+        iniciales: iniciales(c.pacienteNombre),
+        nombre: c.pacienteNombre,
+        ultima: formatearFecha(c.fecha),
+      }));
+  });
+
+  ngOnInit(): void {
+    this.citaService.cargar();
+  }
+
+  getEstadoLabel(estado: EstadoCita): string {
+    return ETIQUETAS_ESTADO_CITA[estado] ?? estado;
+  }
+
+  getEstadoClass(estado: EstadoCita): string {
+    const map: Record<EstadoCita, string> = {
+      RESERVADA: 'badge-pendiente',
+      ATENDIDA: 'badge-atendida',
+      CANCELADA: 'badge-cancelada',
+      AUSENTE: 'badge-no-asistio',
     };
     return map[estado] || '';
   }

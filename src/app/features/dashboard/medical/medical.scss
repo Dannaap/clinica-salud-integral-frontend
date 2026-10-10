@@ -479,6 +479,12 @@ $neutral-100: #f8f9fa;
   &-pendiente { background: #fff3cd; color: #664d03; }
   &-atendida { background: #cfe2ff; color: #084298; }
   &-en-espera { background: #fff3cd; color: #664d03; }
+  &-cancelada { background: #f8d7da; color: #842029; }
+  &-no-asistio { background: #e2e3e5; color: #41464b; }
+}
+
+a.btn-icon {
+  text-decoration: none;
 }
 
 // Botones de acción
