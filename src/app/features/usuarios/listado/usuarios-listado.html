@@ -14,7 +14,7 @@
       <p class="page-description">Crea, edita y administra las cuentas del personal de la clínica</p>
     </div>
     <div class="page-top-actions">
-      <button type="button" class="btn-new-user" aria-label="Nuevo usuario">
+      <button type="button" class="btn-new-user" aria-label="Nuevo usuario" (click)="abrirCrear()">
         <lucide-icon [img]="iconPlus"></lucide-icon>
         <span>NUEVO usuario</span>
       </button>
@@ -27,7 +27,7 @@
       <div class="kpi-info">
         <span class="kpi-title">TOTAL USUARIOS</span>
         <span class="kpi-number text-primary">{{ usuarioService.stats().totalUsuarios }}</span>
-        <span class="kpi-subtext">Activos en el sistema</span>
+        <span class="kpi-subtext">Registrados en el sistema</span>
       </div>
       <div class="kpi-icon-wrapper bg-soft-indigo">
         <lucide-icon [img]="iconUsers" class="icon-indigo"></lucide-icon>
@@ -75,10 +75,10 @@
       <input
         type="search"
         class="filter-search-input"
-        placeholder="Buscar por nombre o correo"
+        placeholder="Buscar por nombre, correo o DNI"
         [value]="usuarioService.busqueda()"
         (input)="onSearchInput($event)"
-        aria-label="Buscar por nombre o correo"
+        aria-label="Buscar por nombre, correo o DNI"
       />
     </div>
 
@@ -94,19 +94,6 @@
           <option value="ADMIN">Rol: Administrador</option>
           <option value="RECEPCION">Rol: Recepción</option>
           <option value="MEDICO">Rol: Médico</option>
-        </select>
-      </div>
-
-      <div class="select-wrapper">
-        <select
-          class="filter-select"
-          [value]="usuarioService.filtroEstado()"
-          (change)="onEstadoChange($event)"
-          aria-label="Filtrar por estado"
-        >
-          <option value="TODOS">Estado: Todos</option>
-          <option value="ACTIVO">Estado: Activo</option>
-          <option value="INACTIVO">Estado: Inactivo</option>
         </select>
       </div>
     </div>
@@ -131,8 +118,7 @@
             <th scope="col" class="th-usuario">USUARIO</th>
             <th scope="col" class="th-correo">CORREO</th>
             <th scope="col" class="th-rol">ROL</th>
-            <th scope="col" class="th-acceso">ÚLTIMO ACCESO</th>
-            <th scope="col" class="th-estado">ESTADO</th>
+            <th scope="col" class="th-dni">DNI</th>
             <th scope="col" class="th-acciones"><span class="sr-only">Acciones</span></th>
           </tr>
         </thead>
@@ -147,7 +133,7 @@
                   <div class="user-text-info">
                     <span class="user-fullname">{{ usuario.nombre }} {{ usuario.apellidos }}</span>
                     <span class="user-role-detail">
-                      {{ usuario.cargo || usuario.especialidad || 'Personal' }}
+                      {{ usuario.especialidad || obtenerEtiquetaRol(usuario.rol) }}
                     </span>
                   </div>
                 </div>
@@ -174,49 +160,50 @@
                 }
               </td>
 
-              <td class="td-acceso">
-                @let dateTime = obtenerFechaYHora(usuario.ultimoAcceso);
-                <div class="access-datetime">
-                  <span class="access-date">{{ dateTime.fecha }}</span>
-                  <span class="access-time">{{ dateTime.hora }}</span>
-                </div>
-              </td>
-
-              <td class="td-estado">
-                @if (usuario.activo) {
-                  <span class="badge-status status-active">
-                    <span class="status-dot"></span>
-                    <span>Activo</span>
-                  </span>
-                } @else {
-                  <span class="badge-status status-inactive">
-                    <span class="status-dot"></span>
-                    <span>Inactivo</span>
-                  </span>
-                }
+              <td class="td-dni">
+                <span class="dni-text">{{ usuario.dni }}</span>
               </td>
 
               <td class="td-acciones">
-                <button
-                  type="button"
-                  class="btn-view-action"
-                  (click)="verDetalleUsuario(usuario)"
-                  title="Ver detalle del usuario"
-                  aria-label="Ver detalle del usuario"
-                >
-                  <lucide-icon [img]="iconEye"></lucide-icon>
-                </button>
+                <div class="row-actions">
+                  <button
+                    type="button"
+                    class="btn-view-action"
+                    (click)="abrirEditar(usuario)"
+                    title="Editar usuario"
+                    aria-label="Editar usuario"
+                  >
+                    <lucide-icon [img]="iconPencil"></lucide-icon>
+                  </button>
+                  <button
+                    type="button"
+                    class="btn-view-action btn-delete-action"
+                    (click)="pedirEliminar(usuario)"
+                    [disabled]="esUsuarioActual(usuario)"
+                    [title]="esUsuarioActual(usuario) ? 'No puedes eliminar tu propia cuenta' : 'Eliminar usuario'"
+                    aria-label="Eliminar usuario"
+                  >
+                    <lucide-icon [img]="iconTrash"></lucide-icon>
+                  </button>
+                </div>
               </td>
             </tr>
           } @empty {
             <tr class="table-row-empty">
-              <td colspan="6" class="td-empty">
-                <div class="empty-state-box">
-                  <p class="empty-text">No se encontraron usuarios que coincidan con los filtros.</p>
-                  <button type="button" class="btn-empty-reset" (click)="limpiarFiltros()">
-                    Restablecer filtros
-                  </button>
-                </div>
+              <td colspan="5" class="td-empty">
+                @if (usuarioService.cargando()) {
+                  <div class="empty-state-box">
+                    <span class="spinner spinner-lg" aria-hidden="true"></span>
+                    <p class="empty-text">Cargando usuarios...</p>
+                  </div>
+                } @else {
+                  <div class="empty-state-box">
+                    <p class="empty-text">No se encontraron usuarios que coincidan con los filtros.</p>
+                    <button type="button" class="btn-empty-reset" (click)="limpiarFiltros()">
+                      Restablecer filtros
+                    </button>
+                  </div>
+                }
               </td>
             </tr>
           }
@@ -224,5 +211,131 @@
       </table>
     </div>
   </section>
+
+  <!-- 6. Modal de alta / edición de usuario -->
+  @if (modalFormularioAbierto()) {
+    <div class="modal-backdrop" (click)="cerrarFormulario()">
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-usuario" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <h2 class="modal-title" id="titulo-modal-usuario">
+              {{ usuarioEditando() ? 'Editar usuario' : 'Nuevo usuario' }}
+            </h2>
+            <p class="modal-subtitle">
+              {{ usuarioEditando() ? 'Actualiza los datos de la cuenta' : 'Registra una nueva cuenta del personal' }}
+            </p>
+          </div>
+          <button type="button" class="btn-close" (click)="cerrarFormulario()" aria-label="Cerrar">
+            <lucide-icon [img]="iconX"></lucide-icon>
+          </button>
+        </div>
+
+        <form [formGroup]="formulario" (ngSubmit)="guardar()" novalidate>
+          <div class="modal-body form-grid">
+            <div class="form-group">
+              <label class="form-label" for="usuario-nombres">Nombres</label>
+              <input id="usuario-nombres" type="text" class="form-input" formControlName="nombres" [class.is-invalid]="tieneError('nombres')" />
+              @if (tieneError('nombres')) {
+                <span class="form-error">Ingresa los nombres.</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="usuario-apellidos">Apellidos</label>
+              <input id="usuario-apellidos" type="text" class="form-input" formControlName="apellidos" [class.is-invalid]="tieneError('apellidos')" />
+              @if (tieneError('apellidos')) {
+                <span class="form-error">Ingresa los apellidos.</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="usuario-dni">DNI</label>
+              <input id="usuario-dni" type="text" inputmode="numeric" maxlength="8" class="form-input" formControlName="dni" [class.is-invalid]="tieneError('dni')" />
+              @if (tieneError('dni')) {
+                <span class="form-error">El DNI debe tener 8 dígitos.</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="usuario-rol">Rol</label>
+              <select id="usuario-rol" class="form-input" formControlName="rol">
+                <option value="ADMIN">Administrador</option>
+                <option value="RECEPCION">Recepción</option>
+                <option value="MEDICO">Médico</option>
+              </select>
+            </div>
+
+            <div class="form-group full-width">
+              <label class="form-label" for="usuario-email">Correo electrónico</label>
+              <input id="usuario-email" type="email" class="form-input" formControlName="email" autocomplete="off" [class.is-invalid]="tieneError('email')" />
+              @if (tieneError('email')) {
+                <span class="form-error">Ingresa un correo válido.</span>
+              }
+            </div>
+
+            @if (!usuarioEditando()) {
+              <div class="form-group full-width">
+                <label class="form-label" for="usuario-password">Contraseña</label>
+                <input id="usuario-password" type="password" class="form-input" formControlName="password" autocomplete="new-password" [class.is-invalid]="tieneError('password')" />
+                <span class="form-hint" [class.form-error]="tieneError('password')">
+                  Mínimo 8 caracteres, con mayúscula, minúscula, número y símbolo.
+                </span>
+              </div>
+            } @else {
+              <p class="form-hint full-width">El DNI, el correo y la contraseña no se modifican desde esta pantalla.</p>
+            }
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline" (click)="cerrarFormulario()" [disabled]="guardando()">
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="guardando()">
+              @if (guardando()) {
+                <span class="spinner" aria-hidden="true"></span>
+                <span>Guardando...</span>
+              } @else {
+                <span>{{ usuarioEditando() ? 'Guardar cambios' : 'Crear usuario' }}</span>
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- 7. Modal de confirmación de borrado -->
+  @if (usuarioAEliminar(); as usuario) {
+    <div class="modal-backdrop" (click)="cancelarEliminar()">
+      <div class="modal-card modal-sm" role="alertdialog" aria-modal="true" aria-labelledby="titulo-modal-eliminar" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2 class="modal-title" id="titulo-modal-eliminar">Eliminar usuario</h2>
+          <button type="button" class="btn-close" (click)="cancelarEliminar()" aria-label="Cerrar">
+            <lucide-icon [img]="iconX"></lucide-icon>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p class="modal-desc">
+            ¿Seguro que deseas eliminar la cuenta de
+            <strong>{{ usuario.nombre }} {{ usuario.apellidos }}</strong> ({{ usuario.email }})?
+            Esta acción no se puede deshacer.
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" (click)="cancelarEliminar()" [disabled]="eliminando()">
+            Cancelar
+          </button>
+          <button type="button" class="btn btn-danger" (click)="confirmarEliminar()" [disabled]="eliminando()">
+            @if (eliminando()) {
+              <span class="spinner" aria-hidden="true"></span>
+              <span>Eliminando...</span>
+            } @else {
+              <span>Eliminar</span>
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
 
 </div>
