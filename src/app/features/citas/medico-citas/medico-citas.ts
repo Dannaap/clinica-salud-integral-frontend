@@ -1,12 +1,20 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { Observable, finalize } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
-import { CitaConDetalle, CitaService } from '../../../core/services/cita.service';
-import { EstadoCita, TipoConsulta } from '../../../core/models/cita.model';
+import { CitaService } from '../../../core/services/cita.service';
+import { TurnoService } from '../../../core/services/turno.service';
+import { ToastService } from '../../../core/services/toast.service';
+import { Cita, ETIQUETAS_ESTADO_CITA, EstadoCita } from '../../../core/models/cita.model';
+import { Turno } from '../../../core/models/turno.model';
+import { formatearFecha, hoyIso } from '../../../core/utils/fechas';
 
 export type PestanaTiempo = 'hoy' | 'proximas' | 'todas';
+
+// Código CIE-10 que valida el backend: letra + 2 dígitos y subcategoría opcional (p. ej. K29.7)
+const PATRON_CIE10 = /^[A-Za-z][0-9]{2}(\.[A-Za-z0-9]{1,4})?$/;
 
 @Component({
   selector: 'app-medico-citas',
@@ -15,76 +23,91 @@ export type PestanaTiempo = 'hoy' | 'proximas' | 'todas';
   templateUrl: './medico-citas.html',
   styleUrl: './medico-citas.scss'
 })
-export class MedicoCitasComponent {
+export class MedicoCitasComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly citaService = inject(CitaService);
+  private readonly turnoService = inject(TurnoService);
+  private readonly toast = inject(ToastService);
 
-  get usuario() {
-    const info = this.authService.usuarioActual();
-    if (info) {
-      return {
-        nombre: info.nombreCompleto,
-        especialidad: info.especialidad ?? 'Cardiólogo',
-        iniciales: info.iniciales,
-      };
-    }
-    const u = this.authService.obtenerUsuario();
-    return {
-      nombre: u ? `Dr. ${u.nombre} ${u.apellidos}`.trim() : 'Dr. Axel Rojas',
-      especialidad: u?.especialidad ?? 'Cardiólogo',
-      iniciales: u ? `${u.nombre.charAt(0)}${u.apellidos.charAt(0)}`.toUpperCase() : 'AR',
-    };
-  }
+  readonly usuario = this.authService.usuarioActual;
+  readonly cargando = this.citaService.cargando;
 
-  readonly fechaHoy = '2026-09-14';
+  // Permisos según el rol (los mismos que aplica el backend)
+  readonly puedeAtender = computed(() => !!this.usuario()?.esMedico || !!this.usuario()?.esAdmin);
+  readonly puedeGestionar = computed(
+    () => !!this.usuario()?.esAdmin || !!this.usuario()?.esRecepcion
+  );
+
+  readonly fechaHoy = hoyIso();
 
   pestanaActiva = signal<PestanaTiempo>('hoy');
   estadoFiltro = signal<EstadoCita | 'TODOS'>('TODOS');
-  tipoFiltro = signal<TipoConsulta | 'TODOS'>('TODOS');
   busqueda = signal<string>('');
 
-  citaSeleccionada = signal<CitaConDetalle | null>(null);
-  get cita(): CitaConDetalle | null {
+  citaSeleccionada = signal<Cita | null>(null);
+  get cita(): Cita | null {
     return this.citaSeleccionada();
   }
   modalDetalleAbierto = signal<boolean>(false);
   modalAccionAbierto = signal<boolean>(false);
   accionTipo = signal<'atender' | 'cancelar' | 'reprogramar'>('atender');
+  procesando = signal<boolean>(false);
 
-  nuevaFechaReprogramar = signal<string>('2026-09-15');
-  nuevaHoraReprogramar = signal<string>('09:00');
-  motivoCancelacion = signal<string>('');
-  observacionesAtencion = signal<string>('');
-  mensajeFeedback = signal<{ tipo: 'success' | 'error'; texto: string } | null>(null);
+  // Formulario de atención
+  motivoConsulta = signal<string>('');
+  diagnostico = signal<string>('');
+  codigoCie10 = signal<string>('');
+  notasAtencion = signal<string>('');
 
-  kpis = computed(() => {
-    return this.citaService.obtenerResumenPorMedico(3, this.fechaHoy);
-  });
+  // Reprogramación: turnos libres del mismo médico
+  turnosDisponibles = signal<Turno[]>([]);
+  cargandoTurnos = signal<boolean>(false);
+  turnoSeleccionadoId = signal<number | null>(null);
+
+  // El backend ya entrega solo las citas del médico cuando el rol es MEDICO
+  kpis = computed(() => this.citaService.obtenerResumenDelDia(this.fechaHoy));
 
   citasFiltradas = computed(() => {
-    const todasDelMedico = this.citaService.obtenerCitasPorMedico(3);
     const pestana = this.pestanaActiva();
     const estado = this.estadoFiltro();
-    const tipo = this.tipoFiltro();
     const query = this.busqueda().trim().toLowerCase();
 
-    return todasDelMedico.filter((c) => {
+    return this.citaService.citas().filter((c) => {
       if (pestana === 'hoy' && c.fecha !== this.fechaHoy) return false;
       if (pestana === 'proximas' && c.fecha <= this.fechaHoy) return false;
       if (estado !== 'TODOS' && c.estado !== estado) return false;
-      if (tipo !== 'TODOS' && c.tipo !== tipo) return false;
 
       if (query) {
         const matchNombre = c.pacienteNombre.toLowerCase().includes(query);
         const matchDni = c.pacienteDni.includes(query);
-        const matchHc = c.historiaClinica?.toLowerCase().includes(query) ?? false;
+        const matchMedico = c.medicoNombre.toLowerCase().includes(query);
         const matchMotivo = c.motivo?.toLowerCase().includes(query) ?? false;
-        if (!matchNombre && !matchDni && !matchHc && !matchMotivo) return false;
+        if (!matchNombre && !matchDni && !matchMedico && !matchMotivo) return false;
       }
 
       return true;
     });
   });
+
+  // El formulario activo está completo y puede enviarse
+  accionValida = computed(() => {
+    switch (this.accionTipo()) {
+      case 'atender':
+        return (
+          !!this.motivoConsulta().trim() &&
+          !!this.diagnostico().trim() &&
+          PATRON_CIE10.test(this.codigoCie10().trim())
+        );
+      case 'reprogramar':
+        return this.turnoSeleccionadoId() !== null;
+      default:
+        return true;
+    }
+  });
+
+  ngOnInit(): void {
+    this.citaService.cargar();
+  }
 
   cambiarPestana(pestana: PestanaTiempo): void {
     this.pestanaActiva.set(pestana);
@@ -98,34 +121,46 @@ export class MedicoCitasComponent {
     this.busqueda.set(valor);
   }
 
-  abrirDetalle(cita: CitaConDetalle): void {
+  abrirDetalle(cita: Cita): void {
     this.citaSeleccionada.set(cita);
     this.modalDetalleAbierto.set(true);
   }
 
-  iniciarConsulta(cita: CitaConDetalle): void {
+  iniciarConsulta(cita: Cita): void {
     this.citaSeleccionada.set(cita);
     this.accionTipo.set('atender');
-    this.observacionesAtencion.set(cita.observaciones ?? '');
+    this.motivoConsulta.set(cita.motivo ?? '');
+    this.diagnostico.set('');
+    this.codigoCie10.set('');
+    this.notasAtencion.set('');
     this.modalAccionAbierto.set(true);
   }
 
-  abrirReprogramar(cita: CitaConDetalle): void {
+  abrirReprogramar(cita: Cita): void {
     this.citaSeleccionada.set(cita);
     this.accionTipo.set('reprogramar');
-    this.nuevaFechaReprogramar.set('2026-09-15');
-    this.nuevaHoraReprogramar.set('09:00');
+    this.turnoSeleccionadoId.set(null);
+    this.turnosDisponibles.set([]);
     this.modalAccionAbierto.set(true);
+
+    this.cargandoTurnos.set(true);
+    this.turnoService
+      .listarDisponibles(cita.medicoId)
+      .pipe(finalize(() => this.cargandoTurnos.set(false)))
+      .subscribe({
+        next: (turnos) => this.turnosDisponibles.set(turnos),
+        error: () => {},
+      });
   }
 
-  abrirCancelar(cita: CitaConDetalle): void {
+  abrirCancelar(cita: Cita): void {
     this.citaSeleccionada.set(cita);
     this.accionTipo.set('cancelar');
-    this.motivoCancelacion.set('');
     this.modalAccionAbierto.set(true);
   }
 
   cerrarModales(): void {
+    if (this.procesando()) return;
     this.modalDetalleAbierto.set(false);
     this.modalAccionAbierto.set(false);
     this.citaSeleccionada.set(null);
@@ -133,46 +168,56 @@ export class MedicoCitasComponent {
 
   ejecutarAccion(): void {
     const cita = this.citaSeleccionada();
-    if (!cita) return;
+    if (!cita || !this.accionValida() || this.procesando()) return;
+
+    let peticion: Observable<unknown>;
+    let mensajeExito: string;
 
     if (this.accionTipo() === 'atender') {
-      this.citaService.actualizarEstadoCita(cita.id, 'ATENDIDA', this.observacionesAtencion());
-      this.mostrarNotificacion('success', `La consulta con ${cita.pacienteNombre} fue registrada como atendida.`);
+      peticion = this.citaService.registrarAtencion({
+        citaId: cita.id,
+        motivoConsulta: this.motivoConsulta().trim(),
+        diagnostico: this.diagnostico().trim(),
+        codigoCie10: this.codigoCie10().trim().toUpperCase(),
+        notas: this.notasAtencion().trim() || undefined,
+      });
+      mensajeExito = `La consulta con ${cita.pacienteNombre} fue registrada como atendida.`;
     } else if (this.accionTipo() === 'reprogramar') {
-      this.citaService.reprogramarCita(cita.id, this.nuevaFechaReprogramar(), this.nuevaHoraReprogramar());
-      this.mostrarNotificacion('success', `Cita reprogramada con éxito para el ${this.nuevaFechaReprogramar()} a las ${this.nuevaHoraReprogramar()}.`);
-    } else if (this.accionTipo() === 'cancelar') {
-      this.citaService.cancelarCita(cita.id, this.motivoCancelacion());
-      this.mostrarNotificacion('success', `La cita con ${cita.pacienteNombre} ha sido cancelada.`);
+      const turno = this.turnosDisponibles().find((t) => t.id === this.turnoSeleccionadoId())!;
+      peticion = this.citaService.reprogramar(cita.id, turno.id);
+      mensajeExito = `Cita reprogramada con éxito para el ${this.fecha(turno.fecha)} a las ${turno.horaInicio}.`;
+    } else {
+      peticion = this.citaService.cancelar(cita.id);
+      mensajeExito = `La cita con ${cita.pacienteNombre} ha sido cancelada.`;
     }
 
-    this.cerrarModales();
+    this.procesando.set(true);
+    peticion.pipe(finalize(() => this.procesando.set(false))).subscribe({
+      next: () => {
+        this.toast.exito(mensajeExito);
+        this.procesando.set(false);
+        this.cerrarModales();
+      },
+      // El mensaje de error lo muestra el interceptor global
+      error: () => {},
+    });
   }
 
-  private mostrarNotificacion(tipo: 'success' | 'error', texto: string): void {
-    this.mensajeFeedback.set({ tipo, texto });
-    setTimeout(() => {
-      this.mensajeFeedback.set(null);
-    }, 4500);
+  fecha(fechaIso: string): string {
+    return formatearFecha(fechaIso);
+  }
+
+  getEstadoLabel(estado: EstadoCita): string {
+    return ETIQUETAS_ESTADO_CITA[estado] ?? estado;
   }
 
   getEstadoClass(estado: EstadoCita): string {
     switch (estado) {
-      case 'CONFIRMADA': return 'badge-confirmada';
-      case 'PENDIENTE': return 'badge-pendiente';
+      case 'RESERVADA': return 'badge-pendiente';
       case 'ATENDIDA': return 'badge-atendida';
       case 'CANCELADA': return 'badge-cancelada';
+      case 'AUSENTE': return 'badge-ausente';
       default: return '';
-    }
-  }
-
-  getTipoLabel(tipo: TipoConsulta): string {
-    switch (tipo) {
-      case 'CONSULTA_GENERAL': return 'Consulta General';
-      case 'CONTROL': return 'Control';
-      case 'EMERGENCIA': return 'Emergencia';
-      case 'SEGUIMIENTO': return 'Seguimiento';
-      default: return tipo;
     }
   }
 }

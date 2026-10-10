@@ -1,27 +1,18 @@
 <main class="content">
-  <!-- Feedback Toast -->
-  @if (mensajeFeedback(); as fb) {
-    <div class="feedback-banner" [ngClass]="fb.tipo">
-      <span class="material-symbols-outlined">{{ fb.tipo === 'success' ? 'check_circle' : 'error' }}</span>
-      <span>{{ fb.texto }}</span>
-    </div>
-  }
-
   <!-- Header / Banner de sección -->
   <section class="page-title-row">
     <div class="title-info">
       <h1 class="page-main-heading">Agenda de Consultas</h1>
       <p class="page-sub-heading">
-        Gestión de pacientes citados para <span class="highlight">Dr. Axel Rojas</span> • Especialidad de Cardiología
+        @if (usuario()?.esMedico) {
+          Gestión de pacientes citados para <span class="highlight">{{ usuario()?.nombreCompleto }}</span>
+          @if (usuario()?.especialidad) {
+            • Especialidad de {{ usuario()?.especialidad }}
+          }
+        } @else {
+          Citas de <span class="highlight">todos los médicos</span> de la clínica
+        }
       </p>
-    </div>
-
-    <div class="assigned-office">
-      <span class="material-symbols-outlined">meeting_room</span>
-      <div>
-        <span class="office-label">Consultorio Asignado</span>
-        <span class="office-value">Consultorio 3 • Piso 2</span>
-      </div>
     </div>
   </section>
 
@@ -32,28 +23,18 @@
         <span class="material-symbols-outlined">calendar_month</span>
       </div>
       <div class="kpi-body">
-        <span class="kpi-number">{{ kpis().totalHoy }}</span>
+        <span class="kpi-number">{{ kpis().total }}</span>
         <span class="kpi-label">Citas del día</span>
       </div>
     </div>
 
-    <div class="kpi-card" (click)="setEstadoFiltro('PENDIENTE')">
+    <div class="kpi-card" (click)="setEstadoFiltro('RESERVADA')">
       <div class="kpi-icon pending">
         <span class="material-symbols-outlined">hourglass_top</span>
       </div>
       <div class="kpi-body">
-        <span class="kpi-number">{{ kpis().pendientes }}</span>
-        <span class="kpi-label">En espera / Pendientes</span>
-      </div>
-    </div>
-
-    <div class="kpi-card" (click)="setEstadoFiltro('CONFIRMADA')">
-      <div class="kpi-icon confirmed">
-        <span class="material-symbols-outlined">verified</span>
-      </div>
-      <div class="kpi-body">
-        <span class="kpi-number">{{ kpis().confirmadas }}</span>
-        <span class="kpi-label">Confirmadas</span>
+        <span class="kpi-number">{{ kpis().reservadas }}</span>
+        <span class="kpi-label">Reservadas / Por atender</span>
       </div>
     </div>
 
@@ -64,6 +45,16 @@
       <div class="kpi-body">
         <span class="kpi-number">{{ kpis().atendidas }}</span>
         <span class="kpi-label">Atendidas</span>
+      </div>
+    </div>
+
+    <div class="kpi-card" (click)="setEstadoFiltro('CANCELADA')">
+      <div class="kpi-icon cancelled">
+        <span class="material-symbols-outlined">event_busy</span>
+      </div>
+      <div class="kpi-body">
+        <span class="kpi-number">{{ kpis().canceladas }}</span>
+        <span class="kpi-label">Canceladas</span>
       </div>
     </div>
   </section>
@@ -78,7 +69,7 @@
           [class.active]="pestanaActiva() === 'hoy'"
           (click)="cambiarPestana('hoy')">
           <span class="material-symbols-outlined">today</span>
-          <span>Hoy (14 Sep)</span>
+          <span>Hoy ({{ fecha(fechaHoy) }})</span>
         </button>
         <button
           type="button"
@@ -102,7 +93,7 @@
         <span class="material-symbols-outlined search-icon">search</span>
         <input
           type="text"
-          placeholder="Buscar por nombre, DNI o HC..."
+          placeholder="Buscar por paciente, DNI o médico..."
           [ngModel]="busqueda()"
           (ngModelChange)="onBuscar($event)" />
       </div>
@@ -120,16 +111,9 @@
       <button
         type="button"
         class="chip-btn"
-        [class.active]="estadoFiltro() === 'CONFIRMADA'"
-        (click)="setEstadoFiltro('CONFIRMADA')">
-        Confirmadas
-      </button>
-      <button
-        type="button"
-        class="chip-btn"
-        [class.active]="estadoFiltro() === 'PENDIENTE'"
-        (click)="setEstadoFiltro('PENDIENTE')">
-        Pendientes
+        [class.active]="estadoFiltro() === 'RESERVADA'"
+        (click)="setEstadoFiltro('RESERVADA')">
+        Reservadas
       </button>
       <button
         type="button"
@@ -144,6 +128,13 @@
         [class.active]="estadoFiltro() === 'CANCELADA'"
         (click)="setEstadoFiltro('CANCELADA')">
         Canceladas
+      </button>
+      <button
+        type="button"
+        class="chip-btn"
+        [class.active]="estadoFiltro() === 'AUSENTE'"
+        (click)="setEstadoFiltro('AUSENTE')">
+        No asistieron
       </button>
     </div>
   </section>
@@ -163,8 +154,8 @@
           <tr>
             <th>Hora / Fecha</th>
             <th>Paciente</th>
-            <th>Motivo / Diagnóstico</th>
-            <th>Tipo</th>
+            <th>Motivo</th>
+            <th>Médico</th>
             <th>Estado</th>
             <th class="text-right">Acciones</th>
           </tr>
@@ -174,7 +165,7 @@
             <td class="col-time">
               <div class="time-box">
                 <span class="time-main">{{ cita.hora }}</span>
-                <span class="date-sub">{{ cita.fecha }}</span>
+                <span class="date-sub">{{ fecha(cita.fecha) }}</span>
               </div>
             </td>
 
@@ -186,7 +177,7 @@
                 <div class="patient-meta">
                   <span class="patient-name">{{ cita.pacienteNombre }}</span>
                   <span class="patient-sub">
-                    DNI: <strong>{{ cita.pacienteDni }}</strong> • {{ cita.historiaClinica }}
+                    DNI: <strong>{{ cita.pacienteDni }}</strong>
                   </span>
                 </div>
               </div>
@@ -197,19 +188,19 @@
             </td>
 
             <td class="col-type">
-              <span class="type-badge">{{ getTipoLabel(cita.tipo) }}</span>
+              <span class="type-badge">{{ cita.medicoNombre }}</span>
             </td>
 
             <td class="col-status">
               <span class="badge" [ngClass]="getEstadoClass(cita.estado)">
-                {{ cita.estado }}
+                {{ getEstadoLabel(cita.estado) }}
               </span>
             </td>
 
             <td class="col-actions text-right">
               <div class="actions-group">
                 <button
-                  *ngIf="cita.estado !== 'ATENDIDA' && cita.estado !== 'CANCELADA'"
+                  *ngIf="cita.estado === 'RESERVADA' && puedeAtender()"
                   class="btn-action btn-attend"
                   type="button"
                   title="Atender consulta"
@@ -221,13 +212,13 @@
                 <button
                   class="btn-action btn-view"
                   type="button"
-                  title="Ver detalle del paciente"
+                  title="Ver detalle de la cita"
                   (click)="abrirDetalle(cita)">
                   <span class="material-symbols-outlined">visibility</span>
                 </button>
 
                 <button
-                  *ngIf="cita.estado !== 'ATENDIDA' && cita.estado !== 'CANCELADA'"
+                  *ngIf="cita.estado === 'RESERVADA' && puedeGestionar()"
                   class="btn-action btn-reschedule"
                   type="button"
                   title="Reprogramar cita"
@@ -236,7 +227,7 @@
                 </button>
 
                 <button
-                  *ngIf="cita.estado !== 'ATENDIDA' && cita.estado !== 'CANCELADA'"
+                  *ngIf="cita.estado === 'RESERVADA' && puedeGestionar()"
                   class="btn-action btn-cancel"
                   type="button"
                   title="Cancelar cita"
@@ -250,16 +241,22 @@
       </table>
     </div>
 
-    <!-- Estado vacío -->
+    <!-- Estado de carga / vacío -->
     <ng-template #emptyState>
-      <div class="empty-state">
-        <span class="material-symbols-outlined empty-icon">event_busy</span>
-        <h3 class="empty-title">No se encontraron citas</h3>
-        <p class="empty-desc">No hay citas programadas que coincidan con los filtros seleccionados.</p>
-        <button class="btn btn-outline" (click)="setEstadoFiltro('TODOS'); onBuscar('')">
-          Limpiar filtros
-        </button>
+      <div class="empty-state" *ngIf="cargando(); else sinCitas">
+        <span class="spinner spinner-lg" aria-hidden="true"></span>
+        <p class="empty-desc">Cargando citas...</p>
       </div>
+      <ng-template #sinCitas>
+        <div class="empty-state">
+          <span class="material-symbols-outlined empty-icon">event_busy</span>
+          <h3 class="empty-title">No se encontraron citas</h3>
+          <p class="empty-desc">No hay citas programadas que coincidan con los filtros seleccionados.</p>
+          <button class="btn btn-outline" (click)="setEstadoFiltro('TODOS'); onBuscar(''); cambiarPestana('todas')">
+            Ver todas las citas
+          </button>
+        </div>
+      </ng-template>
     </ng-template>
   </section>
 </main>
@@ -271,8 +268,8 @@
       <div class="modal-title-box">
         <span class="material-symbols-outlined icon-header">assignment_ind</span>
         <div>
-          <h3 class="modal-title">Expediente de Cita</h3>
-          <span class="modal-subtitle">{{ cita.historiaClinica }} • {{ cita.fecha }} - {{ cita.hora }} hrs</span>
+          <h3 class="modal-title">Detalle de la Cita</h3>
+          <span class="modal-subtitle">{{ fecha(cita.fecha) }} • {{ cita.hora }} – {{ cita.horaFin }} hrs</span>
         </div>
       </div>
       <button class="btn-close" (click)="cerrarModales()" type="button" aria-label="Cerrar">
@@ -292,35 +289,31 @@
             <span class="item-title">Documento DNI:</span>
             <span class="item-value">{{ cita.pacienteDni }}</span>
           </div>
-          <div class="detail-item">
-            <span class="item-title">Historia Clínica:</span>
-            <span class="item-value">{{ cita.historiaClinica }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="item-title">Consultorio:</span>
-            <span class="item-value">{{ cita.consultorio }}</span>
-          </div>
         </div>
       </div>
 
       <div class="detail-section">
         <h4 class="section-label">Información de la Consulta</h4>
         <div class="detail-grid">
-          <div class="detail-item full-width">
-            <span class="item-title">Motivo de la Cita:</span>
-            <p class="item-text">{{ cita.motivo }}</p>
+          <div class="detail-item">
+            <span class="item-title">Médico:</span>
+            <span class="item-value">{{ cita.medicoNombre }}</span>
           </div>
           <div class="detail-item">
-            <span class="item-title">Tipo:</span>
-            <span class="type-badge">{{ getTipoLabel(cita.tipo) }}</span>
+            <span class="item-title">Especialidad:</span>
+            <span class="item-value">{{ cita.especialidad }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="item-title">Duración:</span>
+            <span class="item-value">{{ cita.duracion }} minutos</span>
           </div>
           <div class="detail-item">
             <span class="item-title">Estado Actual:</span>
-            <span class="badge" [ngClass]="getEstadoClass(cita.estado)">{{ cita.estado }}</span>
+            <span class="badge" [ngClass]="getEstadoClass(cita.estado)">{{ getEstadoLabel(cita.estado) }}</span>
           </div>
           <div class="detail-item full-width">
-            <span class="item-title">Observaciones Clínicas / Antecedentes:</span>
-            <p class="item-text">{{ cita.observaciones || 'Sin observaciones adicionales registradas.' }}</p>
+            <span class="item-title">Motivo de la Cita:</span>
+            <p class="item-text">{{ cita.motivo || 'Sin motivo registrado.' }}</p>
           </div>
         </div>
       </div>
@@ -329,10 +322,10 @@
     <div class="modal-footer">
       <button class="btn btn-outline" type="button" (click)="cerrarModales()">Cerrar</button>
       <button
-        *ngIf="cita.estado !== 'ATENDIDA' && cita.estado !== 'CANCELADA'"
+        *ngIf="cita.estado === 'RESERVADA' && puedeAtender()"
         class="btn btn-primary"
         type="button"
-        (click)="cerrarModales(); iniciarConsulta(cita)">
+        (click)="modalDetalleAbierto.set(false); iniciarConsulta(cita)">
         <span class="material-symbols-outlined">stethoscope</span>
         <span>Atender Consulta</span>
       </button>
@@ -364,82 +357,112 @@
       <!-- Caso ATENDER -->
       <div *ngIf="accionTipo() === 'atender'" class="form-modal">
         <p class="modal-desc">
-          Vas a registrar la atención médica con <strong>{{ cita.pacienteNombre }}</strong>. Ingresa las notas clínicas o indicaciones para el expediente.
+          Vas a registrar la atención médica con <strong>{{ cita.pacienteNombre }}</strong>. Al guardar, la cita quedará como atendida.
         </p>
         <div class="form-group">
-          <label class="form-label" for="notasAtencion">Notas de la consulta y diagnóstico</label>
+          <label class="form-label" for="motivoConsulta">Motivo de la consulta *</label>
+          <input
+            id="motivoConsulta"
+            type="text"
+            class="form-control"
+            placeholder="Ej. Dolor abdominal de 3 días de evolución"
+            [ngModel]="motivoConsulta()"
+            (ngModelChange)="motivoConsulta.set($event)" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="diagnostico">Diagnóstico *</label>
+          <textarea
+            id="diagnostico"
+            class="form-control"
+            rows="3"
+            placeholder="Escribe el diagnóstico de la consulta..."
+            [ngModel]="diagnostico()"
+            (ngModelChange)="diagnostico.set($event)"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="codigoCie10">Código CIE-10 *</label>
+          <input
+            id="codigoCie10"
+            type="text"
+            class="form-control"
+            maxlength="8"
+            placeholder="Ej. K29.7"
+            [ngModel]="codigoCie10()"
+            (ngModelChange)="codigoCie10.set($event)" />
+          <span class="form-hint">Una letra y dos dígitos, con subcategoría opcional (A00, K29.7).</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="notasAtencion">Notas e indicaciones</label>
           <textarea
             id="notasAtencion"
             class="form-control"
-            rows="4"
-            placeholder="Escribe el diagnóstico, indicaciones o tratamiento recetado..."
-            [ngModel]="observacionesAtencion()"
-            (ngModelChange)="observacionesAtencion.set($event)"></textarea>
+            rows="3"
+            placeholder="Indicaciones o tratamiento (opcional)..."
+            [ngModel]="notasAtencion()"
+            (ngModelChange)="notasAtencion.set($event)"></textarea>
         </div>
       </div>
 
       <!-- Caso REPROGRAMAR -->
       <div *ngIf="accionTipo() === 'reprogramar'" class="form-modal">
         <p class="modal-desc">
-          Selecciona la nueva fecha y hora para la consulta de <strong>{{ cita.pacienteNombre }}</strong>.
+          Selecciona el nuevo turno de <strong>{{ cita.medicoNombre }}</strong> para la consulta de
+          <strong>{{ cita.pacienteNombre }}</strong> (actual: {{ fecha(cita.fecha) }} {{ cita.hora }}).
         </p>
         <div class="form-group">
-          <label class="form-label" for="nuevaFecha">Nueva Fecha</label>
-          <input
-            id="nuevaFecha"
-            type="date"
-            class="form-control"
-            [ngModel]="nuevaFechaReprogramar()"
-            (ngModelChange)="nuevaFechaReprogramar.set($event)" />
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="nuevaHora">Nueva Hora</label>
-          <select
-            id="nuevaHora"
-            class="form-control"
-            [ngModel]="nuevaHoraReprogramar()"
-            (ngModelChange)="nuevaHoraReprogramar.set($event)">
-            <option value="09:00">09:00 hrs</option>
-            <option value="09:30">09:30 hrs</option>
-            <option value="10:00">10:00 hrs</option>
-            <option value="10:30">10:30 hrs</option>
-            <option value="11:00">11:00 hrs</option>
-            <option value="11:30">11:30 hrs</option>
-            <option value="12:00">12:00 hrs</option>
-          </select>
+          <label class="form-label" for="nuevoTurno">Turnos disponibles</label>
+          <div class="modal-loading" *ngIf="cargandoTurnos(); else selectorTurnos">
+            <span class="spinner" aria-hidden="true"></span>
+            <span>Buscando turnos disponibles...</span>
+          </div>
+          <ng-template #selectorTurnos>
+            <select
+              *ngIf="turnosDisponibles().length > 0; else sinTurnos"
+              id="nuevoTurno"
+              class="form-control"
+              [ngModel]="turnoSeleccionadoId()"
+              (ngModelChange)="turnoSeleccionadoId.set($event)">
+              <option [ngValue]="null" disabled>Selecciona un turno...</option>
+              <option *ngFor="let turno of turnosDisponibles()" [ngValue]="turno.id">
+                {{ fecha(turno.fecha) }} • {{ turno.horaInicio }} – {{ turno.horaFin }} hrs
+              </option>
+            </select>
+            <ng-template #sinTurnos>
+              <p class="modal-desc modal-warning-desc">
+                Este médico no tiene turnos futuros disponibles. Registra un turno antes de reprogramar.
+              </p>
+            </ng-template>
+          </ng-template>
         </div>
       </div>
 
       <!-- Caso CANCELAR -->
       <div *ngIf="accionTipo() === 'cancelar'" class="form-modal">
         <p class="modal-desc modal-warning-desc">
-          ¿Estás seguro de cancelar la cita médica programada con <strong>{{ cita.pacienteNombre }}</strong> para las {{ cita.hora }}?
+          ¿Estás seguro de cancelar la cita médica programada con <strong>{{ cita.pacienteNombre }}</strong>
+          para el {{ fecha(cita.fecha) }} a las {{ cita.hora }}? El turno quedará libre nuevamente.
         </p>
-        <div class="form-group">
-          <label class="form-label" for="motivoCancel">Motivo de cancelación (opcional)</label>
-          <input
-            id="motivoCancel"
-            type="text"
-            class="form-control"
-            placeholder="Ej. Paciente solicitó reprogramación o no se presentó..."
-            [ngModel]="motivoCancelacion()"
-            (ngModelChange)="motivoCancelacion.set($event)" />
-        </div>
       </div>
     </div>
 
     <div class="modal-footer">
-      <button class="btn btn-outline" type="button" (click)="cerrarModales()">Cancelar</button>
+      <button class="btn btn-outline" type="button" (click)="cerrarModales()" [disabled]="procesando()">
+        {{ accionTipo() === 'cancelar' ? 'Volver' : 'Cancelar' }}
+      </button>
       <button
         class="btn"
         [ngClass]="accionTipo() === 'cancelar' ? 'btn-danger' : 'btn-primary'"
         type="button"
+        [disabled]="procesando() || !accionValida()"
         (click)="ejecutarAccion()">
-        <span class="material-symbols-outlined">
-          {{ accionTipo() === 'atender' ? 'check_circle' : (accionTipo() === 'reprogramar' ? 'save' : 'delete') }}
-        </span>
+        <span class="spinner" aria-hidden="true" *ngIf="procesando(); else iconoAccion"></span>
+        <ng-template #iconoAccion>
+          <span class="material-symbols-outlined">
+            {{ accionTipo() === 'atender' ? 'check_circle' : (accionTipo() === 'reprogramar' ? 'save' : 'delete') }}
+          </span>
+        </ng-template>
         <span>
-          {{ accionTipo() === 'atender' ? 'Finalizar y Atender' : (accionTipo() === 'reprogramar' ? 'Guardar Cambios' : 'Confirmar Cancelación') }}
+          {{ procesando() ? 'Procesando...' : (accionTipo() === 'atender' ? 'Finalizar y Atender' : (accionTipo() === 'reprogramar' ? 'Guardar Cambios' : 'Confirmar Cancelación')) }}
         </span>
       </button>
     </div>
