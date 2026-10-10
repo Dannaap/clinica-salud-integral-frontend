@@ -1,6 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, finalize, map, tap } from 'rxjs';
+import { MedicoService } from './medico.service';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../models/api-response.model';
 import {
@@ -18,9 +19,18 @@ export class UsuarioService {
   private readonly http = inject(HttpClient);
   private readonly url = `${environment.apiUrl}/usuarios`;
 
+  private readonly medicoService = inject(MedicoService);
+
   // Usuarios de la clínica tal como los devuelve el backend
   private readonly _usuarios = signal<Usuario[]>([]);
-  readonly usuarios = this._usuarios.asReadonly();
+
+  // Usuarios con la especialidad de su perfil médico (cuando lo tienen)
+  readonly usuarios = computed<Usuario[]>(() =>
+    this._usuarios().map((usuario) => ({
+      ...usuario,
+      especialidad: this.medicoService.buscarPorUsuario(usuario.id)?.especialidad,
+    }))
+  );
 
   // Estado de la carga del listado
   readonly cargando = signal<boolean>(false);
@@ -31,7 +41,7 @@ export class UsuarioService {
 
   // Estadísticas KPI computadas dinámicamente
   readonly stats = computed<UsuarioStats>(() => {
-    const list = this._usuarios();
+    const list = this.usuarios();
     const admins = list.filter((u) => u.rol === 'ADMIN').length;
     const recepcion = list.filter((u) => u.rol === 'RECEPCION').length;
     const medicos = list.filter((u) => u.rol === 'MEDICO').length;
@@ -55,7 +65,7 @@ export class UsuarioService {
     const termino = this.busqueda().trim().toLowerCase();
     const rol = this.filtroRol();
 
-    return this._usuarios().filter((usuario) => {
+    return this.usuarios().filter((usuario) => {
       // Filtro por texto (nombre, apellidos, correo o DNI)
       const nombreCompleto = `${usuario.nombre} ${usuario.apellidos}`.toLowerCase();
       const email = usuario.email.toLowerCase();
@@ -87,6 +97,7 @@ export class UsuarioService {
 
   // Recarga el listado y refleja el estado de carga en `cargando`
   cargar(): void {
+    this.medicoService.cargar();
     this.cargando.set(true);
     this.listarTodos()
       .pipe(finalize(() => this.cargando.set(false)))
