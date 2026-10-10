@@ -5,6 +5,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, startWith } from 'rxjs';
 import { SidebarComponent } from '../sidebar/sidebar';
 import { HeaderComponent } from '../header/header';
+import { AuthService } from '../../../core/services/auth.service';
 
 // Textos del header que cada ruta hija puede definir en `data.header`
 export interface HeaderConfig {
@@ -28,6 +29,10 @@ const HEADER_POR_DEFECTO: HeaderConfig = {
 })
 export class AdminLayoutComponent {
   private readonly router = inject(Router);
+  private readonly authService = inject(AuthService);
+
+  // Usuario de la sesión activa, mostrado en el sidebar
+  readonly usuario = this.authService.usuarioActual;
 
   sidebarAbierto = false;
 

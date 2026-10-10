@@ -15,11 +15,13 @@ export class PerfilComponent {
 
   get usuario() {
     const u = this.authService.obtenerUsuario();
+    const info = this.authService.usuarioActual();
     return {
-      nombre: u ? `${u.nombre} ${u.apellidos}` : 'Juan Pérez',
-      email: u?.email ?? 'admin@clinica.com',
-      rol: 'Administrador',
-      telefono: '+51 987 654 321',
+      nombre: info?.nombreCompleto ?? '',
+      iniciales: info?.iniciales ?? '',
+      email: u?.email ?? '',
+      rol: info?.rolLabel ?? '',
+      dni: u?.dni ?? '',
     };
   }
 }

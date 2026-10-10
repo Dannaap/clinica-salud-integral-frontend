@@ -1,5 +1,12 @@
 <div class="layout-wrapper">
-  <app-sidebar [abierto]="sidebarAbierto"></app-sidebar>
+  <app-sidebar
+    [abierto]="sidebarAbierto"
+    [nombre]="usuario()?.nombreCompleto ?? ''"
+    [rol]="usuario()?.rolLabel ?? ''"
+    [iniciales]="usuario()?.iniciales ?? ''"
+    [esAdmin]="!!usuario()?.esAdmin"
+    [esMedico]="!!usuario()?.esMedico"
+  ></app-sidebar>
 
   <div class="sidebar-overlay" *ngIf="sidebarAbierto" (click)="sidebarAbierto = false"></div>
 
