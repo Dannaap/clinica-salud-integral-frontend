@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { catchError, of, switchMap, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AuthService } from '../services/auth.service';
+import { sinToastDeError } from '../utils/http-context';
 
 // Adjunta el JWT a las peticiones dirigidas al backend y cierra la sesión
 // cuando el servidor deja de reconocerla.
@@ -53,7 +54,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
         // /cuenta solo exige estar autenticado: si también falla, la sesión es inválida
         // (y esa misma petición, al pasar por este interceptor, la cierra).
-        return http.get(`${apiUrl}/cuenta`).pipe(
+        const context = sinToastDeError();
+        return http.get(`${apiUrl}/cuenta`, { context }).pipe(
           catchError(() => of(null)),
           switchMap(() => throwError(() => error))
         );

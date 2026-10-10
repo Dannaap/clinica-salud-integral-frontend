@@ -1,5 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
 import { Observable, catchError, map, of, switchMap, tap, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../models/api-response.model';
@@ -13,6 +13,7 @@ import {
   UsuarioDTO,
 } from '../models/usuario.model';
 import { obtenerMensajeError } from '../utils/http-error';
+import { sinToastDeError } from '../utils/http-context';
 
 export interface UsuarioSesionInfo {
   nombreCompleto: string;
@@ -68,8 +69,11 @@ export class AuthService {
   }
 
   login(credentials: LoginRequest): Observable<LoginResponse> {
+    // Los errores del login se muestran en el propio formulario, no como toast
+    const context = sinToastDeError();
+
     return this.http
-      .post<ApiResponse<AuthResponse>>(`${this.apiUrl}/auth/login`, credentials)
+      .post<ApiResponse<AuthResponse>>(`${this.apiUrl}/auth/login`, credentials, { context })
       .pipe(
         map((respuesta) => respuesta.data),
         // El login solo devuelve token, email y rol: el resto del perfil sale de /cuenta
@@ -93,9 +97,12 @@ export class AuthService {
   }
 
   private obtenerPerfil(auth: AuthResponse): Observable<Usuario> {
-    const headers = { Authorization: `Bearer ${auth.token}` };
+    const opciones = {
+      headers: { Authorization: `Bearer ${auth.token}` },
+      context: sinToastDeError(),
+    };
 
-    return this.http.get<ApiResponse<UsuarioDTO>>(`${this.apiUrl}/cuenta`, { headers }).pipe(
+    return this.http.get<ApiResponse<UsuarioDTO>>(`${this.apiUrl}/cuenta`, opciones).pipe(
       map(({ data }) => ({
         id: data.id,
         dni: data.dni,
@@ -107,7 +114,7 @@ export class AuthService {
       })),
       switchMap((usuario) =>
         usuario.rol === 'MEDICO'
-          ? this.obtenerEspecialidad(usuario.id, headers).pipe(
+          ? this.obtenerEspecialidad(usuario.id, opciones).pipe(
               map((especialidad) => ({ ...usuario, especialidad }))
             )
           : of(usuario)
@@ -118,12 +125,12 @@ export class AuthService {
   // La especialidad del médico vive en su perfil médico, no en la cuenta de usuario
   private obtenerEspecialidad(
     usuarioId: number,
-    headers: Record<string, string>
+    opciones: { headers: Record<string, string>; context: HttpContext }
   ): Observable<string | undefined> {
     return this.http
       .get<ApiResponse<Array<{ usuarioId: number; especialidad: string }>>>(
         `${this.apiUrl}/medicos`,
-        { headers }
+        opciones
       )
       .pipe(
         map(({ data }) => data.find((m) => m.usuarioId === usuarioId)?.especialidad),
