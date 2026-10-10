@@ -11,10 +11,21 @@ export type DiaSemana =
 // Franja del día a la que pertenece el turno (se deriva de la hora de inicio)
 export type FranjaTurno = 'MAÑANA' | 'TARDE' | 'NOCHE';
 
-// Estado operativo del turno
-export type EstadoTurno = 'ACTIVO' | 'INACTIVO';
+// Un turno está reservado cuando ya tiene una cita vigente asignada
+export type EstadoTurno = 'DISPONIBLE' | 'RESERVADO';
 
-// Turno médico: bloque de horario semanal asignado a un médico
+// Turno tal como lo expone el backend (pe.saludintegral.clinica.turnos.TurnoResponse)
+export interface TurnoDTO {
+  id: number;
+  medicoId: number;
+  medico: string;
+  especialidad: string;
+  inicio: string; // formato: '2026-09-14T08:00:00'
+  fin: string;
+  disponible: boolean;
+}
+
+// Turno médico: bloque de horario con fecha asignado a un médico
 export interface Turno {
   id: number;
   medicoId: number;
@@ -22,16 +33,25 @@ export interface Turno {
   especialidad: string;
   iniciales: string;
   diaSemana: DiaSemana;
+  fecha: string; // formato: '2026-09-14'
   horaInicio: string; // formato: '08:00'
   horaFin: string; // formato: '13:00'
-  consultorio: string;
+  inicio: string; // formato: '2026-09-14T08:00:00'
+  fin: string;
   estado: EstadoTurno;
+}
+
+// Filtros que acepta GET /turnos
+export interface FiltrosTurno {
+  medicoId?: number;
+  desde?: Date;
+  hasta?: Date;
 }
 
 // Resumen estadístico para las tarjetas KPI del módulo de turnos
 export interface ResumenTurnos {
   totalTurnos: number;
-  turnosActivos: number;
+  turnosDisponibles: number;
+  turnosReservados: number;
   medicosConTurno: number;
-  consultoriosEnUso: number;
 }

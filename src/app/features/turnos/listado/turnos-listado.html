@@ -21,7 +21,7 @@
       <div class="kpi-info">
         <span class="kpi-title">TOTAL DE TURNOS</span>
         <span class="kpi-number text-primary">{{ turnoService.stats().totalTurnos }}</span>
-        <span class="kpi-subtext">Bloques horarios registrados</span>
+        <span class="kpi-subtext">Bloques horarios de la semana</span>
       </div>
       <div class="kpi-icon-wrapper bg-soft-indigo">
         <lucide-icon [img]="iconCalendarClock" class="icon-indigo"></lucide-icon>
@@ -30,9 +30,9 @@
 
     <div class="kpi-card-item">
       <div class="kpi-info">
-        <span class="kpi-title">TURNOS ACTIVOS</span>
-        <span class="kpi-number text-green">{{ turnoService.stats().turnosActivos }}</span>
-        <span class="kpi-subtext">Vigentes esta semana</span>
+        <span class="kpi-title">TURNOS DISPONIBLES</span>
+        <span class="kpi-number text-green">{{ turnoService.stats().turnosDisponibles }}</span>
+        <span class="kpi-subtext">Sin cita asignada</span>
       </div>
       <div class="kpi-icon-wrapper bg-soft-brown">
         <lucide-icon [img]="iconCalendarCheck" class="icon-brown"></lucide-icon>
@@ -52,12 +52,12 @@
 
     <div class="kpi-card-item">
       <div class="kpi-info">
-        <span class="kpi-title">CONSULTORIOS EN USO</span>
-        <span class="kpi-number text-dark-blue">{{ turnoService.stats().consultoriosEnUso }}</span>
-        <span class="kpi-subtext">Ambientes ocupados</span>
+        <span class="kpi-title">TURNOS RESERVADOS</span>
+        <span class="kpi-number text-dark-blue">{{ turnoService.stats().turnosReservados }}</span>
+        <span class="kpi-subtext">Con cita asignada</span>
       </div>
       <div class="kpi-icon-wrapper bg-soft-purple">
-        <lucide-icon [img]="iconDoorOpen" class="icon-purple"></lucide-icon>
+        <lucide-icon [img]="iconCalendarX" class="icon-purple"></lucide-icon>
       </div>
     </div>
   </section>
@@ -69,10 +69,10 @@
       <input
         type="search"
         class="filter-search-input"
-        placeholder="Buscar por médico, especialidad o consultorio"
+        placeholder="Buscar por médico o especialidad"
         [value]="turnoService.busqueda()"
         (input)="onSearchInput($event)"
-        aria-label="Buscar por médico, especialidad o consultorio"
+        aria-label="Buscar por médico o especialidad"
       />
     </div>
 
@@ -127,8 +127,8 @@
           aria-label="Filtrar por estado"
         >
           <option value="TODOS">Estado: Todos</option>
-          <option value="ACTIVO">Estado: Activo</option>
-          <option value="INACTIVO">Estado: Inactivo</option>
+          <option value="DISPONIBLE">Estado: Disponible</option>
+          <option value="RESERVADO">Estado: Reservado</option>
         </select>
       </div>
     </div>
@@ -150,6 +150,41 @@
       Mostrando <strong>{{ turnoService.turnosFiltrados().length }}</strong>
       de {{ turnoService.stats().totalTurnos }} turnos
     </span>
+
+    <div class="week-nav" role="group" aria-label="Semana visible">
+      <button
+        type="button"
+        class="week-nav-btn"
+        (click)="turnoService.cambiarSemana(-1)"
+        [disabled]="turnoService.cargando()"
+        aria-label="Semana anterior"
+      >
+        <lucide-icon [img]="iconChevronLeft"></lucide-icon>
+      </button>
+      <span class="week-nav-range">{{ rangoSemana() }}</span>
+      <button
+        type="button"
+        class="week-nav-btn"
+        (click)="turnoService.cambiarSemana(1)"
+        [disabled]="turnoService.cargando()"
+        aria-label="Semana siguiente"
+      >
+        <lucide-icon [img]="iconChevronRight"></lucide-icon>
+      </button>
+      @if (turnoService.desplazamientoSemanas() !== 0) {
+        <button
+          type="button"
+          class="week-nav-today"
+          (click)="turnoService.irASemanaActual()"
+          [disabled]="turnoService.cargando()"
+        >
+          Semana actual
+        </button>
+      }
+      @if (turnoService.cargando()) {
+        <span class="spinner" aria-label="Cargando turnos"></span>
+      }
+    </div>
 
     <div class="view-toggle" role="group" aria-label="Tipo de vista">
       <button
@@ -195,14 +230,14 @@
             <button
               type="button"
               class="shift-card"
-              [class.is-inactive]="turno.estado === 'INACTIVO'"
+              [class.is-inactive]="turno.estado === 'RESERVADO'"
               (click)="verHorarioSemanal(turno)"
               [attr.aria-label]="'Ver horario semanal de ' + turno.medicoNombre"
             >
               <span class="shift-time">{{ turno.horaInicio }} – {{ turno.horaFin }}</span>
               <span class="shift-doctor">{{ turno.medicoNombre }}</span>
               <span class="shift-specialty">{{ turno.especialidad }}</span>
-              <span class="shift-office">{{ turno.consultorio }}</span>
+              <span class="shift-office">{{ turno.estado === 'DISPONIBLE' ? 'Disponible' : 'Reservado' }}</span>
             </button>
           } @empty {
             <p class="week-day-empty">Sin turnos</p>
@@ -221,7 +256,6 @@
             <th scope="col" class="th-medico">MÉDICO</th>
             <th scope="col" class="th-dia">FECHA</th>
             <th scope="col" class="th-horario">HORARIO</th>
-            <th scope="col" class="th-consultorio">CONSULTORIO</th>
             <th scope="col" class="th-estado">ESTADO</th>
             <th scope="col" class="th-acciones"><span class="sr-only">Acciones</span></th>
           </tr>
@@ -255,22 +289,17 @@
                 <span class="horario-text">{{ turno.horaInicio }} – {{ turno.horaFin }}</span>
               </td>
 
-              <!-- Consultorio -->
-              <td class="td-consultorio">
-                <span class="consultorio-text">{{ turno.consultorio }}</span>
-              </td>
-
               <!-- Estado -->
               <td class="td-estado">
-                @if (turno.estado === 'ACTIVO') {
+                @if (turno.estado === 'DISPONIBLE') {
                   <span class="badge-status status-active">
                     <span class="status-dot"></span>
-                    <span>Activo</span>
+                    <span>Disponible</span>
                   </span>
                 } @else {
                   <span class="badge-status status-inactive">
                     <span class="status-dot"></span>
-                    <span>Inactivo</span>
+                    <span>Reservado</span>
                   </span>
                 }
               </td>
@@ -290,13 +319,24 @@
             </tr>
           } @empty {
             <tr class="table-row-empty">
-              <td colspan="6" class="td-empty">
-                <div class="empty-state-box">
-                  <p class="empty-text">No se encontraron turnos que coincidan con los filtros.</p>
-                  <button type="button" class="btn-empty-reset" (click)="limpiarFiltros()">
-                    Restablecer filtros
-                  </button>
-                </div>
+              <td colspan="5" class="td-empty">
+                @if (turnoService.cargando()) {
+                  <div class="empty-state-box">
+                    <span class="spinner spinner-lg" aria-hidden="true"></span>
+                    <p class="empty-text">Cargando turnos...</p>
+                  </div>
+                } @else if (turnoService.stats().totalTurnos === 0) {
+                  <div class="empty-state-box">
+                    <p class="empty-text">No hay turnos programados para esta semana.</p>
+                  </div>
+                } @else {
+                  <div class="empty-state-box">
+                    <p class="empty-text">No se encontraron turnos que coincidan con los filtros.</p>
+                    <button type="button" class="btn-empty-reset" (click)="limpiarFiltros()">
+                      Restablecer filtros
+                    </button>
+                  </div>
+                }
               </td>
             </tr>
           }
@@ -332,19 +372,16 @@
             <div class="horario-item">
               <div class="horario-item-day">{{ fechaDia(turno.diaSemana) }}</div>
               <div class="horario-item-time">{{ turno.horaInicio }} – {{ turno.horaFin }}</div>
-              <div class="horario-item-office">
-                <span>{{ turno.consultorio }}</span>
-              </div>
               <div class="horario-item-status">
-                @if (turno.estado === 'ACTIVO') {
+                @if (turno.estado === 'DISPONIBLE') {
                   <span class="badge-status status-active">
                     <span class="status-dot"></span>
-                    <span>Activo</span>
+                    <span>Disponible</span>
                   </span>
                 } @else {
                   <span class="badge-status status-inactive">
                     <span class="status-dot"></span>
-                    <span>Inactivo</span>
+                    <span>Reservado</span>
                   </span>
                 }
               </div>

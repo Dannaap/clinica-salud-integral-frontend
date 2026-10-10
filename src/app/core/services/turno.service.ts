@@ -1,16 +1,38 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { UsuarioService } from './usuario.service';
-import { Usuario } from '../models/usuario.model';
-import { DiaSemana, EstadoTurno, FranjaTurno, ResumenTurnos, Turno } from '../models/turno.model';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable, finalize, map } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import { ApiResponse } from '../models/api-response.model';
+import {
+  DiaSemana,
+  EstadoTurno,
+  FiltrosTurno,
+  FranjaTurno,
+  ResumenTurnos,
+  Turno,
+  TurnoDTO,
+} from '../models/turno.model';
+import {
+  aFechaHoraIso,
+  desdeFechaHoraIso,
+  iniciales,
+  parteFecha,
+  parteHora,
+} from '../utils/fechas';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TurnoService {
-  private readonly usuarioService = inject(UsuarioService);
+  private readonly http = inject(HttpClient);
+  private readonly url = `${environment.apiUrl}/turnos`;
 
-  // Turnos base generados a partir de los médicos registrados en el sistema
-  private readonly _turnos = signal<Turno[]>(this.generarTurnosIniciales());
+  // Turnos de la semana visible, tal como los devuelve el backend
+  private readonly _turnos = signal<Turno[]>([]);
+  readonly turnos = this._turnos.asReadonly();
+
+  // Estado de la carga del listado
+  readonly cargando = signal<boolean>(false);
 
   // Filtros reactivos con Signals
   readonly busqueda = signal<string>('');
@@ -30,14 +52,17 @@ export class TurnoService {
     'DOMINGO',
   ];
 
-  // Fecha de referencia (hoy) para ubicar los turnos en la semana actual
+  // Fecha de referencia (hoy)
   readonly hoy = signal<Date>(new Date());
 
-  // Fecha exacta de cada día de la semana actual (lunes a domingo)
+  // Semana visible respecto a la actual (0 = esta semana, 1 = la siguiente, ...)
+  readonly desplazamientoSemanas = signal<number>(0);
+
+  // Fecha exacta de cada día de la semana visible (lunes a domingo)
   readonly fechasSemana = computed<Record<DiaSemana, Date>>(() => {
     const hoy = this.hoy();
     const lunes = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
-    lunes.setDate(lunes.getDate() - ((lunes.getDay() + 6) % 7));
+    lunes.setDate(lunes.getDate() - ((lunes.getDay() + 6) % 7) + this.desplazamientoSemanas() * 7);
 
     return this.diasSemana.reduce(
       (fechas, dia, i) => {
@@ -56,14 +81,13 @@ export class TurnoService {
   // Estadísticas KPI computadas dinámicamente
   readonly stats = computed<ResumenTurnos>(() => {
     const lista = this._turnos();
-    const medicosConTurno = new Set(lista.map((t) => t.medicoId)).size;
-    const consultoriosEnUso = new Set(lista.map((t) => t.consultorio)).size;
+    const disponibles = lista.filter((t) => t.estado === 'DISPONIBLE').length;
 
     return {
       totalTurnos: lista.length,
-      turnosActivos: lista.filter((t) => t.estado === 'ACTIVO').length,
-      medicosConTurno,
-      consultoriosEnUso,
+      turnosDisponibles: disponibles,
+      turnosReservados: lista.length - disponibles,
+      medicosConTurno: new Set(lista.map((t) => t.medicoId)).size,
     };
   });
 
@@ -80,8 +104,7 @@ export class TurnoService {
         const coincideTexto =
           !termino ||
           turno.medicoNombre.toLowerCase().includes(termino) ||
-          turno.especialidad.toLowerCase().includes(termino) ||
-          turno.consultorio.toLowerCase().includes(termino);
+          turno.especialidad.toLowerCase().includes(termino);
 
         const coincideDia = dia === 'TODOS' || turno.diaSemana === dia;
         const coincideEstado = estado === 'TODOS' || turno.estado === estado;
@@ -94,10 +117,7 @@ export class TurnoService {
         );
       })
       .sort(
-        (a, b) =>
-          this.ordenDia(a.diaSemana) - this.ordenDia(b.diaSemana) ||
-          a.horaInicio.localeCompare(b.horaInicio) ||
-          a.medicoNombre.localeCompare(b.medicoNombre)
+        (a, b) => a.inicio.localeCompare(b.inicio) || a.medicoNombre.localeCompare(b.medicoNombre)
       );
   });
 
@@ -110,14 +130,71 @@ export class TurnoService {
     }));
   });
 
-  // Todos los turnos de un médico específico (para la vista de horario semanal)
+  // ─── Llamadas al backend ──────────────────────────────────
+
+  // GET /turnos con filtros opcionales por médico y rango de fechas
+  listar(filtros: FiltrosTurno = {}): Observable<Turno[]> {
+    let params = new HttpParams();
+    if (filtros.medicoId !== undefined) {
+      params = params.set('medicoId', filtros.medicoId);
+    }
+    // El backend exige indicar ambas fechas del rango
+    if (filtros.desde && filtros.hasta) {
+      params = params
+        .set('desde', aFechaHoraIso(filtros.desde))
+        .set('hasta', aFechaHoraIso(filtros.hasta));
+    }
+
+    return this.http
+      .get<ApiResponse<TurnoDTO[]>>(this.url, { params })
+      .pipe(map(({ data }) => data.map((dto) => this.aTurno(dto))));
+  }
+
+  // Turnos sin cita asignada y con fecha futura, para reservar o reprogramar
+  listarDisponibles(medicoId?: number): Observable<Turno[]> {
+    const ahora = aFechaHoraIso(new Date());
+    return this.listar({ medicoId }).pipe(
+      map((turnos) =>
+        turnos
+          .filter((t) => t.estado === 'DISPONIBLE' && t.inicio > ahora)
+          .sort((a, b) => a.inicio.localeCompare(b.inicio))
+      )
+    );
+  }
+
+  // Carga los turnos de la semana visible y refleja el estado en `cargando`
+  cargar(): void {
+    const desde = this.fechasSemana().LUNES;
+    const hasta = new Date(desde.getFullYear(), desde.getMonth(), desde.getDate() + 7);
+
+    this.cargando.set(true);
+    this.listar({ desde, hasta })
+      .pipe(finalize(() => this.cargando.set(false)))
+      .subscribe({
+        next: (turnos) => this._turnos.set(turnos),
+        error: () => this._turnos.set([]),
+      });
+  }
+
+  // Cambia la semana visible y recarga sus turnos
+  cambiarSemana(semanas: number): void {
+    this.desplazamientoSemanas.update((actual) => actual + semanas);
+    this.cargar();
+  }
+
+  irASemanaActual(): void {
+    this.desplazamientoSemanas.set(0);
+    this.cargar();
+  }
+
+  // Todos los turnos de un médico en la semana visible (vista de horario semanal)
   obtenerTurnosPorMedico(medicoId: number): Turno[] {
     return this._turnos()
       .filter((t) => t.medicoId === medicoId)
-      .sort((a, b) => this.ordenDia(a.diaSemana) - this.ordenDia(b.diaSemana));
+      .sort((a, b) => a.inicio.localeCompare(b.inicio));
   }
 
-  // Fecha exacta en la semana actual del día indicado
+  // Fecha exacta en la semana visible del día indicado
   obtenerFecha(dia: DiaSemana): Date {
     return this.fechasSemana()[dia];
   }
@@ -162,48 +239,24 @@ export class TurnoService {
     return 'NOCHE';
   }
 
-  private ordenDia(dia: DiaSemana): number {
-    return this.diasSemana.indexOf(dia);
-  }
+  // Adapta el TurnoResponse del backend al modelo que usan las vistas
+  private aTurno(dto: TurnoDTO): Turno {
+    const inicio = desdeFechaHoraIso(dto.inicio);
 
-  // Genera turnos semanales de ejemplo para cada médico activo de la clínica
-  private generarTurnosIniciales(): Turno[] {
-    const medicos = this.usuarioService.usuarios().filter((u) => u.rol === 'MEDICO');
-
-    const patrones: Array<{
-      dias: DiaSemana[];
-      horaInicio: string;
-      horaFin: string;
-    }> = [
-      { dias: ['LUNES', 'MIERCOLES', 'VIERNES'], horaInicio: '08:00', horaFin: '13:00' },
-      { dias: ['MARTES', 'JUEVES'], horaInicio: '14:00', horaFin: '19:00' },
-      { dias: ['SABADO'], horaInicio: '09:00', horaFin: '12:00' },
-    ];
-
-    let idCounter = 1;
-    const turnos: Turno[] = [];
-
-    medicos.forEach((medico: Usuario, index: number) => {
-      const patron = patrones[index % patrones.length];
-      const consultorio = `Consultorio ${(index % 6) + 1}`;
-      const estado: EstadoTurno = medico.activo === false ? 'INACTIVO' : 'ACTIVO';
-
-      patron.dias.forEach((dia) => {
-        turnos.push({
-          id: idCounter++,
-          medicoId: medico.id,
-          medicoNombre: `${medico.nombre} ${medico.apellidos}`.trim(),
-          especialidad: medico.especialidad ?? 'Medicina General',
-          iniciales: medico.iniciales ?? 'MD',
-          diaSemana: dia,
-          horaInicio: patron.horaInicio,
-          horaFin: patron.horaFin,
-          consultorio,
-          estado,
-        });
-      });
-    });
-
-    return turnos;
+    return {
+      id: dto.id,
+      medicoId: dto.medicoId,
+      medicoNombre: dto.medico,
+      especialidad: dto.especialidad,
+      iniciales: iniciales(dto.medico),
+      // getDay(): 0 = domingo ... 6 = sábado
+      diaSemana: this.diasSemana[(inicio.getDay() + 6) % 7],
+      fecha: parteFecha(dto.inicio),
+      horaInicio: parteHora(dto.inicio),
+      horaFin: parteHora(dto.fin),
+      inicio: dto.inicio,
+      fin: dto.fin,
+      estado: dto.disponible ? 'DISPONIBLE' : 'RESERVADO',
+    };
   }
 }

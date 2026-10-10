@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -7,7 +7,9 @@ import {
   CalendarClock,
   CalendarCheck2,
   Stethoscope,
-  DoorOpen,
+  CalendarX2,
+  ChevronLeft,
+  ChevronRight,
   Search,
   X,
   Eye,
@@ -24,14 +26,16 @@ import { DiaSemana, EstadoTurno, FranjaTurno, Turno } from '../../../core/models
   templateUrl: './turnos-listado.html',
   styleUrl: './turnos-listado.scss',
 })
-export class TurnosListadoComponent {
+export class TurnosListadoComponent implements OnInit {
   readonly turnoService = inject(TurnoService);
 
   // Iconos Lucide
   readonly iconCalendarClock = CalendarClock;
   readonly iconCalendarCheck = CalendarCheck2;
   readonly iconStethoscope = Stethoscope;
-  readonly iconDoorOpen = DoorOpen;
+  readonly iconCalendarX = CalendarX2;
+  readonly iconChevronLeft = ChevronLeft;
+  readonly iconChevronRight = ChevronRight;
   readonly iconSearch = Search;
   readonly iconX = X;
   readonly iconEye = Eye;
@@ -50,6 +54,17 @@ export class TurnosListadoComponent {
     if (id === null) return [];
     return this.turnoService.obtenerTurnosPorMedico(id);
   });
+
+  ngOnInit(): void {
+    this.turnoService.cargar();
+  }
+
+  // Rango de fechas de la semana visible, formato dd/mm – dd/mm/aaaa
+  rangoSemana(): string {
+    const lunes = this.fechaDia('LUNES');
+    const domingo = this.fechaDia('DOMINGO');
+    return `${lunes.slice(0, 5)} – ${domingo}`;
+  }
 
   // Acciones de filtros
   onSearchInput(event: Event): void {
