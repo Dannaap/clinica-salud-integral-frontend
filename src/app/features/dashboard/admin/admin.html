@@ -1,14 +1,14 @@
 <main class="content">
   <section class="greeting-section">
     <h1 class="greeting-title">
-      Buenos días, {{ usuario.nombre }} <span class="wave">👋</span>
+      {{ saludo }}, {{ usuario.nombre }} <span class="wave">👋</span>
     </h1>
     <p class="greeting-subtitle">
-      Hoy es lunes, 14 de septiembre de 2026
+      Hoy es {{ fechaHoy }}
       <span class="separator">•</span>
-      12 citas programadas
+      {{ resumenHoy().total }} citas programadas
       <span class="separator">•</span>
-      <span class="highlight">3 pacientes en espera</span>
+      <span class="highlight">{{ resumenHoy().reservadas }} por atender</span>
     </p>
   </section>
 
@@ -17,16 +17,16 @@
       <div class="kpi-top">
         <div class="kpi-text">
           <span class="kpi-item-label">Citas hoy</span>
-          <span class="kpi-item-value is-primary">{{ kpis.citasHoy }}</span>
+          <span class="kpi-item-value is-primary">{{ kpis().citasHoy }}</span>
         </div>
         <div class="kpi-item-icon is-primary">
           <span class="material-symbols-outlined">calendar_today</span>
         </div>
       </div>
       <div class="kpi-item-footer">
-        <span>3 pendientes</span>
+        <span>{{ resumenHoy().reservadas }} por atender</span>
         <span class="dot"></span>
-        <span class="strong">9 confirmadas</span>
+        <span class="strong">{{ resumenHoy().atendidas }} atendidas</span>
       </div>
     </div>
 
@@ -34,15 +34,15 @@
       <div class="kpi-top">
         <div class="kpi-text">
           <span class="kpi-item-label">Pacientes registrados</span>
-          <span class="kpi-item-value">{{ kpis.pacientesRegistrados }}</span>
+          <span class="kpi-item-value">{{ kpis().pacientesRegistrados }}</span>
         </div>
         <div class="kpi-item-icon is-primary">
           <span class="material-symbols-outlined">group</span>
         </div>
       </div>
-      <div class="kpi-item-footer is-success">
-        <span class="material-symbols-outlined">trending_up</span>
-        <span>+5 esta semana</span>
+      <div class="kpi-item-footer">
+        <span class="material-symbols-outlined">badge</span>
+        <span>Padrón total de la clínica</span>
       </div>
     </div>
 
@@ -50,23 +50,23 @@
       <div class="kpi-top">
         <div class="kpi-text">
           <span class="kpi-item-label">Tasa de inasistencias</span>
-          <span class="kpi-item-value is-danger">{{ kpis.tasaInasistencias }}%</span>
+          <span class="kpi-item-value is-danger">{{ kpis().tasaInasistencias }}%</span>
         </div>
         <div class="kpi-item-icon is-danger">
           <span class="material-symbols-outlined">warning</span>
         </div>
       </div>
-      <div class="kpi-item-footer is-success">
-        <span class="material-symbols-outlined">arrow_downward</span>
-        <span>-2% vs semana pasada</span>
+      <div class="kpi-item-footer">
+        <span class="material-symbols-outlined">event_busy</span>
+        <span>{{ kpis().inasistencias }} inasistencias registradas</span>
       </div>
     </div>
 
     <div class="kpi-item">
       <div class="kpi-top">
         <div class="kpi-text">
-          <span class="kpi-item-label">Historias clínicas</span>
-          <span class="kpi-item-value">{{ kpis.historiasClinicas }}</span>
+          <span class="kpi-item-label">Atenciones registradas</span>
+          <span class="kpi-item-value">{{ kpis().atenciones }}</span>
         </div>
         <div class="kpi-item-icon is-primary">
           <span class="material-symbols-outlined">assignment</span>
@@ -74,7 +74,7 @@
       </div>
       <div class="kpi-item-footer is-success">
         <span class="material-symbols-outlined">check_circle</span>
-        <span>0 registros duplicados</span>
+        <span>Citas con atención médica</span>
       </div>
     </div>
   </section>
@@ -84,16 +84,12 @@
       <div class="card-header">
         <div class="card-title-wrapper">
           <span class="material-symbols-outlined text-primary">event_available</span>
-          <h2 class="card-title">Próximas citas de hoy</h2>
+          <h2 class="card-title">Citas de hoy</h2>
         </div>
-        <button
-          type="button"
-          class="link-primary"
-          (click)="mostrarProximamente('Listado completo de citas')"
-        >
+        <a class="link-primary" routerLink="/citas">
           <span>Ver todas</span>
           <span class="material-symbols-outlined">arrow_forward</span>
-        </button>
+        </a>
       </div>
 
       <div class="table-wrapper">
@@ -109,34 +105,29 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let cita of citas">
+            <tr *ngFor="let cita of citas()">
               <td class="time-cell">{{ cita.hora }}</td>
-              <td class="patient-cell">{{ cita.paciente }}</td>
-              <td>{{ cita.medico }}</td>
+              <td class="patient-cell">{{ cita.pacienteNombre }}</td>
+              <td>{{ cita.medicoNombre }}</td>
               <td>{{ cita.especialidad }}</td>
               <td>
                 <span class="badge" [ngClass]="getEstadoClass(cita.estado)">
-                  {{ cita.estado }}
+                  {{ getEstadoLabel(cita.estado) }}
                 </span>
               </td>
               <td class="text-center">
                 <div class="action-buttons">
-                  <button
-                    class="btn-icon"
-                    title="Ver detalles"
-                    type="button"
-                    (click)="mostrarProximamente('Detalles de cita')"
-                  >
+                  <a class="btn-icon" title="Ver en la agenda de citas" routerLink="/citas">
                     <span class="material-symbols-outlined">visibility</span>
-                  </button>
-                  <button
-                    class="btn-icon"
-                    title="Editar cita"
-                    type="button"
-                    (click)="mostrarProximamente('Editar cita')"
-                  >
-                    <span class="material-symbols-outlined">edit</span>
-                  </button>
+                  </a>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="citas().length === 0">
+              <td colspan="6">
+                <div class="estado-vacio">
+                  <span class="spinner spinner-lg" aria-hidden="true" *ngIf="cargandoCitas()"></span>
+                  <span>{{ cargandoCitas() ? 'Cargando citas...' : 'No hay citas programadas para hoy.' }}</span>
                 </div>
               </td>
             </tr>
@@ -199,28 +190,28 @@
         <span class="material-symbols-outlined text-primary">medical_services</span>
         <h2 class="card-title">Nuestro equipo médico</h2>
       </div>
-      <button
-        type="button"
-        class="link-primary"
-        (click)="mostrarProximamente('Directorio médico completo')"
-      >
+      <a class="link-primary" routerLink="/usuarios">
         <span>Ver todos</span>
         <span class="material-symbols-outlined">arrow_forward</span>
-      </button>
+      </a>
     </div>
 
-    <div class="doctor-grid">
-      <div class="doctor-card" *ngFor="let doctor of doctores">
+    <div class="doctor-grid" *ngIf="doctores().length > 0; else sinMedicos">
+      <div class="doctor-card" *ngFor="let doctor of doctores()">
         <div class="doctor-photo-wrapper">
-          <img [src]="doctor.foto" [alt]="doctor.nombre" class="doctor-photo" />
+          <div class="doctor-photo avatar-iniciales" aria-hidden="true">{{ doctor.iniciales }}</div>
           <span class="status-dot" [class.available]="doctor.disponible"></span>
         </div>
         <h3 class="doctor-name">{{ doctor.nombre }}</h3>
         <span class="doctor-specialty">{{ doctor.especialidad }}</span>
-        <button class="btn-doctor" type="button" (click)="mostrarProximamente('Agenda de ' + doctor.nombre)">
-          Ver agenda
-        </button>
+        <a class="btn-doctor" routerLink="/turnos">Ver turnos</a>
       </div>
     </div>
+    <ng-template #sinMedicos>
+      <div class="estado-vacio">
+        <span class="spinner spinner-lg" aria-hidden="true" *ngIf="cargandoMedicos()"></span>
+        <span>{{ cargandoMedicos() ? 'Cargando equipo médico...' : 'Aún no hay médicos registrados.' }}</span>
+      </div>
+    </ng-template>
   </section>
 </main>

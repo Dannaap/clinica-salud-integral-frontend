@@ -44,6 +44,24 @@ export function hoyIso(): string {
   return aFechaIso(new Date());
 }
 
+// Fecha de hoy en texto: 'lunes, 14 de septiembre de 2026'
+export function fechaLargaDeHoy(): string {
+  return new Intl.DateTimeFormat('es-PE', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(new Date());
+}
+
+// Saludo según la hora del día
+export function saludoDelDia(): string {
+  const hora = new Date().getHours();
+  if (hora < 12) return 'Buenos días';
+  if (hora < 19) return 'Buenas tardes';
+  return 'Buenas noches';
+}
+
 // Iniciales a partir de un nombre completo: 'Axel Rojas' -> 'AR'
 export function iniciales(nombreCompleto: string): string {
   const partes = nombreCompleto.trim().split(/\s+/).filter(Boolean);

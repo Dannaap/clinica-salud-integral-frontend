@@ -260,6 +260,13 @@
 .badge-pendiente  { background: #fff3cd; color: #664d03; }
 .badge-atendida   { background: #cfe2ff; color: #084298; }
 .badge-no-asistio { background: #e2e3e5; color: #41464b; }
+.badge-cancelada  { background: #f8d7da; color: #842029; }
+
+a.btn-icon,
+a.btn-doctor,
+a.link-primary {
+  text-decoration: none;
+}
 
 .action-buttons {
   display: inline-flex;

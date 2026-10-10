@@ -1,22 +1,12 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
-
-interface Cita {
-  hora: string;
-  paciente: string;
-  medico: string;
-  especialidad: string;
-  estado: 'Confirmada' | 'Pendiente' | 'Atendida' | 'No asistió';
-}
-
-interface Doctor {
-  nombre: string;
-  especialidad: string;
-  foto: string;
-  disponible: boolean;
-}
+import { CitaService } from '../../../core/services/cita.service';
+import { MedicoService } from '../../../core/services/medico.service';
+import { PacienteService } from '../../pacientes/paciente.service';
+import { ETIQUETAS_ESTADO_CITA, EstadoCita } from '../../../core/models/cita.model';
+import { fechaLargaDeHoy, hoyIso, iniciales, saludoDelDia } from '../../../core/utils/fechas';
 
 @Component({
   selector: 'app-admin',
@@ -25,78 +15,74 @@ interface Doctor {
   templateUrl: './admin.html',
   styleUrl: './admin.scss',
 })
-export class AdminComponent {
+export class AdminComponent implements OnInit {
   private readonly authService = inject(AuthService);
+  private readonly citaService = inject(CitaService);
+  private readonly pacienteService = inject(PacienteService);
+  private readonly medicoService = inject(MedicoService);
+
+  readonly saludo = saludoDelDia();
+  readonly fechaHoy = fechaLargaDeHoy();
+  private readonly hoy = hoyIso();
+
+  readonly cargandoCitas = this.citaService.cargando;
+  readonly cargandoMedicos = this.medicoService.cargando;
 
   get usuario() {
     const info = this.authService.usuarioActual();
-    if (info) {
-      return {
-        nombre: info.nombreCompleto,
-        rol: info.rolLabel,
-        iniciales: info.iniciales,
-      };
-    }
-    const u = this.authService.obtenerUsuario();
-    const nombre = u ? `${u.nombre} ${u.apellidos}`.trim() : 'Dr. Juan Pérez';
-    const iniciales = u
-      ? `${u.nombre.charAt(0)}${u.apellidos.charAt(0)}`.toUpperCase()
-      : 'JP';
     return {
-      nombre,
-      rol: 'Administrador',
-      iniciales,
+      nombre: info?.nombreCompleto ?? '',
+      rol: info?.rolLabel ?? '',
+      iniciales: info?.iniciales ?? '',
     };
   }
 
-  kpis = {
-    citasHoy: 12,
-    pacientesRegistrados: 348,
-    tasaInasistencias: 8,
-    historiasClinicas: 312,
-  };
+  // Citas del día, ordenadas por hora
+  readonly citas = computed(() => this.citaService.obtenerCitasDelDia(this.hoy));
+  readonly resumenHoy = computed(() => this.citaService.resumir(this.citas()));
 
-  citas: Cita[] = [
-    { hora: '09:00', paciente: 'María López', medico: 'Dr. Axel Rojas', especialidad: 'Gastroenterología', estado: 'Confirmada' },
-    { hora: '09:30', paciente: 'Carlos Ruiz', medico: 'Dra. Glenda Zambrano', especialidad: 'Cardiología', estado: 'Pendiente' },
-    { hora: '10:00', paciente: 'Ana Torres', medico: 'Dr. Pablo Salazar', especialidad: 'Neurología', estado: 'Confirmada' },
-    { hora: '10:30', paciente: 'Luis Mendoza', medico: 'Dra. Jackelyn Muñoz', especialidad: 'Pediatría', estado: 'No asistió' },
-    { hora: '11:00', paciente: 'Sofía Ramírez', medico: 'Dr. Aldo Landeo', especialidad: 'Gastroenterología', estado: 'Atendida' },
-  ];
+  readonly kpis = computed(() => {
+    const historico = this.citaService.resumir(this.citaService.citas());
+    const concluidas = historico.atendidas + historico.ausentes;
 
-  doctores: Doctor[] = [
-    {
-      nombre: 'Dr. Axel Alonso Rojas',
-      especialidad: 'Gastroenterólogo',
-      foto: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC2ARzQUm0i6EwgosKDj1PnTbqnADvkR8joxWzLZkCuTAlMVrDTnddgoORqHekRtPGIunGUQseo90Za5CkeL6ZImpuM-KMtZx8d_WFfOgiNwWAQXySAF52zGHOwn3oSL_luXJcRdvv4Kvq84UB9WV-F9QtxWnu1RtAyr8H6Ai39hauKv_yrtwWqARsBcHX4kOFBilLMbIWdng0Jb2U28wel6T1RRmR1zLSNRGKDL4Vdtq3J-oiPuKsWLg',
-      disponible: true,
-    },
-    {
-      nombre: 'Dra. Glenda Zambrano',
-      especialidad: 'Gastroenteróloga',
-      foto: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDEHWcO3fAztjhfC-oNvMIv1x0eQSguYoECTy68OtSUU8SiodoJrcM3TBaHzA8UabIQN9gUieqgIlWlp2NptD8oVSvLZWlASm6GTH-HZKpJ38fAU_8bxjNSuEI-BG5jIz4lYRXpxwDqjkCCYUcDJnBBARknyEW3HV7xvs7FHN-WqLQfaL2NX-nLPBNO0wfqUg5qkENhBmLAbk0wA6XQnkhIcqaKrVZYIOZseAQ6T421IicIuJSGZV7y2w',
-      disponible: true,
-    },
-    {
-      nombre: 'Dr. Pablo Salazar Vilcaluri',
-      especialidad: 'Gastroenterólogo',
-      foto: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAtJSzDl2-vb4JcOsp8vjChVHumVjyjWVio9OCy-5i2QxVGBAMwAwYKCVAUGqgeYKP2DF3Rvtkx0dXl_M3Y-WCDGTrTg2hiDm2f-nui4ta9aScII9v5H4OGSh_qn6kwe9eygu6sI4kq3Ij3gc7F21E3rajB546TWKul46Q28WA-D6SsStHGmXdzyCHaZMt4M8YgwB6hTN3SKs96y_mu50gwem3h0V4HcXaSbq7nUbToiz4GJN-Gn7DVVQ',
-      disponible: true,
-    },
-    {
-      nombre: 'Dra. Jackelyn Muñoz Sosa',
-      especialidad: 'Gastroenteróloga Pediátrica',
-      foto: 'https://lh3.googleusercontent.com/aida-public/AB6AXuASxcURHkxRleXavcfZGOjyXkUE2Q-0Tl17fvWqAswFQmSu2M80CHUMSZT_r3A11BBG2XgDFPCrKbjbJURmWMlLaLZasnNGHHWccZJTSKsa4c_2vCu5LCgb19XjdcEsVmNDCQpE0yUg-IJM69edeE_RXe0Jqa11Ax2HGwww1cgbq1j8z8MekSsE4qUDqKRNNE0pYs7iiUAy-7LorjYQIrbq9LtDMKuxSiZWDvG-yHnQ39o25pdAL4Wqbw',
-      disponible: false,
-    },
-  ];
+    return {
+      citasHoy: this.resumenHoy().total,
+      pacientesRegistrados: this.pacienteService.pacientes().length,
+      // Citas a las que el paciente no asistió sobre el total de citas ya concluidas
+      tasaInasistencias: concluidas ? Math.round((historico.ausentes / concluidas) * 100) : 0,
+      inasistencias: historico.ausentes,
+      atenciones: historico.atendidas,
+    };
+  });
 
-  getEstadoClass(estado: string): string {
-    const map: { [key: string]: string } = {
-      'Confirmada': 'badge-confirmada',
-      'Pendiente': 'badge-pendiente',
-      'Atendida': 'badge-atendida',
-      'No asistió': 'badge-no-asistio',
+  readonly doctores = computed(() =>
+    this.medicoService.medicos().map((medico) => {
+      const nombre = `${medico.nombres} ${medico.apellidos}`;
+      return {
+        nombre,
+        iniciales: iniciales(nombre),
+        especialidad: medico.especialidad,
+        disponible: medico.activo,
+      };
+    })
+  );
+
+  ngOnInit(): void {
+    this.citaService.cargar();
+    this.pacienteService.cargar();
+    this.medicoService.cargar();
+  }
+
+  getEstadoLabel(estado: EstadoCita): string {
+    return ETIQUETAS_ESTADO_CITA[estado] ?? estado;
+  }
+
+  getEstadoClass(estado: EstadoCita): string {
+    const map: Record<EstadoCita, string> = {
+      RESERVADA: 'badge-pendiente',
+      ATENDIDA: 'badge-atendida',
+      CANCELADA: 'badge-cancelada',
+      AUSENTE: 'badge-no-asistio',
     };
     return map[estado] || '';
   }
