@@ -168,7 +168,7 @@ export class TurnoService {
 
   // Genera turnos semanales de ejemplo para cada médico activo de la clínica
   private generarTurnosIniciales(): Turno[] {
-    const medicos = this.usuarioService.obtenerMedicos();
+    const medicos = this.usuarioService.usuarios().filter((u) => u.rol === 'MEDICO');
 
     const patrones: Array<{
       dias: DiaSemana[];

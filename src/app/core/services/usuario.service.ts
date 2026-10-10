@@ -1,216 +1,33 @@
-import { Injectable, computed, signal } from '@angular/core';
-import { Rol, Usuario, UsuarioStats } from '../models/usuario.model';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, finalize, map, tap } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import { ApiResponse } from '../models/api-response.model';
+import {
+  ActualizarUsuarioRequest,
+  CrearUsuarioRequest,
+  Usuario,
+  UsuarioDTO,
+  UsuarioStats,
+} from '../models/usuario.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UsuarioService {
-  // Lista base de usuarios de la clínica
-  private readonly _usuarios = signal<Usuario[]>([
-    {
-      id: 1,
-      nombre: 'Dr. Juan',
-      apellidos: 'Pérez',
-      cargo: 'Director Médico / Administrador',
-      email: 'jperez@saludintegral.pe',
-      rol: 'ADMIN',
-      ultimoAcceso: '15/09/2026 08:12',
-      activo: true,
-      iniciales: 'JP',
-    },
-    {
-      id: 2,
-      nombre: 'Lucía',
-      apellidos: 'Fernández',
-      cargo: 'Jefa de Recepción',
-      email: 'lfernandez@saludintegral.pe',
-      rol: 'RECEPCION',
-      ultimoAcceso: '15/09/2026 07:45',
-      activo: true,
-      iniciales: 'LF',
-    },
-    {
-      id: 3,
-      nombre: 'Dr. Axel Alonso',
-      apellidos: 'Rojas',
-      especialidad: 'Gastroenterología',
-      email: 'arojas@saludintegral.pe',
-      rol: 'MEDICO',
-      ultimoAcceso: '14/09/2026 18:30',
-      activo: true,
-      iniciales: 'AR',
-    },
-    {
-      id: 4,
-      nombre: 'Dra. Glenda',
-      apellidos: 'Zambrano',
-      especialidad: 'Cardiología',
-      email: 'gzambrano@saludintegral.pe',
-      rol: 'MEDICO',
-      ultimoAcceso: '14/09/2026 17:15',
-      activo: true,
-      iniciales: 'GZ',
-    },
-    {
-      id: 5,
-      nombre: 'Dr. Pablo',
-      apellidos: 'Salazar Vilcaluri',
-      especialidad: 'Neurología',
-      email: 'psalazar@saludintegral.pe',
-      rol: 'MEDICO',
-      ultimoAcceso: '13/09/2026 19:00',
-      activo: true,
-      iniciales: 'PS',
-    },
-    {
-      id: 6,
-      nombre: 'Dra. Jackelyn',
-      apellidos: 'Muñoz Sosa',
-      especialidad: 'Pediatría',
-      email: 'jmunoz@saludintegral.pe',
-      rol: 'MEDICO',
-      ultimoAcceso: '12/09/2026 16:20',
-      activo: true,
-      iniciales: 'JM',
-    },
-    {
-      id: 7,
-      nombre: 'Carlos',
-      apellidos: 'Mendoza',
-      cargo: 'Administrador de Sistemas',
-      email: 'cmendoza@saludintegral.pe',
-      rol: 'ADMIN',
-      ultimoAcceso: '12/09/2026 11:30',
-      activo: true,
-      iniciales: 'CM',
-    },
-    {
-      id: 8,
-      nombre: 'Mariana',
-      apellidos: 'Vargas Torres',
-      cargo: 'Recepcionista Turno Mañana',
-      email: 'mvargas@saludintegral.pe',
-      rol: 'RECEPCION',
-      ultimoAcceso: '11/09/2026 08:00',
-      activo: true,
-      iniciales: 'MV',
-    },
-    {
-      id: 9,
-      nombre: 'Jorge',
-      apellidos: 'Quispe Huamán',
-      cargo: 'Recepcionista Turno Tarde',
-      email: 'jquispe@saludintegral.pe',
-      rol: 'RECEPCION',
-      ultimoAcceso: '10/09/2026 14:10',
-      activo: true,
-      iniciales: 'JQ',
-    },
-    {
-      id: 10,
-      nombre: 'Andrea',
-      apellidos: 'Salas Ríos',
-      cargo: 'Recepción Central',
-      email: 'asalas@saludintegral.pe',
-      rol: 'RECEPCION',
-      ultimoAcceso: '09/09/2026 09:15',
-      activo: true,
-      iniciales: 'AS',
-    },
-    {
-      id: 11,
-      nombre: 'Dr. Roberto',
-      apellidos: 'Castillo',
-      especialidad: 'Traumatología',
-      email: 'rcastillo@saludintegral.pe',
-      rol: 'MEDICO',
-      ultimoAcceso: '08/09/2026 15:40',
-      activo: true,
-      iniciales: 'RC',
-    },
-    {
-      id: 12,
-      nombre: 'Dra. Patricia',
-      apellidos: 'Navarro',
-      especialidad: 'Dermatología',
-      email: 'pnavarro@saludintegral.pe',
-      rol: 'MEDICO',
-      ultimoAcceso: '08/09/2026 12:00',
-      activo: true,
-      iniciales: 'PN',
-    },
-    {
-      id: 13,
-      nombre: 'Dr. Fernando',
-      apellidos: 'García',
-      especialidad: 'Oftalmología',
-      email: 'fgarcia@saludintegral.pe',
-      rol: 'MEDICO',
-      ultimoAcceso: '07/09/2026 17:30',
-      activo: true,
-      iniciales: 'FG',
-    },
-    {
-      id: 14,
-      nombre: 'Dra. Diana',
-      apellidos: 'Flores',
-      especialidad: 'Ginecología',
-      email: 'dflores@saludintegral.pe',
-      rol: 'MEDICO',
-      ultimoAcceso: '07/09/2026 10:20',
-      activo: true,
-      iniciales: 'DF',
-    },
-    {
-      id: 15,
-      nombre: 'Dr. Manuel',
-      apellidos: 'Romero',
-      especialidad: 'Urología',
-      email: 'mromero@saludintegral.pe',
-      rol: 'MEDICO',
-      ultimoAcceso: '06/09/2026 16:50',
-      activo: true,
-      iniciales: 'MR',
-    },
-    {
-      id: 16,
-      nombre: 'Dra. Sofía',
-      apellidos: 'Gutiérrez',
-      especialidad: 'Otorrinolaringología',
-      email: 'sgutierrez@saludintegral.pe',
-      rol: 'MEDICO',
-      ultimoAcceso: '05/09/2026 14:00',
-      activo: true,
-      iniciales: 'SG',
-    },
-    {
-      id: 17,
-      nombre: 'Dr. Hugo',
-      apellidos: 'Bustamante',
-      especialidad: 'Medicina Interna',
-      email: 'hbustamante@saludintegral.pe',
-      rol: 'MEDICO',
-      ultimoAcceso: '04/09/2026 18:15',
-      activo: true,
-      iniciales: 'HB',
-    },
-    {
-      id: 18,
-      nombre: 'Dr. Víctor',
-      apellidos: 'Cárdenas',
-      especialidad: 'Endocrinología',
-      email: 'vcardenas@saludintegral.pe',
-      rol: 'MEDICO',
-      ultimoAcceso: '03/09/2026 11:45',
-      activo: true,
-      iniciales: 'VC',
-    },
-  ]);
+  private readonly http = inject(HttpClient);
+  private readonly url = `${environment.apiUrl}/usuarios`;
+
+  // Usuarios de la clínica tal como los devuelve el backend
+  private readonly _usuarios = signal<Usuario[]>([]);
+  readonly usuarios = this._usuarios.asReadonly();
+
+  // Estado de la carga del listado
+  readonly cargando = signal<boolean>(false);
 
   // Filtros reactivos con Signals
   readonly busqueda = signal<string>('');
   readonly filtroRol = signal<string>('TODOS');
-  readonly filtroEstado = signal<string>('TODOS');
 
   // Estadísticas KPI computadas dinámicamente
   readonly stats = computed<UsuarioStats>(() => {
@@ -229,7 +46,7 @@ export class UsuarioService {
       administradores: admins,
       recepcion: recepcion,
       medicos: medicos,
-      especialidades: especialidades || 8,
+      especialidades: especialidades,
     };
   });
 
@@ -237,37 +54,72 @@ export class UsuarioService {
   readonly usuariosFiltrados = computed<Usuario[]>(() => {
     const termino = this.busqueda().trim().toLowerCase();
     const rol = this.filtroRol();
-    const estado = this.filtroEstado();
 
     return this._usuarios().filter((usuario) => {
-      // Filtro por texto (nombre, apellidos o correo)
+      // Filtro por texto (nombre, apellidos, correo o DNI)
       const nombreCompleto = `${usuario.nombre} ${usuario.apellidos}`.toLowerCase();
       const email = usuario.email.toLowerCase();
-      const cargo = (usuario.cargo || usuario.especialidad || '').toLowerCase();
       const coincideTexto =
         !termino ||
         nombreCompleto.includes(termino) ||
         email.includes(termino) ||
-        cargo.includes(termino);
+        (usuario.dni ?? '').includes(termino) ||
+        (usuario.especialidad ?? '').toLowerCase().includes(termino);
 
       // Filtro por rol
       const coincideRol =
         rol === 'TODOS' ||
         usuario.rol.toUpperCase() === rol.toUpperCase();
 
-      // Filtro por estado
-      const coincideEstado =
-        estado === 'TODOS' ||
-        (estado === 'ACTIVO' && usuario.activo) ||
-        (estado === 'INACTIVO' && !usuario.activo);
-
-      return coincideTexto && coincideRol && coincideEstado;
+      return coincideTexto && coincideRol;
     });
   });
 
-  // Lista de médicos registrados, usada por otros módulos (p. ej. turnos)
-  obtenerMedicos(): Usuario[] {
-    return this._usuarios().filter((u) => u.rol === 'MEDICO');
+  // ─── Llamadas al backend ──────────────────────────────────
+
+  // GET /usuarios
+  listarTodos(): Observable<Usuario[]> {
+    return this.http.get<ApiResponse<UsuarioDTO[]>>(this.url).pipe(
+      map(({ data }) => data.map((dto) => this.aUsuario(dto))),
+      tap((usuarios) => this._usuarios.set(usuarios))
+    );
+  }
+
+  // Recarga el listado y refleja el estado de carga en `cargando`
+  cargar(): void {
+    this.cargando.set(true);
+    this.listarTodos()
+      .pipe(finalize(() => this.cargando.set(false)))
+      .subscribe({ error: () => {} });
+  }
+
+  // POST /usuarios
+  crear(usuario: CrearUsuarioRequest): Observable<Usuario> {
+    return this.http.post<ApiResponse<UsuarioDTO>>(this.url, usuario).pipe(
+      map(({ data }) => this.aUsuario(data)),
+      tap((creado) => this._usuarios.update((lista) => [...lista, creado]))
+    );
+  }
+
+  // PUT /usuarios/{id}
+  actualizar(id: number, usuario: ActualizarUsuarioRequest): Observable<Usuario> {
+    return this.http.put<ApiResponse<UsuarioDTO>>(`${this.url}/${id}`, usuario).pipe(
+      map(({ data }) => this.aUsuario(data)),
+      tap((actualizado) =>
+        this._usuarios.update((lista) =>
+          // Se conservan los datos que no vienen del endpoint (p. ej. la especialidad)
+          lista.map((u) => (u.id === id ? { ...u, ...actualizado } : u))
+        )
+      )
+    );
+  }
+
+  // DELETE /usuarios/{id}
+  eliminar(id: number): Observable<void> {
+    return this.http.delete<ApiResponse<null>>(`${this.url}/${id}`).pipe(
+      map(() => undefined),
+      tap(() => this._usuarios.update((lista) => lista.filter((u) => u.id !== id)))
+    );
   }
 
   // Métodos de mutación de filtros
@@ -279,13 +131,22 @@ export class UsuarioService {
     this.filtroRol.set(rol);
   }
 
-  setFiltroEstado(estado: string): void {
-    this.filtroEstado.set(estado);
-  }
-
   limpiarFiltros(): void {
     this.busqueda.set('');
     this.filtroRol.set('TODOS');
-    this.filtroEstado.set('TODOS');
+  }
+
+  // Adapta el UsuarioDTO del backend al modelo que usan las vistas
+  private aUsuario(dto: UsuarioDTO): Usuario {
+    return {
+      id: dto.id,
+      dni: dto.dni,
+      nombre: dto.nombres,
+      apellidos: dto.apellidos,
+      email: dto.email,
+      rol: dto.rol,
+      activo: true,
+      iniciales: `${dto.nombres.charAt(0)}${dto.apellidos.charAt(0)}`.toUpperCase(),
+    };
   }
 }

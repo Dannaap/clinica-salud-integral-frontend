@@ -8,9 +8,7 @@ export interface Usuario {
   email: string;
   rol: Rol;
   activo: boolean;
-  cargo?: string;
   especialidad?: string;
-  ultimoAcceso?: string;
   iniciales?: string;
 }
 
@@ -43,6 +41,23 @@ export interface UsuarioDTO {
   nombres: string;
   apellidos: string;
   email: string;
+  rol: Rol;
+}
+
+// Cuerpo de POST /usuarios
+export interface CrearUsuarioRequest {
+  dni: string;
+  nombres: string;
+  apellidos: string;
+  email: string;
+  password: string;
+  rol: Rol;
+}
+
+// Cuerpo de PUT /usuarios/{id}: el backend solo actualiza estos campos
+export interface ActualizarUsuarioRequest {
+  nombres: string;
+  apellidos: string;
   rol: Rol;
 }
 
