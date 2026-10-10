@@ -1,12 +1,18 @@
-import { Injectable, computed, signal } from '@angular/core';
-import { Observable, of, throwError, delay } from 'rxjs';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, catchError, map, of, switchMap, tap, throwError } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import { ApiResponse } from '../models/api-response.model';
 import {
+  AuthResponse,
   LoginRequest,
   LoginResponse,
   Rol,
   SesionUsuario,
   Usuario,
+  UsuarioDTO,
 } from '../models/usuario.model';
+import { obtenerMensajeError } from '../utils/http-error';
 
 export interface UsuarioSesionInfo {
   nombreCompleto: string;
@@ -34,11 +40,8 @@ const RUTAS_DASHBOARD_POR_ROL: Record<Rol, string> = {
   providedIn: 'root',
 })
 export class AuthService {
-  private readonly USUARIOS_FAKE: Array<Usuario & { password: string }> = [
-    { id: 1, nombre: 'Juan', apellidos: 'Pérez', email: 'admin@clinica.com', rol: 'ADMIN', activo: true, password: 'Admin@123' },
-    { id: 2, nombre: 'Lucía', apellidos: 'Fernández', email: 'recepcion@clinica.com', rol: 'RECEPCION', activo: true, password: 'Recepcion@123' },
-    { id: 3, nombre: 'Axel', apellidos: 'Rojas', email: 'medico@clinica.com', rol: 'MEDICO', activo: true, especialidad: 'Cardiólogo', password: 'Medico@123' },
-  ];
+  private readonly http = inject(HttpClient);
+  private readonly apiUrl = environment.apiUrl;
 
   private sesionActual = signal<SesionUsuario | null>(null);
   public sesion = this.sesionActual.asReadonly();
@@ -65,21 +68,17 @@ export class AuthService {
   }
 
   login(credentials: LoginRequest): Observable<LoginResponse> {
-    const usuario = this.USUARIOS_FAKE.find(
-      (u) => u.email === credentials.email && u.password === credentials.password
-    );
-
-    if (!usuario) {
-      return throwError(() => new Error('Usuario o contraseña incorrectos')).pipe(delay(800));
-    }
-
-    const token = `fake-jwt-token-${usuario.id}-${Date.now()}`;
-    const { password, ...usuarioSinPassword } = usuario;
-
-    const response: LoginResponse = { token, usuario: usuarioSinPassword as Usuario };
-    this.guardarSesion(response);
-
-    return of(response).pipe(delay(800));
+    return this.http
+      .post<ApiResponse<AuthResponse>>(`${this.apiUrl}/auth/login`, credentials)
+      .pipe(
+        map((respuesta) => respuesta.data),
+        // El login solo devuelve token, email y rol: el resto del perfil sale de /cuenta
+        switchMap((auth) =>
+          this.obtenerPerfil(auth).pipe(map((usuario) => ({ token: auth.token, usuario })))
+        ),
+        tap((response) => this.guardarSesion(response)),
+        catchError((error) => throwError(() => new Error(obtenerMensajeError(error))))
+      );
   }
 
   logout(): void {
@@ -87,11 +86,56 @@ export class AuthService {
     this.sesionActual.set(null);
   }
 
+  // Indica si el JWT de la sesión sigue dentro de su tiempo de vida
+  tokenVigente(): boolean {
+    const sesion = this.sesionActual();
+    return !!sesion && new Date(sesion.expira) > new Date();
+  }
+
+  private obtenerPerfil(auth: AuthResponse): Observable<Usuario> {
+    const headers = { Authorization: `Bearer ${auth.token}` };
+
+    return this.http.get<ApiResponse<UsuarioDTO>>(`${this.apiUrl}/cuenta`, { headers }).pipe(
+      map(({ data }) => ({
+        id: data.id,
+        dni: data.dni,
+        nombre: data.nombres,
+        apellidos: data.apellidos,
+        email: data.email,
+        rol: data.rol,
+        activo: true,
+      })),
+      switchMap((usuario) =>
+        usuario.rol === 'MEDICO'
+          ? this.obtenerEspecialidad(usuario.id, headers).pipe(
+              map((especialidad) => ({ ...usuario, especialidad }))
+            )
+          : of(usuario)
+      )
+    );
+  }
+
+  // La especialidad del médico vive en su perfil médico, no en la cuenta de usuario
+  private obtenerEspecialidad(
+    usuarioId: number,
+    headers: Record<string, string>
+  ): Observable<string | undefined> {
+    return this.http
+      .get<ApiResponse<Array<{ usuarioId: number; especialidad: string }>>>(
+        `${this.apiUrl}/medicos`,
+        { headers }
+      )
+      .pipe(
+        map(({ data }) => data.find((m) => m.usuarioId === usuarioId)?.especialidad),
+        catchError(() => of(undefined))
+      );
+  }
+
   private guardarSesion(response: LoginResponse): void {
     const sesion: SesionUsuario = {
       usuario: response.usuario,
       token: response.token,
-      expira: new Date(Date.now() + 24 * 60 * 60 * 1000),
+      expira: this.obtenerExpiracion(response.token) ?? new Date(Date.now() + 24 * 60 * 60 * 1000),
     };
     localStorage.setItem('sesion', JSON.stringify(sesion));
     this.sesionActual.set(sesion);
@@ -102,14 +146,27 @@ export class AuthService {
     if (sesionGuardada) {
       try {
         const sesion: SesionUsuario = JSON.parse(sesionGuardada);
-        if (new Date(sesion.expira) > new Date()) {
-          this.sesionActual.set(sesion);
+        // Se descartan las sesiones vencidas y las que no tienen un JWT real
+        const expira = this.obtenerExpiracion(sesion.token);
+        if (expira && expira > new Date()) {
+          this.sesionActual.set({ ...sesion, expira });
         } else {
           localStorage.removeItem('sesion');
         }
       } catch {
         localStorage.removeItem('sesion');
       }
+    }
+  }
+
+  // Lee la fecha de expiración (claim `exp`) del payload del JWT
+  private obtenerExpiracion(token: string): Date | null {
+    try {
+      const payload = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+      const { exp } = JSON.parse(atob(payload));
+      return typeof exp === 'number' ? new Date(exp * 1000) : null;
+    } catch {
+      return null;
     }
   }
 
