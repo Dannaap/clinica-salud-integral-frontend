@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -10,6 +10,7 @@ import {
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ArrowLeft, CheckCircle2, Search, ShieldCheck, UserRound, X } from 'lucide-angular';
 import { LucideAngularModule } from 'lucide-angular';
+import { finalize } from 'rxjs';
 
 import { PacientesLayout } from '../components/pacientes-layout/pacientes-layout';
 import { Paciente, PacienteFormValue } from '../paciente.model';
@@ -57,7 +58,7 @@ function correoOpcional(control: AbstractControl): ValidationErrors | null {
   templateUrl: './registro.html',
   styleUrl: './registro.scss',
 })
-export class Registro {
+export class Registro implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly pacienteService = inject(PacienteService);
   private readonly route = inject(ActivatedRoute);
@@ -72,6 +73,8 @@ export class Registro {
 
   readonly dniEstado = signal<'neutral' | 'disponible' | 'duplicado'>('neutral');
   readonly pacienteEncontrado = signal<Paciente | null>(null);
+  readonly buscandoDni = signal(false);
+  readonly cargandoPaciente = signal(false);
   readonly guardando = signal(false);
   readonly redirigiendo = signal(false);
   readonly mensaje = signal<string | null>(null);
@@ -84,34 +87,41 @@ export class Registro {
     nombres: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50), soloLetras]],
     apellidos: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50), soloLetras]],
     fechaNacimiento: ['', [Validators.required, fechaNacimientoValida]],
-    sexo: ['', Validators.required],
     telefono: ['', [Validators.required, telefonoValido]],
-    correo: ['', [correoOpcional]],
-    tipoSangre: [''],
+    email: ['', [correoOpcional]],
     direccion: ['', [Validators.maxLength(200)]],
-    alergias: ['', [Validators.maxLength(500)]],
   });
 
-  constructor() {
+  ngOnInit(): void {
     const id = Number(this.route.snapshot.queryParamMap.get('editar'));
-    const paciente = id ? this.pacienteService.obtenerPorId(id) : undefined;
-
-    if (paciente) {
-      this.pacienteEditando.set(paciente);
-      this.formulario.patchValue({
-        dni: paciente.dni,
-        nombres: paciente.nombres,
-        apellidos: paciente.apellidos,
-        fechaNacimiento: paciente.fechaNacimiento,
-        sexo: paciente.sexo,
-        telefono: paciente.telefono,
-        correo: paciente.correo ?? '',
-        tipoSangre: paciente.tipoSangre ?? '',
-        direccion: paciente.direccion ?? '',
-        alergias: paciente.alergias ?? '',
-      });
-      this.dniEstado.set('disponible');
+    if (!id) {
+      return;
     }
+
+    this.cargandoPaciente.set(true);
+    this.pacienteService
+      .obtenerPorId(id)
+      .pipe(finalize(() => this.cargandoPaciente.set(false)))
+      .subscribe({
+        next: (paciente) => {
+          this.pacienteEditando.set(paciente);
+          this.formulario.patchValue({
+            dni: paciente.dni,
+            nombres: paciente.nombres,
+            apellidos: paciente.apellidos,
+            fechaNacimiento: paciente.fechaNacimiento ?? '',
+            telefono: paciente.telefono ?? '',
+            email: paciente.email ?? '',
+            direccion: paciente.direccion ?? '',
+          });
+          // El backend no modifica el DNI ni la fecha de nacimiento al actualizar
+          this.formulario.controls.dni.disable();
+          this.formulario.controls.fechaNacimiento.disable();
+          this.dniEstado.set('disponible');
+        },
+        // Si el paciente no existe se vuelve al listado (el error ya se notificó)
+        error: () => this.router.navigate(['/pacientes/listado']),
+      });
   }
 
   get editando(): boolean {
@@ -134,17 +144,26 @@ export class Registro {
       return;
     }
 
-    const paciente = this.pacienteService.buscarPorDni(this.dni.value ?? '');
-    const pacienteEditando = this.pacienteEditando();
+    this.buscandoDni.set(true);
+    this.pacienteService
+      .buscarPorDni(this.dni.value ?? '')
+      .pipe(finalize(() => this.buscandoDni.set(false)))
+      .subscribe({
+        next: (paciente) => {
+          if (paciente && paciente.id !== this.pacienteEditando()?.id) {
+            this.pacienteEncontrado.set(paciente);
+            this.dniEstado.set('duplicado');
+            return;
+          }
 
-    if (paciente && paciente.id !== pacienteEditando?.id) {
-      this.pacienteEncontrado.set(paciente);
-      this.dniEstado.set('duplicado');
-      return;
-    }
-
-    this.pacienteEncontrado.set(null);
-    this.dniEstado.set('disponible');
+          this.pacienteEncontrado.set(null);
+          this.dniEstado.set('disponible');
+        },
+        error: () => {
+          this.dniEstado.set('neutral');
+          this.error.set('No se pudo verificar el DNI. Inténtalo nuevamente.');
+        },
+      });
   }
 
   limpiarResultadoDni(): void {
@@ -172,37 +191,41 @@ export class Registro {
       return;
     }
 
-    const dniValor = (this.dni.value ?? '').trim();
-    const pacienteExistente = this.pacienteService.buscarPorDni(dniValor);
+    const valores = this.formulario.getRawValue();
     const pacienteEditando = this.pacienteEditando();
-
-    if (pacienteExistente && pacienteExistente.id !== pacienteEditando?.id) {
-      this.dniEstado.set('duplicado');
-      this.pacienteEncontrado.set(pacienteExistente);
-      this.error.set('Ya existe un paciente registrado con este DNI.');
-      return;
-    }
+    const datos: PacienteFormValue = {
+      dni: (valores.dni ?? '').trim(),
+      nombres: (valores.nombres ?? '').trim(),
+      apellidos: (valores.apellidos ?? '').trim(),
+      fechaNacimiento: valores.fechaNacimiento || null,
+      telefono: (valores.telefono ?? '').trim() || null,
+      email: (valores.email ?? '').trim() || null,
+      direccion: (valores.direccion ?? '').trim() || null,
+    };
 
     this.guardando.set(true);
     this.error.set(null);
 
-    const datos = this.formulario.getRawValue() as PacienteFormValue;
+    const peticion = pacienteEditando
+      ? this.pacienteService.actualizar(pacienteEditando.id, datos)
+      : this.pacienteService.crear(datos);
 
-    if (pacienteEditando) {
-      this.pacienteService.actualizar(pacienteEditando.id, datos);
-    } else {
-      this.pacienteService.crear(datos);
-    }
+    peticion.pipe(finalize(() => this.guardando.set(false))).subscribe({
+      next: () => {
+        this.redirigiendo.set(true);
+        this.mensaje.set(
+          pacienteEditando
+            ? 'Los datos del paciente fueron actualizados.'
+            : 'Paciente registrado correctamente.',
+        );
 
-    this.guardando.set(false);
-    this.redirigiendo.set(true);
-    this.mensaje.set(
-      pacienteEditando ? 'Los datos del paciente fueron actualizados.' : 'Paciente registrado correctamente.',
-    );
-
-    setTimeout(() => {
-      this.router.navigate(['/pacientes/listado']);
-    }, 1200);
+        setTimeout(() => {
+          this.router.navigate(['/pacientes/listado']);
+        }, 1200);
+      },
+      // El backend valida el DNI duplicado; su mensaje lo muestra el interceptor global
+      error: () => {},
+    });
   }
 
   cancelar(): void {

@@ -61,9 +61,15 @@
           </span>
           }
         </div>
-        <button class="btn btn-secondary dni-button" type="button" (click)="buscarDni()">
+        <button class="btn btn-secondary dni-button" type="button" (click)="buscarDni()"
+          [disabled]="buscandoDni() || editando">
+          @if (buscandoDni()) {
+          <span class="spinner" aria-hidden="true"></span>
+          Buscando...
+          } @else {
           <lucide-icon [img]="iconSearch" aria-hidden="true"></lucide-icon>
           Buscar
+          }
         </button>
       </div>
 
@@ -127,6 +133,7 @@
           <input id="fechaNacimiento" class="form-control" type="date" formControlName="fechaNacimiento" max="{{ hoy }}"
             [class.is-invalid]="tieneError('fechaNacimiento')" />
           @if (edad() !== null) { <span class="form-hint">Edad: {{ edad() }} años</span> }
+          @if (editando) { <span class="form-hint">El DNI y la fecha de nacimiento no se pueden modificar.</span> }
           @if (tieneError('fechaNacimiento')) {
           <span class="form-error">
             @if (formulario.controls.fechaNacimiento.errors?.['required']) { Selecciona la fecha de nacimiento. }
@@ -137,16 +144,6 @@
           </span>
           }
         </div>
-
-        <fieldset class="form-group radio-group">
-          <legend class="form-label">Sexo <span class="required">*</span></legend>
-          <div class="radio-options">
-            <label class="form-radio"><input type="radio" formControlName="sexo" value="Masculino" /> Masculino</label>
-            <label class="form-radio"><input type="radio" formControlName="sexo" value="Femenino" /> Femenino</label>
-            <label class="form-radio"><input type="radio" formControlName="sexo" value="Otro" /> Otro</label>
-          </div>
-          @if (tieneError('sexo')) { <span class="form-error">Selecciona una opción.</span> }
-        </fieldset>
 
         <div class="form-group">
           <label class="form-label" for="telefono">Teléfono <span class="required">*</span></label>
@@ -162,27 +159,12 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="correo">Correo electrónico</label>
-          <input id="correo" class="form-control" type="email" formControlName="correo" placeholder="paciente@email.com"
-            [class.is-invalid]="tieneError('correo')" />
-          @if (tieneError('correo')) {
+          <label class="form-label" for="email">Correo electrónico</label>
+          <input id="email" class="form-control" type="email" formControlName="email" placeholder="paciente@email.com"
+            [class.is-invalid]="tieneError('email')" />
+          @if (tieneError('email')) {
           <span class="form-error">Ingresa un correo electrónico válido (ej. paciente@email.com).</span>
           }
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="tipoSangre">Tipo de sangre</label>
-          <select id="tipoSangre" class="form-control" formControlName="tipoSangre">
-            <option value="">Seleccionar tipo sanguíneo...</option>
-            <option>O+</option>
-            <option>O-</option>
-            <option>A+</option>
-            <option>A-</option>
-            <option>B+</option>
-            <option>B-</option>
-            <option>AB+</option>
-            <option>AB-</option>
-          </select>
         </div>
 
         <div class="form-group form-full">
@@ -193,14 +175,6 @@
             caracteres.</span> }
         </div>
 
-        <div class="form-group form-full">
-          <label class="form-label" for="alergias">Alergias conocidas o antecedentes médicos relevantes</label>
-          <textarea id="alergias" class="form-control" rows="4" formControlName="alergias"
-            placeholder="Describe alergias, antecedentes o escribe 'Ninguna registrada'"
-            [class.is-invalid]="tieneError('alergias')"></textarea>
-          @if (tieneError('alergias')) { <span class="form-error">Este campo no puede superar los 500 caracteres.</span>
-          }
-        </div>
       </div>
 
       <div class="secure-note">
@@ -209,9 +183,13 @@
       </div>
 
       <div class="form-actions">
-        <button class="btn btn-outline" type="button" (click)="cancelar()">Cancelar</button>
-        <button class="btn btn-primary" type="submit" [disabled]="guardando() || redirigiendo()">
+        <button class="btn btn-outline" type="button" (click)="cancelar()" [disabled]="guardando()">Cancelar</button>
+        <button class="btn btn-primary" type="submit" [disabled]="guardando() || redirigiendo() || cargandoPaciente()">
+          @if (guardando() || cargandoPaciente()) {
+          <span class="spinner" aria-hidden="true"></span>
+          } @else {
           <lucide-icon [img]="iconCheck" aria-hidden="true"></lucide-icon>
+          }
           {{ guardando() ? 'Guardando...' : (redirigiendo() ? 'Redirigiendo...' : (editando ? 'Guardar cambios' :
           'Guardar paciente')) }}
         </button>
