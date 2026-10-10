@@ -1,0 +1,53 @@
+<section class="page-title-row">
+  <div class="title-info">
+    <h1 class="page-main-heading">Reportes operativos</h1>
+    <p class="page-sub-heading">
+      Consulta y descarga reportes de citas, pacientes e ingresos.
+    </p>
+  </div>
+
+  <button class="btn btn-primary" type="button" (click)="generarReporte()">
+    <span class="material-symbols-outlined">add_chart</span>
+    <span>Generar reporte</span>
+  </button>
+</section>
+
+<section class="table-container">
+  <div class="table-header">
+    <h2 class="table-title">Reportes disponibles</h2>
+  </div>
+
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Fecha</th>
+          <th>Tipo</th>
+          <th>Estado</th>
+          <th class="text-right">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let r of reportes">
+          <td>{{ r.nombre }}</td>
+          <td>{{ r.fecha }}</td>
+          <td><span class="type-badge">{{ r.tipo }}</span></td>
+          <td>
+            <span
+              class="badge"
+              [class.badge-confirmada]="r.estado === 'Disponible'"
+              [class.badge-pendiente]="r.estado === 'En proceso'">
+              {{ r.estado }}
+            </span>
+          </td>
+          <td class="text-right">
+            <button class="btn-icon" title="Descargar" type="button">
+              <span class="material-symbols-outlined">download</span>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>

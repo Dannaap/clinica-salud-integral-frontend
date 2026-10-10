@@ -95,7 +95,6 @@
 
 // ─── TAMAÑOS ───────────────────────────────────────────────
 
-// Botón grande (banners, CTAs)
 .btn-lg {
   height: 52px;
   padding: 0 28px;
@@ -103,14 +102,12 @@
   font-weight: $font-weight-semibold;
 }
 
-// Botón pequeño (acciones de tabla)
 .btn-sm {
   height: 36px;
   padding: 0 16px;
   font-size: $font-size-sm;
 }
 
-// Botón extra pequeño (chips)
 .btn-xs {
   height: 30px;
   padding: 0 12px;
@@ -137,6 +134,18 @@
   border: none;
   cursor: pointer;
   transition: all $transition-fast;
+
+  // Fix: el icono DENTRO del botón no hereda fondo/borde
+  lucide-icon,
+  svg {
+    width: 18px;
+    height: 18px;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    color: inherit;
+  }
 
   &:hover {
     background-color: $primary-light;

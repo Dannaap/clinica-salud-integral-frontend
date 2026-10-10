@@ -2,17 +2,78 @@
 // ESTILOS GLOBALES — Clínica Salud Integral S.A.C.
 // ═══════════════════════════════════════════════════════════
 
-@use 'styles/typography';
-@use 'styles/buttons';
-@use 'styles/inputs';
-@use 'styles/cards';
-@use 'styles/badges';
-@use 'styles/tables';
-@use 'styles/layout';
-
-// Imports de CSS plano (no son @import de Sass, no están deprecados).
-// Sass los eleva al inicio del CSS generado.
+// Imports de CSS plano
 @import '@fontsource/poppins/400.css';
 @import '@fontsource/poppins/500.css';
 @import '@fontsource/poppins/600.css';
 @import '@fontsource/poppins/700.css';
+
+// ═══════════════════════════════════════════════════════════
+// RESET Y BASE
+// ═══════════════════════════════════════════════════════════
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #f8f9fa;
+  color: #1a1d21;
+}
+
+// lucide-icon es un elemento inline por defecto
+lucide-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// ═══════════════════════════════════════════════════════════
+// BOTONES BASE
+// ═══════════════════════════════════════════════════════════
+
+button {
+  font-family: inherit;
+}
+
+button:focus {
+  outline: none;
+}
+
+button:focus-visible {
+  outline: 2px solid #0b5ed7;
+  outline-offset: 2px;
+}
+
+// ═══════════════════════════════════════════════════════════
+// FIX: SIDEBAR Y LAYOUT (260px fijo)
+// ═══════════════════════════════════════════════════════════
+
+.sidebar {
+  width: 260px !important;
+  box-sizing: border-box !important;
+}
+
+.layout-main {
+  margin-left: 260px !important;
+  width: calc(100% - 260px) !important;
+  box-sizing: border-box !important;
+}
+
+.layout-content {
+  padding: 0 !important;
+  margin-top: 64px !important;
+  width: 100% !important;
+}
+
+// Responsive: en tablet/móvil el sidebar se oculta
+@media (max-width: 992px) {
+  .layout-main {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+}

@@ -12,14 +12,17 @@
       <span class="material-symbols-outlined">home</span>
       <span>Inicio</span>
     </a>
+
     <a routerLink="/pacientes" routerLinkActive="active" class="nav-item" *ngIf="!esMedico">
       <span class="material-symbols-outlined">group</span>
       <span>Pacientes</span>
     </a>
+
     <a routerLink="/citas" routerLinkActive="active" class="nav-item" *ngIf="esMedico || esAdmin">
       <span class="material-symbols-outlined">calendar_month</span>
       <span>Citas</span>
     </a>
+
     <button
       type="button"
       class="nav-item nav-item-disabled"
@@ -29,39 +32,31 @@
       <span class="material-symbols-outlined">calendar_month</span>
       <span>Citas</span>
     </button>
+
     <a routerLink="/turnos" routerLinkActive="active" class="nav-item" *ngIf="esAdmin">
       <span class="material-symbols-outlined">stethoscope</span>
       <span>Turnos médicos</span>
     </a>
-    <button
-      type="button"
-      class="nav-item nav-item-disabled"
-      (click)="mostrarProximamente('Atenciones')"
-      *ngIf="esAdmin || esMedico"
-    >
+
+    <a routerLink="/atenciones" routerLinkActive="active" class="nav-item" *ngIf="esAdmin || esMedico">
       <span class="material-symbols-outlined">assignment</span>
       <span>Atenciones</span>
-    </button>
-    <button
-      type="button"
-      class="nav-item nav-item-disabled"
-      (click)="mostrarProximamente('Reportes')"
-    >
+    </a>
+
+    <a routerLink="/reportes" routerLinkActive="active" class="nav-item" *ngIf="esAdmin">
       <span class="material-symbols-outlined">bar_chart</span>
       <span>Reportes</span>
-    </button>
+    </a>
+
     <a routerLink="/usuarios" routerLinkActive="active" class="nav-item" *ngIf="esAdmin">
       <span class="material-symbols-outlined">manage_accounts</span>
       <span>Usuarios</span>
     </a>
-    <button
-      type="button"
-      class="nav-item nav-item-disabled"
-      (click)="mostrarProximamente('Perfil')"
-    >
+
+    <a routerLink="/perfil" routerLinkActive="active" class="nav-item">
       <span class="material-symbols-outlined">account_circle</span>
       <span>Perfil</span>
-    </button>
+    </a>
   </nav>
 
   <div class="sidebar-footer">

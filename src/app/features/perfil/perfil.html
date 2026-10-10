@@ -1,0 +1,40 @@
+<section class="page-title-row">
+  <div class="title-info">
+    <h1 class="page-main-heading">Mi perfil</h1>
+    <p class="page-sub-heading">Información de tu cuenta en la clínica.</p>
+  </div>
+</section>
+
+<section class="perfil-card">
+  <div class="perfil-header">
+    <div class="avatar">JP</div>
+    <div>
+      <h2>{{ usuario.nombre }}</h2>
+      <span class="rol-badge">{{ usuario.rol }}</span>
+    </div>
+  </div>
+
+  <div class="perfil-grid">
+    <div class="form-group">
+      <label>Nombre completo</label>
+      <input type="text" [value]="usuario.nombre" readonly />
+    </div>
+    <div class="form-group">
+      <label>Correo electrónico</label>
+      <input type="email" [value]="usuario.email" readonly />
+    </div>
+    <div class="form-group">
+      <label>Teléfono</label>
+      <input type="text" [value]="usuario.telefono" readonly />
+    </div>
+    <div class="form-group">
+      <label>Rol</label>
+      <input type="text" [value]="usuario.rol" readonly />
+    </div>
+  </div>
+
+  <div class="perfil-footer">
+    <button class="btn btn-outline" type="button">Cambiar contraseña</button>
+    <button class="btn btn-primary" type="button">Editar perfil</button>
+  </div>
+</section>

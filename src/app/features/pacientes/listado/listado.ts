@@ -15,14 +15,13 @@ import {
 } from 'lucide-angular';
 import { LucideAngularModule } from 'lucide-angular';
 
-import { PacientesLayout } from '../components/pacientes-layout/pacientes-layout';
 import { Paciente } from '../paciente.model';
 import { PacienteService } from '../paciente.service';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-listado',
-  imports: [CommonModule, RouterLink, LucideAngularModule, PacientesLayout],
+  imports: [CommonModule, RouterLink, LucideAngularModule],
   templateUrl: './listado.html',
   styleUrl: './listado.scss',
 })

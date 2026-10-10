@@ -1,8 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { SidebarComponent } from '../../../shared/components/sidebar/sidebar';
-import { HeaderComponent } from '../../../shared/components/header/header';
 import { AuthService } from '../../../core/services/auth.service';
 
 interface CitaAgenda {
@@ -29,7 +27,7 @@ interface PacienteReciente {
 @Component({
   selector: 'app-medical',
   standalone: true,
-  imports: [CommonModule, RouterModule, SidebarComponent, HeaderComponent],
+  imports: [CommonModule, RouterModule],
   templateUrl: './medical.html',
   styleUrl: './medical.scss'
 })
@@ -79,9 +77,6 @@ export class MedicalComponent {
     { iniciales: 'AT', nombre: 'Ana Torres', ultima: '28/08/2026' },
     { iniciales: 'LM', nombre: 'Luis Mendoza', ultima: '20/08/2026' }
   ];
-
-  sidebarAbierto = false;
-  toggleSidebar() { this.sidebarAbierto = !this.sidebarAbierto; }
 
   getEstadoClass(estado: string): string {
     const map: { [key: string]: string } = {

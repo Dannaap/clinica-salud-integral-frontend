@@ -1,11 +1,8 @@
-$primary: #0b5ed7;
-$primary-dark: #084298;
-$neutral-900: #1a1d21;
-$neutral-700: #495057;
+@use '../../../../styles/variables' as *;
 
 .sidebar {
   width: 260px;
-  background: $primary;
+  background: #0b5ed7;
   position: fixed;
   left: 0;
   top: 0;
@@ -15,6 +12,7 @@ $neutral-700: #495057;
   color: white;
   z-index: 50;
   transition: transform 0.3s ease;
+  overflow-y: auto;
 
   &-header {
     padding: 1.25rem;
@@ -115,7 +113,7 @@ $neutral-700: #495057;
         height: 36px;
         border-radius: 50%;
         background: white;
-        color: $primary;
+        color: #0b5ed7;
         display: flex;
         align-items: center;
         justify-content: center;

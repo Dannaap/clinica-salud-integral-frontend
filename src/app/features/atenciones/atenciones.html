@@ -1,0 +1,50 @@
+<section class="page-title-row">
+  <div class="title-info">
+    <h1 class="page-main-heading">Atenciones médicas</h1>
+    <p class="page-sub-heading">
+      Historial de consultas registradas en el sistema.
+    </p>
+  </div>
+</section>
+
+<section class="table-container">
+  <div class="table-header">
+    <h2 class="table-title">Últimas atenciones</h2>
+  </div>
+
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Paciente</th>
+          <th>Médico</th>
+          <th>Fecha</th>
+          <th>Diagnóstico</th>
+          <th>Estado</th>
+          <th class="text-right">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let a of atenciones">
+          <td>{{ a.paciente }}</td>
+          <td>{{ a.medico }}</td>
+          <td>{{ a.fecha }}</td>
+          <td>{{ a.diagnostico }}</td>
+          <td>
+            <span
+              class="badge"
+              [class.badge-confirmada]="a.estado === 'Registrada'"
+              [class.badge-pendiente]="a.estado === 'En revisión'">
+              {{ a.estado }}
+            </span>
+          </td>
+          <td class="text-right">
+            <button class="btn-icon" title="Ver detalle" type="button">
+              <span class="material-symbols-outlined">visibility</span>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>

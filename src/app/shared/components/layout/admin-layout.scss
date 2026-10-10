@@ -4,6 +4,7 @@
   display: flex;
   min-height: 100vh;
   background-color: #f8fafc;
+  width: 100%;
 }
 
 .sidebar-overlay {
@@ -11,6 +12,7 @@
   inset: 0;
   background: rgba(0, 0, 0, 0.4);
   z-index: 45;
+  display: none;
 }
 
 .layout-main {
@@ -20,22 +22,26 @@
   flex-direction: column;
   min-height: 100vh;
   min-width: 0;
+  width: calc(100% - 260px);
   transition: margin-left 0.3s ease;
 }
 
 .layout-content {
   flex: 1;
   margin-top: 64px;
-  padding: 24px 32px 48px;
+  padding: 0;
   background-color: #f8fafc;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 @media (max-width: 992px) {
-  .layout-main {
-    margin-left: 0;
+  .sidebar-overlay {
+    display: block;
   }
 
-  .layout-content {
-    padding: 16px 12px 32px;
+  .layout-main {
+    margin-left: 0;
+    width: 100%;
   }
 }

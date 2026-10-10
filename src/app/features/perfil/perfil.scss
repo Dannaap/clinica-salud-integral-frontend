@@ -1,0 +1,159 @@
+:host {
+  display: block;
+  width: 100%;
+  padding: 24px 32px 48px;
+
+  @media (max-width: 992px) {
+    padding: 16px 16px 32px;
+  }
+
+  @media (max-width: 576px) {
+    padding: 12px 12px 24px;
+  }
+}
+
+.page-title-row {
+  margin-bottom: 24px;
+}
+
+.page-main-heading {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a1d21;
+  margin: 0 0 4px;
+}
+
+.page-sub-heading {
+  font-size: 14px;
+  color: #495057;
+  margin: 0;
+}
+
+.perfil-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+  max-width: 800px;
+  width: 100%;
+}
+
+.perfil-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #e9ecef;
+
+  .avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: #0b5ed7;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 600;
+  }
+
+  h2 {
+    margin: 0 0 6px;
+    font-size: 20px;
+    color: #1a1d21;
+  }
+
+  .rol-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: #e7f1ff;
+    color: #084298;
+    font-size: 12px;
+    font-weight: 500;
+  }
+}
+
+.perfil-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #495057;
+  }
+
+  input {
+    padding: 10px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    font-size: 14px;
+    background: #f8f9fa;
+    color: #1a1d21;
+    font-family: inherit;
+  }
+}
+
+.perfil-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #e9ecef;
+
+  @media (max-width: 576px) {
+    flex-direction: column-reverse;
+
+    .btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.btn-primary {
+  background: #0b5ed7;
+  color: white;
+
+  &:hover {
+    background: #084298;
+  }
+}
+
+.btn-outline {
+  background: white;
+  color: #0b5ed7;
+  border: 1px solid #0b5ed7;
+
+  &:hover {
+    background: #e7f1ff;
+  }
+}

@@ -15,7 +15,7 @@
     </div>
     <div class="page-top-actions">
       <button type="button" class="btn-new-user" aria-label="Nuevo usuario">
-        <lucide-icon [img]="iconPlus" class="btn-icon"></lucide-icon>
+        <lucide-icon [img]="iconPlus"></lucide-icon>
         <span>NUEVO usuario</span>
       </button>
     </div>
@@ -23,7 +23,6 @@
 
   <!-- 3. Tarjetas KPI de Resumen -->
   <section class="kpi-grid" aria-label="Estadísticas de usuarios">
-    <!-- Card 1: Total Usuarios -->
     <div class="kpi-card-item">
       <div class="kpi-info">
         <span class="kpi-title">TOTAL USUARIOS</span>
@@ -35,7 +34,6 @@
       </div>
     </div>
 
-    <!-- Card 2: Administradores -->
     <div class="kpi-card-item">
       <div class="kpi-info">
         <span class="kpi-title">ADMINISTRADORES</span>
@@ -47,7 +45,6 @@
       </div>
     </div>
 
-    <!-- Card 3: Recepción -->
     <div class="kpi-card-item">
       <div class="kpi-info">
         <span class="kpi-title">RECEPCIÓN</span>
@@ -59,7 +56,6 @@
       </div>
     </div>
 
-    <!-- Card 4: Médicos -->
     <div class="kpi-card-item">
       <div class="kpi-info">
         <span class="kpi-title">MÉDICOS</span>
@@ -143,7 +139,6 @@
         <tbody>
           @for (usuario of usuarioService.usuariosFiltrados(); track usuario.id) {
             <tr class="table-row">
-              <!-- Usuario (Avatar + Nombre + Cargo/Especialidad) -->
               <td class="td-usuario">
                 <div class="user-cell">
                   <div class="user-avatar-circle" aria-hidden="true">
@@ -158,12 +153,10 @@
                 </div>
               </td>
 
-              <!-- Correo -->
               <td class="td-correo">
                 <span class="email-text">{{ usuario.email }}</span>
               </td>
 
-              <!-- Rol con badges semánticos -->
               <td class="td-rol">
                 @switch (usuario.rol) {
                   @case ('ADMIN') {
@@ -181,7 +174,6 @@
                 }
               </td>
 
-              <!-- Último Acceso (Fecha y Hora) -->
               <td class="td-acceso">
                 @let dateTime = obtenerFechaYHora(usuario.ultimoAcceso);
                 <div class="access-datetime">
@@ -190,7 +182,6 @@
                 </div>
               </td>
 
-              <!-- Estado -->
               <td class="td-estado">
                 @if (usuario.activo) {
                   <span class="badge-status status-active">
@@ -205,7 +196,6 @@
                 }
               </td>
 
-              <!-- Botón Acción Ver Detalle -->
               <td class="td-acciones">
                 <button
                   type="button"
