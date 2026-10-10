@@ -34,12 +34,12 @@
 
   <div class="summary-card">
     <div class="summary-icon is-success">
-      <lucide-icon [img]="iconPlus" size="20"></lucide-icon>
+      <lucide-icon [img]="iconSearch" size="20"></lucide-icon>
     </div>
     <div class="summary-body">
-      <span class="summary-label">Nuevos este mes</span>
-      <span class="summary-value">+{{ resumen().nuevos }}</span>
-      <span class="summary-foot is-success">+12% vs mes anterior</span>
+      <span class="summary-label">Resultados de la búsqueda</span>
+      <span class="summary-value">{{ resumen().filtrados }}</span>
+      <span class="summary-foot">Coinciden con el filtro actual</span>
     </div>
   </div>
 
@@ -48,9 +48,9 @@
       <lucide-icon [img]="iconCalendarPlus" size="20"></lucide-icon>
     </div>
     <div class="summary-body">
-      <span class="summary-label">Con citas activas</span>
-      <span class="summary-value">{{ resumen().citasActivas }}</span>
-      <span class="summary-foot">Programadas esta semana</span>
+      <span class="summary-label">Con correo registrado</span>
+      <span class="summary-value">{{ resumen().conCorreo }}</span>
+      <span class="summary-foot">Reciben notificaciones de citas</span>
     </div>
   </div>
 </div>
@@ -64,41 +64,6 @@
       placeholder="Buscar por DNI o nombre..."
       [value]="busqueda()"
       (input)="actualizarBusqueda($event)" />
-  </div>
-
-  <div class="filter-group">
-    <label>Estado</label>
-    <select [value]="filtroEstado()" (change)="cambiarEstado($event)">
-      <option value="Todos">Todos</option>
-      <option value="Activo">Activo</option>
-      <option value="Inactivo">Inactivo</option>
-      <option value="Nuevo">Nuevo</option>
-    </select>
-  </div>
-
-  <div class="filter-group">
-    <label>Sexo</label>
-    <select [value]="filtroSexo()" (change)="cambiarSexo($event)">
-      <option value="Todos">Todos</option>
-      <option value="Masculino">Masculino</option>
-      <option value="Femenino">Femenino</option>
-      <option value="Otro">Otro</option>
-    </select>
-  </div>
-
-  <div class="filter-group">
-    <label>Tipo de sangre</label>
-    <select [value]="filtroSangre()" (change)="cambiarSangre($event)">
-      <option value="Todos">Todos</option>
-      <option value="A+">A+</option>
-      <option value="A-">A-</option>
-      <option value="B+">B+</option>
-      <option value="B-">B-</option>
-      <option value="O+">O+</option>
-      <option value="O-">O-</option>
-      <option value="AB+">AB+</option>
-      <option value="AB-">AB-</option>
-    </select>
   </div>
 
   <button class="btn-clear" type="button" (click)="limpiarFiltros()">
@@ -117,9 +82,7 @@
           <th>DNI</th>
           <th>Edad</th>
           <th>Teléfono</th>
-          <th>Sexo</th>
-          <th>Tipo sangre</th>
-          <th>Estado</th>
+          <th>Correo</th>
           <th class="text-right">Acciones</th>
         </tr>
       </thead>
@@ -134,19 +97,9 @@
             </div>
           </td>
           <td>{{ p.dni }}</td>
-          <td>{{ edad(p.fechaNacimiento) }} años</td>
-          <td>{{ p.telefono }}</td>
-          <td>{{ p.sexo }}</td>
-          <td>{{ p.tipoSangre }}</td>
-          <td>
-            <span
-              class="badge"
-              [class.badge-activo]="p.estado === 'Activo'"
-              [class.badge-inactivo]="p.estado === 'Inactivo'"
-              [class.badge-nuevo]="p.estado === 'Nuevo'">
-              {{ p.estado }}
-            </span>
-          </td>
+          <td>{{ edad(p.fechaNacimiento) }}</td>
+          <td>{{ p.telefono || '—' }}</td>
+          <td>{{ p.email || '—' }}</td>
           <td class="text-right">
             <button class="btn-icon" title="Ver detalle" type="button" (click)="abrirDetalle(p)">
               <lucide-icon [img]="iconEye" size="16"></lucide-icon>
@@ -157,6 +110,19 @@
             <button class="btn-icon is-danger" title="Eliminar" type="button" (click)="eliminarPaciente(p, $event)">
               <lucide-icon [img]="iconTrash" size="16"></lucide-icon>
             </button>
+          </td>
+        </tr>
+        <tr *ngIf="pacientesPagina().length === 0">
+          <td colspan="6">
+            <div class="table-state" *ngIf="cargando(); else sinPacientes">
+              <span class="spinner spinner-lg" aria-hidden="true"></span>
+              <span>Cargando pacientes...</span>
+            </div>
+            <ng-template #sinPacientes>
+              <div class="table-state">
+                <span>{{ busqueda() ? 'No hay pacientes que coincidan con la búsqueda.' : 'Aún no hay pacientes registrados.' }}</span>
+              </div>
+            </ng-template>
           </td>
         </tr>
       </tbody>
@@ -182,3 +148,52 @@
     </button>
   </div>
 </div>
+
+@if (pacienteSeleccionado(); as paciente) {
+  <div class="modal-backdrop" role="presentation" (click)="cerrarDetalle()">
+    <section class="patient-modal" role="dialog" aria-modal="true" aria-labelledby="patient-detail-title" (click)="$event.stopPropagation()">
+      <button class="modal-close" type="button" aria-label="Cerrar detalle" (click)="cerrarDetalle()">×</button>
+      <div class="modal-avatar">{{ iniciales(paciente) }}</div>
+      <h2 id="patient-detail-title">{{ nombreCompleto(paciente) }}</h2>
+      <p class="modal-subtitle">Ficha del paciente · DNI {{ paciente.dni }}</p>
+      <div class="detail-grid">
+        <div><span>Fecha de nacimiento</span><strong>{{ paciente.fechaNacimiento ? (paciente.fechaNacimiento | date: 'dd/MM/yyyy') : 'No registrada' }}</strong></div>
+        <div><span>Edad</span><strong>{{ edad(paciente.fechaNacimiento) }}</strong></div>
+        <div><span>Teléfono</span><strong>{{ paciente.telefono || 'No registrado' }}</strong></div>
+        <div><span>Correo electrónico</span><strong>{{ paciente.email || 'No registrado' }}</strong></div>
+        <div class="detail-full"><span>Dirección</span><strong>{{ paciente.direccion || 'No registrada' }}</strong></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" type="button" (click)="cerrarDetalle()">Cerrar</button>
+        <button class="btn btn-danger" type="button" (click)="eliminarPaciente(paciente)">Eliminar</button>
+        <button class="btn btn-primary" type="button" (click)="editarPaciente(paciente)">Editar paciente</button>
+      </div>
+    </section>
+  </div>
+}
+
+@if (pacienteAEliminar(); as paciente) {
+  <div class="modal-backdrop confirm-backdrop" role="presentation" (click)="cancelarEliminacion()">
+    <section class="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="confirm-delete-title" (click)="$event.stopPropagation()">
+      <button class="modal-close" type="button" aria-label="Cerrar modal" (click)="cancelarEliminacion()">×</button>
+      <div class="confirm-icon">
+        <lucide-icon [img]="iconTrash" aria-hidden="true"></lucide-icon>
+      </div>
+      <h2 id="confirm-delete-title">¿Eliminar paciente?</h2>
+      <p class="confirm-message">
+        ¿Estás seguro de eliminar el expediente de <strong>{{ nombreCompleto(paciente) }}</strong> (DNI: {{ paciente.dni }})? Esta acción no se puede deshacer.
+      </p>
+      <div class="modal-actions">
+        <button class="btn btn-outline" type="button" (click)="cancelarEliminacion()" [disabled]="eliminando()">Cancelar</button>
+        <button class="btn btn-danger" type="button" (click)="confirmarEliminacion()" [disabled]="eliminando()">
+          @if (eliminando()) {
+            <span class="spinner" aria-hidden="true"></span>
+            <span>Eliminando...</span>
+          } @else {
+            <span>Sí, eliminar</span>
+          }
+        </button>
+      </div>
+    </section>
+  </div>
+}

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   CalendarPlus,
@@ -14,10 +14,12 @@ import {
   X,
 } from 'lucide-angular';
 import { LucideAngularModule } from 'lucide-angular';
+import { finalize } from 'rxjs';
 
 import { Paciente } from '../paciente.model';
 import { PacienteService } from '../paciente.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-listado',
@@ -25,9 +27,10 @@ import { AuthService } from '../../../core/services/auth.service';
   templateUrl: './listado.html',
   styleUrl: './listado.scss',
 })
-export class Listado {
+export class Listado implements OnInit {
   private readonly pacienteService = inject(PacienteService);
   private readonly authService = inject(AuthService);
+  private readonly toast = inject(ToastService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private debounceTimer?: any;
@@ -48,15 +51,13 @@ export class Listado {
   readonly iconList = ListFilter;
 
   readonly pacientes = this.pacienteService.pacientes;
+  readonly cargando = this.pacienteService.cargando;
   readonly busqueda = signal('');
-  readonly filtroEstado = signal<'Todos' | 'Activo' | 'Inactivo' | 'Nuevo'>('Todos');
-  readonly filtroSexo = signal<'Todos' | 'Masculino' | 'Femenino' | 'Otro'>('Todos');
-  readonly filtroSangre = signal<string>('Todos');
   readonly paginaActual = signal(1);
   readonly tamanoPagina = 8;
   readonly pacienteSeleccionado = signal<Paciente | null>(null);
   readonly pacienteAEliminar = signal<Paciente | null>(null);
-  readonly mensaje = signal<string | null>(null);
+  readonly eliminando = signal(false);
 
   constructor() {
     const dniParam = this.route.snapshot.queryParamMap.get('dni');
@@ -65,23 +66,19 @@ export class Listado {
     }
   }
 
+  ngOnInit(): void {
+    this.pacienteService.cargar();
+  }
+
   readonly pacientesFiltrados = computed(() => {
     const termino = this.busqueda().trim().toLowerCase();
-    const estado = this.filtroEstado();
-    const sexo = this.filtroSexo();
-    const sangre = this.filtroSangre();
 
-    return this.pacientes().filter((paciente) => {
-      const coincideBusqueda =
+    return this.pacientes().filter(
+      (paciente) =>
         !termino ||
         `${paciente.nombres} ${paciente.apellidos}`.toLowerCase().includes(termino) ||
-        paciente.dni.includes(termino);
-      const coincideEstado = estado === 'Todos' || paciente.estado === estado;
-      const coincideSexo = sexo === 'Todos' || paciente.sexo === sexo;
-      const coincideSangre = sangre === 'Todos' || paciente.tipoSangre === sangre;
-
-      return coincideBusqueda && coincideEstado && coincideSexo && coincideSangre;
-    });
+        paciente.dni.includes(termino),
+    );
   });
 
   readonly pacientesPagina = computed(() => {
@@ -101,8 +98,8 @@ export class Listado {
     const lista = this.pacientes();
     return {
       total: lista.length,
-      nuevos: lista.filter((p) => p.estado === 'Nuevo').length,
-      citasActivas: lista.reduce((acc, p) => acc + (p.citasActivas || 0), 0),
+      filtrados: this.pacientesFiltrados().length,
+      conCorreo: lista.filter((p) => !!p.email).length,
     };
   });
 
@@ -123,6 +120,9 @@ export class Listado {
   }
 
   cancelarEliminacion(): void {
+    if (this.eliminando()) {
+      return;
+    }
     this.pacienteAEliminar.set(null);
   }
 
@@ -132,38 +132,28 @@ export class Listado {
       return;
     }
 
-    const eliminado = this.pacienteService.eliminar(paciente.id);
-    if (eliminado) {
-      if (this.pacienteSeleccionado()?.id === paciente.id) {
-        this.cerrarDetalle();
-      }
+    this.eliminando.set(true);
+    this.pacienteService
+      .eliminar(paciente.id)
+      .pipe(finalize(() => this.eliminando.set(false)))
+      .subscribe({
+        next: () => {
+          if (this.pacienteSeleccionado()?.id === paciente.id) {
+            this.cerrarDetalle();
+          }
 
-      this.pacienteAEliminar.set(null);
-      this.mensaje.set('Paciente eliminado del padrón clínico con éxito.');
-      window.setTimeout(() => this.mensaje.set(null), 3000);
-    }
-  }
-
-  cambiarEstado(event: Event): void {
-    this.filtroEstado.set((event.target as HTMLSelectElement).value as any);
-    this.paginaActual.set(1);
-  }
-
-  cambiarSexo(event: Event): void {
-    this.filtroSexo.set((event.target as HTMLSelectElement).value as any);
-    this.paginaActual.set(1);
-  }
-
-  cambiarSangre(event: Event): void {
-    this.filtroSangre.set((event.target as HTMLSelectElement).value);
-    this.paginaActual.set(1);
+          this.pacienteAEliminar.set(null);
+          // Si la página actual quedó vacía se retrocede a la última con datos
+          this.paginaActual.update((pagina) => Math.min(pagina, this.totalPaginas()));
+          this.toast.exito('Paciente eliminado del padrón clínico con éxito.');
+        },
+        // El mensaje de error lo muestra el interceptor global
+        error: () => {},
+      });
   }
 
   limpiarFiltros(): void {
     this.busqueda.set('');
-    this.filtroEstado.set('Todos');
-    this.filtroSexo.set('Todos');
-    this.filtroSangre.set('Todos');
     this.paginaActual.set(1);
   }
 
@@ -187,11 +177,6 @@ export class Listado {
     });
   }
 
-  agendarCita(): void {
-    this.mensaje.set('La agenda de citas se habilitará en el Sprint 2.');
-    window.setTimeout(() => this.mensaje.set(null), 3500);
-  }
-
   nombreCompleto(paciente: Paciente): string {
     return `${paciente.nombres} ${paciente.apellidos}`;
   }
@@ -200,7 +185,11 @@ export class Listado {
     return `${paciente.nombres.charAt(0)}${paciente.apellidos.charAt(0)}`;
   }
 
-  edad(fechaNacimiento: string): number {
+  edad(fechaNacimiento?: string | null): string {
+    if (!fechaNacimiento) {
+      return '—';
+    }
+
     const hoy = new Date();
     const nacimiento = new Date(`${fechaNacimiento}T00:00:00`);
     let edad = hoy.getFullYear() - nacimiento.getFullYear();
@@ -212,6 +201,6 @@ export class Listado {
       edad--;
     }
 
-    return edad;
+    return `${edad} años`;
   }
 }
