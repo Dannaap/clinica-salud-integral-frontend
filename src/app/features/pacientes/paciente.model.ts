@@ -1,24 +1,14 @@
-export type SexoPaciente = 'Masculino' | 'Femenino' | 'Otro';
-export type EstadoPaciente = 'Activo' | 'Inactivo' | 'Nuevo';
-
+// Paciente tal como lo persiste el backend (pe.saludintegral.clinica.pacientes.Paciente)
 export interface Paciente {
   id: number;
   dni: string;
   nombres: string;
   apellidos: string;
-  fechaNacimiento: string;
-  sexo: SexoPaciente;
-  telefono: string;
-  correo?: string;
-  tipoSangre?: string;
-  direccion?: string;
-  alergias?: string;
-  ultimaAtencion?: string;
-  citasActivas: number;
-  estado: EstadoPaciente;
+  fechaNacimiento?: string | null; // formato: '1992-03-14'
+  telefono?: string | null;
+  email?: string | null;
+  direccion?: string | null;
 }
 
-export type PacienteFormValue = Omit<
-  Paciente,
-  'id' | 'citasActivas' | 'estado' | 'ultimaAtencion'
->;
+// Cuerpo de POST /pacientes y PUT /pacientes/{id}
+export type PacienteFormValue = Omit<Paciente, 'id'>;
